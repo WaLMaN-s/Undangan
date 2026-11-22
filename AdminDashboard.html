@@ -775,34 +775,23 @@
               </form>
             </div>
 
-            <!-- Right Column: Live Mobile Phone Preview -->
+            <!-- Right Column: Live Mobile Phone Preview (Full Scrollable Multi-Theme Engine) -->
             <div class="mobile-preview-sticky">
-              <div style="text-align:center; margin-bottom:10px; display:flex; align-items:center; justify-content:center; gap:8px;">
+              <div style="text-align:center; margin-bottom:8px; display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap;">
                 <span class="badge badge-gold">LIVE MOBILE PREVIEW (380px)</span>
-                <span id="prevActiveThemeBadge" class="badge badge-neutral">Elegant Floral</span>
+                <span id="prevActiveThemeBadge" class="badge badge-neutral">1. Elegant Floral</span>
+              </div>
+              <div style="display:flex; justify-content:center; gap:4px; margin-bottom:10px; flex-wrap:wrap;">
+                <button type="button" class="btn btn-outline btn-sm" style="padding:4px 8px; font-size:11px;" onclick="scrollPhonePreviewTo('prev-sec-cover')">1. Cover</button>
+                <button type="button" class="btn btn-outline btn-sm" style="padding:4px 8px; font-size:11px;" onclick="scrollPhonePreviewTo('prev-sec-hero')">2. Hero</button>
+                <button type="button" class="btn btn-outline btn-sm" style="padding:4px 8px; font-size:11px;" onclick="scrollPhonePreviewTo('prev-sec-couple')">3. Mempelai</button>
+                <button type="button" class="btn btn-outline btn-sm" style="padding:4px 8px; font-size:11px;" onclick="scrollPhonePreviewTo('prev-sec-event')">4. Acara</button>
+                <button type="button" class="btn btn-outline btn-sm" style="padding:4px 8px; font-size:11px;" onclick="scrollPhonePreviewTo('prev-sec-gallery')">5. Story &amp; Galeri</button>
+                <button type="button" class="btn btn-outline btn-sm" style="padding:4px 8px; font-size:11px;" onclick="scrollPhonePreviewTo('prev-sec-rsvp')">6. RSVP &amp; QR</button>
               </div>
               <div class="phone-mockup">
                 <div class="phone-notch"><div class="phone-speaker"></div></div>
-                <div id="previewPhoneScreen" class="phone-screen" data-theme="elegant_floral">
-                  <!-- Ornamen Header Dinamis di Live Preview -->
-                  <div id="prevThemeOrnamentHeader" style="margin-bottom:8px;"></div>
-
-                  <div style="font-size:10.5px; letter-spacing:0.18em; text-transform:uppercase; color:var(--prev-primary); font-weight:600; margin-bottom:6px;">THE WEDDING OF</div>
-                  <h2 id="prevCoupleTitle" style="font-family:var(--font-heading); font-size:24px; color:var(--prev-text); margin-bottom:12px;">Romeo &amp; Juliet</h2>
-                  <img id="prevCoverImg" class="preview-hero-img" src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80" alt="Preview Cover">
-                  <div class="prev-themed-card">
-                    <div style="font-size:11px; color:var(--prev-muted);">Kepada Yth. Bapak/Ibu/Saudara/i</div>
-                    <div style="font-family:var(--font-heading); font-size:18px; font-weight:600; color:var(--prev-text); margin:4px 0;">Budi Santoso</div>
-                    <div id="prevDescription" style="font-size:12px; color:var(--prev-muted); margin-top:6px;">Tanpa mengurangi rasa hormat, kami mengundang Anda...</div>
-                  </div>
-                  <div class="prev-themed-card" style="text-align:left;">
-                    <div style="font-family:var(--font-heading); font-size:14px; font-weight:600; color:var(--prev-primary); margin-bottom:4px;" id="prevDateText">12 Desember 2026</div>
-                    <div style="font-size:12px; font-weight:600;" id="prevAkadText">Akad Nikah: 08:00 - 10:00 WIB</div>
-                    <div style="font-size:12px; font-weight:600; margin-top:2px;" id="prevReceptionText">Resepsi: 11:00 - 14:00 WIB</div>
-                    <div style="font-size:11.5px; color:var(--prev-muted); margin-top:6px;" id="prevVenueText">The Grand Champagne Ballroom</div>
-                  </div>
-                  <div style="font-family:var(--font-decor); font-style:italic; font-size:14px; color:var(--prev-muted); padding:8px;" id="prevQuoteText"></div>
-                </div>
+                <div id="previewPhoneScreen" class="phone-screen" data-theme="elegant_floral" style="padding:0;"></div>
               </div>
             </div>
           </div>

@@ -1035,6 +1035,7 @@
   function updateStoryItemField(idx, field, val) {
     if (ADMIN_STATE.storyDraft[idx]) {
       ADMIN_STATE.storyDraft[idx][field] = val;
+      updateLiveMobilePreview();
     }
   }
 
@@ -1074,6 +1075,7 @@
   function updateGalleryItemField(idx, field, val) {
     if (ADMIN_STATE.galleryDraft[idx]) {
       ADMIN_STATE.galleryDraft[idx][field] = val;
+      updateLiveMobilePreview();
     }
   }
 
@@ -1154,11 +1156,6 @@
   function renderPreviewOrnamentHtml(themeId, groomNick, brideNick) {
     const gInit = String(groomNick || 'R').trim().charAt(0).toUpperCase();
     const bInit = String(brideNick || 'J').trim().charAt(0).toUpperCase();
-    if (themeId === 'thelove_cinematic') {
-      return `
-        <div style="font-family:'Abhaya Libre',serif; font-style:italic; font-size:13px; color:#CDA062; letter-spacing:0.12em; margin-bottom:2px;">${escapeHtml(gInit)}&amp;${escapeHtml(bInit)} WEDDING • THELOVE</div>
-      `;
-    }
     if (themeId === 'batak_heritage') {
       return `
         <div style="height:10px; background:repeating-linear-gradient(90deg,#7A1215 0 10px,#D4AF37 10px 14px,#121010 14px 22px); border-top:1px solid #D4AF37; border-bottom:1px solid #D4AF37; margin-bottom:6px;"></div>
@@ -1185,6 +1182,14 @@
     `;
   }
 
+  function scrollPhonePreviewTo(sectionId) {
+    const screen = document.getElementById('previewPhoneScreen');
+    const target = document.getElementById(sectionId);
+    if (screen && target) {
+      screen.scrollTo({ top: target.offsetTop - 8, behavior: 'smooth' });
+    }
+  }
+
   function selectInvitationTheme(themeId) {
     const chosen = THEME_LABELS[themeId] ? themeId : 'elegant_floral';
     const hiddenInput = document.getElementById('edInvitationTheme');
@@ -1204,12 +1209,7 @@
       badge.textContent = THEME_LABELS[chosen] || '1. Elegant Floral';
     }
 
-    const ornamentBox = document.getElementById('prevThemeOrnamentHeader');
-    if (ornamentBox) {
-      const gNick = (document.getElementById('edGroomNickname') && document.getElementById('edGroomNickname').value) || 'Romeo';
-      const bNick = (document.getElementById('edBrideNickname') && document.getElementById('edBrideNickname').value) || 'Juliet';
-      ornamentBox.innerHTML = renderPreviewOrnamentHtml(chosen, gNick, bNick);
-    }
+    renderFullInteractivePhonePreview(chosen);
   }
 
   async function handleQuickApplyTheme() {
@@ -1228,27 +1228,295 @@
 
   function updateLiveMobilePreview() {
     const themeId = (document.getElementById('edInvitationTheme') && document.getElementById('edInvitationTheme').value) || 'elegant_floral';
-    const groomNick = document.getElementById('edGroomNickname').value || document.getElementById('edGroomName').value || 'Romeo';
-    const brideNick = document.getElementById('edBrideNickname').value || document.getElementById('edBrideName').value || 'Juliet';
     selectInvitationTheme(themeId);
-    const coverImg = document.getElementById('edCoverImage').value;
-    const desc = document.getElementById('edDescription').value;
-    const wDate = document.getElementById('edWeddingDate').value;
-    const akadTitle = document.getElementById('edAkadTitle').value || 'Akad Nikah';
-    const akadTime = document.getElementById('edAkadTime').value;
-    const recTitle = document.getElementById('edReceptionTitle').value || 'Resepsi';
-    const recTime = document.getElementById('edReceptionTime').value;
-    const venue = document.getElementById('edVenue').value;
-    const quote = document.getElementById('edQuoteText').value;
+  }
 
-    document.getElementById('prevCoupleTitle').textContent = `${groomNick} & ${brideNick}`;
-    if (coverImg) document.getElementById('prevCoverImg').src = coverImg;
-    document.getElementById('prevDescription').textContent = desc;
-    document.getElementById('prevDateText').textContent = formatLongWeddingDate(wDate);
-    document.getElementById('prevAkadText').textContent = `${akadTitle}: ${akadTime}`;
-    document.getElementById('prevReceptionText').textContent = `${recTitle}: ${recTime}`;
-    document.getElementById('prevVenueText').textContent = venue;
-    document.getElementById('prevQuoteText').textContent = quote;
+  function renderFullInteractivePhonePreview(themeId) {
+    const screen = document.getElementById('previewPhoneScreen');
+    if (!screen) return;
+
+    const groomName = (document.getElementById('edGroomName') && document.getElementById('edGroomName').value) || 'Romeo Montague';
+    const brideName = (document.getElementById('edBrideName') && document.getElementById('edBrideName').value) || 'Juliet Capulet';
+    const groomNick = (document.getElementById('edGroomNickname') && document.getElementById('edGroomNickname').value) || groomName.split(' ')[0] || 'Romeo';
+    const brideNick = (document.getElementById('edBrideNickname') && document.getElementById('edBrideNickname').value) || brideName.split(' ')[0] || 'Juliet';
+    const groomParents = (document.getElementById('edGroomParents') && document.getElementById('edGroomParents').value) || 'Putra dari Bpk. Montague & Ibu Montague';
+    const brideParents = (document.getElementById('edBrideParents') && document.getElementById('edBrideParents').value) || 'Putri dari Bpk. Capulet & Ibu Capulet';
+    const coverImg = (document.getElementById('edCoverImage') && document.getElementById('edCoverImage').value) || 'https:\/\/images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80';
+    const groomPhoto = (document.getElementById('edGroomPhoto') && document.getElementById('edGroomPhoto').value) || 'https:\/\/images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80';
+    const bridePhoto = (document.getElementById('edBridePhoto') && document.getElementById('edBridePhoto').value) || 'https:\/\/images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80';
+    const desc = (document.getElementById('edDescription') && document.getElementById('edDescription').value) || 'Tanpa mengurangi rasa hormat, kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri hari bahagia pernikahan kami.';
+    const wDate = (document.getElementById('edWeddingDate') && document.getElementById('edWeddingDate').value) || '2026-12-12';
+    const akadTitle = (document.getElementById('edAkadTitle') && document.getElementById('edAkadTitle').value) || 'Akad Nikah';
+    const akadTime = (document.getElementById('edAkadTime') && document.getElementById('edAkadTime').value) || '08:00 - 10:00 WIB';
+    const recTitle = (document.getElementById('edReceptionTitle') && document.getElementById('edReceptionTitle').value) || 'Resepsi Pernikahan';
+    const recTime = (document.getElementById('edReceptionTime') && document.getElementById('edReceptionTime').value) || '11:00 - 14:00 WIB';
+    const venue = (document.getElementById('edVenue') && document.getElementById('edVenue').value) || 'The Grand Ballroom';
+    const address = (document.getElementById('edAddress') && document.getElementById('edAddress').value) || 'Jl. Jend. Sudirman, Jakarta';
+    const quoteText = (document.getElementById('edQuoteText') && document.getElementById('edQuoteText').value) || '';
+    const quoteSource = (document.getElementById('edQuoteSource') && document.getElementById('edQuoteSource').value) || '';
+    const closingText = (document.getElementById('edClosingText') && document.getElementById('edClosingText').value) || 'Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir.';
+
+    const coupleShort = `${escapeHtml(groomNick)} &amp; ${escapeHtml(brideNick)}`;
+    const gInit = escapeHtml(String(groomNick).trim().charAt(0).toUpperCase() || 'R');
+    const bInit = escapeHtml(String(brideNick).trim().charAt(0).toUpperCase() || 'J');
+    const readableDate = escapeHtml(formatLongWeddingDate(wDate));
+
+    let monthName = 'Mei';
+    let dayName = 'Sabtu';
+    let dayNum = '16';
+    let yearNum = '2026';
+    try {
+      const dObj = new Date(wDate + 'T00:00:00');
+      if (!isNaN(dObj.getTime())) {
+        monthName = escapeHtml(dObj.toLocaleDateString('id-ID', { month: 'long' }));
+        dayName = escapeHtml(dObj.toLocaleDateString('id-ID', { weekday: 'long' }));
+        dayNum = escapeHtml(String(dObj.getDate()));
+        yearNum = escapeHtml(String(dObj.getFullYear()));
+      }
+    } catch (e) {}
+
+    const stories = (ADMIN_STATE.storyDraft && ADMIN_STATE.storyDraft.length)
+      ? ADMIN_STATE.storyDraft
+      : [{ year: '2023', title: 'Pertemuan Pertama', story: 'Awal kisah perjalanan cinta kami.' }];
+
+    const gallery = (ADMIN_STATE.galleryDraft && ADMIN_STATE.galleryDraft.length)
+      ? ADMIN_STATE.galleryDraft
+      : [{ image_url: coverImg, caption: 'Prewedding' }];
+
+    /* 6. THELOVE CINEMATIC (RAMSES & PRISKA STYLE) */
+    if (themeId === 'thelove_cinematic') {
+      screen.innerHTML = `
+        <div style="background:#1B1B18; color:#FFFFFF; font-family:'Inter',sans-serif; text-align:center;">
+          <!-- 1. Cover Full-Bleed -->
+          <div id="prev-sec-cover" style="min-height:460px; background:linear-gradient(180deg,rgba(0,0,0,0.3) 0%,rgba(0,0,0,0.2) 55%,#1B1B18 93%),url('${escapeHtml(coverImg)}') center/cover; display:flex; flex-direction:column; justify-content:space-between; padding:28px 18px 26px;">
+            <div style="font-family:'Great Vibes',cursive; font-size:34px; color:#FFF; text-shadow:0 2px 12px rgba(0,0,0,0.7);">${coupleShort}</div>
+            <div>
+              <div style="font-size:11.5px; color:rgba(255,255,255,0.85);">Kepada Yth. Bapak/Ibu/Saudara/i</div>
+              <div style="font-family:'Playfair Display',serif; font-size:20px; font-weight:700; margin:4px 0;">Naposo HKBP Tridarma</div>
+              <div style="font-size:10px; font-style:italic; color:rgba(255,255,255,0.65); margin-bottom:10px;">*Mohon maaf apabila ada kesalahan penulisan nama/gelar</div>
+              <span style="display:inline-block; background:#313131; color:#FFF; border:1px solid rgba(205,160,98,0.45); border-radius:5px; padding:8px 18px; font-size:11.5px;">✉ Open Invitation</span>
+            </div>
+          </div>
+
+          <!-- 2. Hero Full-Bleed + Countdown -->
+          <div id="prev-sec-hero" style="min-height:390px; background:linear-gradient(180deg,rgba(0,0,0,0.2) 55%,#1B1B18 94%),url('${escapeHtml(coverImg)}') center/cover; display:flex; flex-direction:column; justify-content:flex-end; padding:24px 16px;">
+            <div style="font-family:'Abhaya Libre',serif; font-style:italic; font-size:16px; color:#CDA062;">The Wedding of</div>
+            <div style="font-family:'Great Vibes',cursive; font-size:40px; color:#FFF; margin:2px 0;">${coupleShort}</div>
+            <div style="font-size:12px; color:rgba(255,255,255,0.85); margin-bottom:12px;">${readableDate}</div>
+            <div style="font-size:9.5px; letter-spacing:0.22em; color:#CDA062; margin-bottom:6px;">COUNTDOWN TIMER</div>
+            <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:6px;">
+              <div style="background:rgba(255,255,255,0.07); border:1px solid rgba(205,160,98,0.35); border-radius:5px; padding:8px 2px;"><div style="font-family:'Playfair Display',serif; font-size:18px; font-weight:700;">18</div><div style="font-size:9px; color:#CDA062;">DAYS</div></div>
+              <div style="background:rgba(255,255,255,0.07); border:1px solid rgba(205,160,98,0.35); border-radius:5px; padding:8px 2px;"><div style="font-family:'Playfair Display',serif; font-size:18px; font-weight:700;">09</div><div style="font-size:9px; color:#CDA062;">HOURS</div></div>
+              <div style="background:rgba(255,255,255,0.07); border:1px solid rgba(205,160,98,0.35); border-radius:5px; padding:8px 2px;"><div style="font-family:'Playfair Display',serif; font-size:18px; font-weight:700;">42</div><div style="font-size:9px; color:#CDA062;">MINS</div></div>
+              <div style="background:rgba(255,255,255,0.07); border:1px solid rgba(205,160,98,0.35); border-radius:5px; padding:8px 2px;"><div style="font-family:'Playfair Display',serif; font-size:18px; font-weight:700;">15</div><div style="font-size:9px; color:#CDA062;">SECS</div></div>
+            </div>
+          </div>
+
+          <!-- Verse -->
+          <div style="padding:24px 18px; background:#1B1B18;">
+            <div style="font-size:12px; letter-spacing:0.22em; color:#CDA062; margin-bottom:6px;">${gInit}&amp;${bInit} WEDDING</div>
+            <div style="font-family:'Abhaya Libre',serif; font-style:italic; font-size:15px; color:#CDA062; margin-bottom:6px;">${escapeHtml(quoteSource)}</div>
+            <div style="font-size:11.5px; font-style:italic; color:rgba(255,255,255,0.75); line-height:1.6;">${escapeHtml(quoteText)}</div>
+          </div>
+
+          <!-- 3. Groom & Bride Tall Portrait Cards (#242424) -->
+          <div id="prev-sec-couple" style="padding:28px 16px; background:#242424;">
+            <div style="font-size:16px; letter-spacing:0.16em; margin-bottom:16px;">GROOM &amp; BRIDE</div>
+            <div style="border-radius:10px; overflow:hidden; border:1px solid rgba(255,255,255,0.08); margin-bottom:14px;">
+              <div style="height:230px; background:linear-gradient(180deg,rgba(36,36,36,0.1) 65%,#242424 97%),url('${escapeHtml(groomPhoto)}') center/cover;"></div>
+              <div style="padding:6px 14px 18px;">
+                <div style="font-family:'Abhaya Libre',serif; font-style:italic; color:#CDA062; font-size:16px;">THE GROOM</div>
+                <div style="font-family:'Playfair Display',serif; font-size:18px; font-weight:600; margin:4px 0;">${escapeHtml(groomName)}</div>
+                <div style="font-size:11.5px; color:rgba(255,255,255,0.72);">${escapeHtml(groomParents)}</div>
+              </div>
+            </div>
+            <div style="font-size:10.5px; letter-spacing:0.25em; color:#CDA062; margin:14px 0;">✦ ROMANTIC PARTNER ✦</div>
+            <div style="border-radius:10px; overflow:hidden; border:1px solid rgba(255,255,255,0.08);">
+              <div style="height:230px; background:linear-gradient(180deg,rgba(36,36,36,0.1) 65%,#242424 97%),url('${escapeHtml(bridePhoto)}') center/cover;"></div>
+              <div style="padding:6px 14px 18px;">
+                <div style="font-family:'Abhaya Libre',serif; font-style:italic; color:#CDA062; font-size:16px;">THE BRIDE</div>
+                <div style="font-family:'Playfair Display',serif; font-size:18px; font-weight:600; margin:4px 0;">${escapeHtml(brideName)}</div>
+                <div style="font-size:11.5px; color:rgba(255,255,255,0.72);">${escapeHtml(brideParents)}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. Wedding Event Split Calendar (#1B1B18) -->
+          <div id="prev-sec-event" style="padding:28px 16px; background:#1B1B18;">
+            <div style="font-size:16px; letter-spacing:0.16em; margin-bottom:16px;">WEDDING EVENT</div>
+            <div style="background:#242424; border:1px solid rgba(205,160,98,0.28); border-radius:10px; padding:18px 14px; margin-bottom:14px;">
+              <div style="font-family:'Abhaya Libre',serif; font-style:italic; font-size:21px; color:#CDA062;">${escapeHtml(akadTitle)}</div>
+              <div style="display:grid; grid-template-columns:1fr 1.2fr 1fr; align-items:center; margin:10px auto; padding:8px 0; border-top:1px solid rgba(205,160,98,0.25); border-bottom:1px solid rgba(205,160,98,0.25);">
+                <div style="color:#CDA062; font-size:13.5px;">${monthName}</div>
+                <div style="border-left:1px solid #CDA062; border-right:1px solid #CDA062; padding:2px 6px;">
+                  <div style="font-size:10px; color:rgba(255,255,255,0.7); text-transform:uppercase;">${dayName}</div>
+                  <div style="font-family:'Playfair Display',serif; font-size:22px; font-weight:700;">${dayNum}</div>
+                </div>
+                <div style="color:#CDA062; font-size:13.5px;">${yearNum}</div>
+              </div>
+              <div style="font-size:12px;">Pukul ${escapeHtml(akadTime)}</div>
+            </div>
+
+            <div style="background:#242424; border:1px solid rgba(205,160,98,0.28); border-radius:10px; padding:18px 14px; margin-bottom:14px;">
+              <div style="font-family:'Abhaya Libre',serif; font-style:italic; font-size:21px; color:#CDA062;">${escapeHtml(recTitle)}</div>
+              <div style="display:grid; grid-template-columns:1fr 1.2fr 1fr; align-items:center; margin:10px auto; padding:8px 0; border-top:1px solid rgba(205,160,98,0.25); border-bottom:1px solid rgba(205,160,98,0.25);">
+                <div style="color:#CDA062; font-size:13.5px;">${monthName}</div>
+                <div style="border-left:1px solid #CDA062; border-right:1px solid #CDA062; padding:2px 6px;">
+                  <div style="font-size:10px; color:rgba(255,255,255,0.7); text-transform:uppercase;">${dayName}</div>
+                  <div style="font-family:'Playfair Display',serif; font-size:22px; font-weight:700;">${dayNum}</div>
+                </div>
+                <div style="color:#CDA062; font-size:13.5px;">${yearNum}</div>
+              </div>
+              <div style="font-size:12px;">Pukul ${escapeHtml(recTime)}</div>
+              <div style="font-size:11.5px; color:rgba(255,255,255,0.72); margin:8px 0 12px;">Bertempat di : ${escapeHtml(venue)} — ${escapeHtml(address)}</div>
+              <span style="display:inline-block; background:#313131; color:#FFF; border-radius:5px; padding:7px 14px; font-size:11px;">📍 Google Maps</span>
+            </div>
+          </div>
+
+          <!-- 5. Our Gallery & Our Journey (#242424) -->
+          <div id="prev-sec-gallery" style="padding:26px 16px; background:#242424;">
+            <div style="font-size:10px; letter-spacing:0.22em; color:#CDA062;">ONE STEP CLOSER</div>
+            <div style="font-family:'Abhaya Libre',serif; font-style:italic; font-size:22px; color:#CDA062; margin-bottom:12px;">Our Gallery &amp; Journey</div>
+            <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:6px; margin-bottom:16px;">
+              ${gallery.slice(0, 4).map((g) => `<img src="${escapeHtml(g.image_url)}" style="width:100%; height:105px; object-fit:cover; border-radius:6px;">`).join('')}
+            </div>
+            <div style="text-align:left; display:flex; flex-direction:column; gap:8px;">
+              ${stories.map((st) => `
+                <div style="background:#1B1B18; border:1px solid rgba(205,160,98,0.25); border-radius:8px; padding:12px;">
+                  <div style="font-family:'Abhaya Libre',serif; font-style:italic; color:#CDA062; font-size:14px;">${escapeHtml(st.year)}</div>
+                  <div style="font-family:'Playfair Display',serif; font-size:14.5px; font-weight:600; margin:2px 0 4px;">${escapeHtml(st.title)}</div>
+                  <div style="font-size:11px; color:rgba(255,255,255,0.72);">${escapeHtml(st.story)}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- 6. RSVP & QR Pass & Thank You -->
+          <div id="prev-sec-rsvp" style="padding:26px 16px; background:#1B1B18;">
+            <div style="font-family:'Abhaya Libre',serif; font-style:italic; font-size:22px; color:#CDA062; margin-bottom:10px;">Ucapan &amp; Rsvp + QR Pass</div>
+            <div style="background:#242424; border:1px solid rgba(205,160,98,0.25); border-radius:8px; padding:14px; margin-bottom:16px;">
+              <div style="font-size:11px; color:#CDA062; margin-bottom:4px;">PERSONAL QR PASS</div>
+              <div style="font-family:'Playfair Display',serif; font-size:16px; margin-bottom:8px;">Naposo HKBP Tridarma</div>
+              <div style="width:90px; height:90px; margin:0 auto; background:#FFF; color:#1B1B18; display:flex; align-items:center; justify-content:center; border-radius:6px; font-size:10px; font-weight:700;">[ QR CODE ]</div>
+            </div>
+            <div style="font-size:11.5px; color:rgba(255,255,255,0.75); margin-bottom:12px;">${escapeHtml(closingText)}</div>
+            <div style="font-size:10px; letter-spacing:0.25em; color:#CDA062;">THANK YOU</div>
+            <div style="font-family:'Great Vibes',cursive; font-size:34px; margin-top:4px;">${coupleShort}</div>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    /* 1-5. OTHER 5 DISTINCT THEMES FULL SCROLLABLE PREVIEW */
+    const ornamentTop = renderPreviewOrnamentHtml(themeId, groomNick, brideNick);
+    const isMinimal = themeId === 'modern_minimalist';
+    const alignStyle = isMinimal ? 'text-align:left;' : 'text-align:center;';
+
+    screen.innerHTML = `
+      <div style="padding:20px 16px; ${alignStyle}">
+        <!-- 1. Cover Pembuka -->
+        <div id="prev-sec-cover" style="padding-bottom:22px; border-bottom:1px dashed var(--prev-border); margin-bottom:20px;">
+          ${ornamentTop}
+          <div style="font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--prev-primary); font-weight:600; margin-bottom:4px;">THE WEDDING OF</div>
+          <h2 style="font-family:var(--font-heading); font-size:25px; color:var(--prev-text); margin-bottom:10px;">${coupleShort}</h2>
+          <img class="preview-hero-img" src="${escapeHtml(coverImg)}" alt="Cover" style="height:195px;">
+          <div class="prev-themed-card" style="margin-bottom:10px;">
+            <div style="font-size:11px; color:var(--prev-muted);">Kepada Yth. Bapak/Ibu/Saudara/i</div>
+            <div style="font-family:var(--font-heading); font-size:18px; font-weight:700; color:var(--prev-text); margin:4px 0;">Budi Santoso</div>
+            <div style="font-size:11.5px; color:var(--prev-muted);">${escapeHtml(desc)}</div>
+          </div>
+          <div style="background:var(--prev-primary); color:#FFF; padding:10px; border-radius:${isMinimal ? '2px' : '99px'}; font-size:11px; font-weight:700; letter-spacing:0.14em; text-align:center;">✉ BUKA UNDANGAN</div>
+        </div>
+
+        <!-- 2. Hero & Countdown + Ayat -->
+        <div id="prev-sec-hero" style="padding-bottom:20px; border-bottom:1px dashed var(--prev-border); margin-bottom:20px;">
+          <div style="font-size:10px; letter-spacing:0.18em; color:var(--prev-primary); font-weight:600;">HITUNG MUNDUR ACARA</div>
+          <div style="font-family:var(--font-heading); font-size:17px; margin:4px 0 10px;">${readableDate}</div>
+          <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:14px; text-align:center;">
+            <div class="prev-themed-card" style="padding:8px 4px; margin:0;"><div style="font-family:var(--font-heading); font-size:17px; font-weight:700;">18</div><div style="font-size:9px; color:var(--prev-muted);">HARI</div></div>
+            <div class="prev-themed-card" style="padding:8px 4px; margin:0;"><div style="font-family:var(--font-heading); font-size:17px; font-weight:700;">09</div><div style="font-size:9px; color:var(--prev-muted);">JAM</div></div>
+            <div class="prev-themed-card" style="padding:8px 4px; margin:0;"><div style="font-family:var(--font-heading); font-size:17px; font-weight:700;">42</div><div style="font-size:9px; color:var(--prev-muted);">MENIT</div></div>
+            <div class="prev-themed-card" style="padding:8px 4px; margin:0;"><div style="font-family:var(--font-heading); font-size:17px; font-weight:700;">15</div><div style="font-size:9px; color:var(--prev-muted);">DETIK</div></div>
+          </div>
+          ${quoteText ? `
+            <div class="prev-themed-card" style="margin:0;">
+              <div style="font-family:var(--font-decor); font-style:italic; font-size:13.5px;">${escapeHtml(quoteText)}</div>
+              <div style="font-size:11px; font-weight:600; color:var(--prev-primary); margin-top:6px;">${escapeHtml(quoteSource)}</div>
+            </div>
+          ` : ''}
+        </div>
+
+        <!-- 3. Profil Mempelai Pria & Wanita -->
+        <div id="prev-sec-couple" style="padding-bottom:20px; border-bottom:1px dashed var(--prev-border); margin-bottom:20px;">
+          <div style="font-size:10px; letter-spacing:0.18em; color:var(--prev-primary); font-weight:600;">PASANGAN MEMPELAI</div>
+          <h3 style="font-family:var(--font-heading); font-size:19px; margin:4px 0 12px;">Groom &amp; Bride</h3>
+          <div class="prev-themed-card">
+            <img src="${escapeHtml(groomPhoto)}" style="width:76px; height:76px; border-radius:${isMinimal ? '2px' : '50%'}; object-fit:cover; border:2px solid var(--prev-primary); margin-bottom:8px;">
+            <div style="font-family:var(--font-heading); font-size:16.5px; font-weight:600;">${escapeHtml(groomName)}</div>
+            <div style="font-size:11px; color:var(--prev-muted); margin-top:4px;">${escapeHtml(groomParents)}</div>
+          </div>
+          <div style="font-family:var(--font-decor); font-size:24px; color:var(--prev-primary); margin:4px 0;">&amp;</div>
+          <div class="prev-themed-card" style="margin-bottom:0;">
+            <img src="${escapeHtml(bridePhoto)}" style="width:76px; height:76px; border-radius:${isMinimal ? '2px' : '50%'}; object-fit:cover; border:2px solid var(--prev-primary); margin-bottom:8px;">
+            <div style="font-family:var(--font-heading); font-size:16.5px; font-weight:600;">${escapeHtml(brideName)}</div>
+            <div style="font-size:11px; color:var(--prev-muted); margin-top:4px;">${escapeHtml(brideParents)}</div>
+          </div>
+        </div>
+
+        <!-- 4. Rangkaian Acara & Maps -->
+        <div id="prev-sec-event" style="padding-bottom:20px; border-bottom:1px dashed var(--prev-border); margin-bottom:20px;">
+          <div style="font-size:10px; letter-spacing:0.18em; color:var(--prev-primary); font-weight:600;">WAKTU &amp; LOKASI</div>
+          <h3 style="font-family:var(--font-heading); font-size:19px; margin:4px 0 12px;">Rangkaian Acara</h3>
+          <div class="prev-themed-card">
+            <div style="font-family:var(--font-heading); font-size:16px; font-weight:600; color:var(--prev-primary);">${escapeHtml(akadTitle)}</div>
+            <div style="font-size:12px; font-weight:600; margin:4px 0;">${readableDate}</div>
+            <div style="font-size:11.5px; color:var(--prev-muted);">Pukul ${escapeHtml(akadTime)}</div>
+          </div>
+          <div class="prev-themed-card">
+            <div style="font-family:var(--font-heading); font-size:16px; font-weight:600; color:var(--prev-primary);">${escapeHtml(recTitle)}</div>
+            <div style="font-size:12px; font-weight:600; margin:4px 0;">${readableDate}</div>
+            <div style="font-size:11.5px; color:var(--prev-muted);">Pukul ${escapeHtml(recTime)}</div>
+          </div>
+          <div class="prev-themed-card" style="margin-bottom:0;">
+            <div style="font-family:var(--font-heading); font-size:15.5px; font-weight:600;">${escapeHtml(venue)}</div>
+            <div style="font-size:11px; color:var(--prev-muted); margin:4px 0 10px;">${escapeHtml(address)}</div>
+            <div style="background:var(--prev-primary); color:#FFF; padding:8px; border-radius:${isMinimal ? '2px' : '99px'}; font-size:11px; font-weight:600; text-align:center;">📍 Petunjuk Arah Google Maps</div>
+          </div>
+        </div>
+
+        <!-- 5. Our Story & Galeri Foto -->
+        <div id="prev-sec-gallery" style="padding-bottom:20px; border-bottom:1px dashed var(--prev-border); margin-bottom:20px;">
+          <div style="font-size:10px; letter-spacing:0.18em; color:var(--prev-primary); font-weight:600;">MOMEN &amp; CERITA</div>
+          <h3 style="font-family:var(--font-heading); font-size:19px; margin:4px 0 12px;">Our Story &amp; Gallery</h3>
+          <div style="text-align:left; margin-bottom:12px;">
+            ${stories.map((st) => `
+              <div class="prev-themed-card" style="margin-bottom:8px; border-left:3px solid var(--prev-primary) !important;">
+                <div style="font-size:10px; font-weight:700; color:var(--prev-primary);">${escapeHtml(st.year)}</div>
+                <div style="font-family:var(--font-heading); font-size:14px; font-weight:600; margin:2px 0;">${escapeHtml(st.title)}</div>
+                <div style="font-size:11px; color:var(--prev-muted);">${escapeHtml(st.story)}</div>
+              </div>
+            `).join('')}
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:6px;">
+            ${gallery.slice(0, 4).map((g) => `<img src="${escapeHtml(g.image_url)}" style="width:100%; height:100px; object-fit:cover; border-radius:${isMinimal ? '2px' : '10px'}; border:1px solid var(--prev-border);">`).join('')}
+          </div>
+        </div>
+
+        <!-- 6. Form RSVP, QR Check-in Pass & Penutup -->
+        <div id="prev-sec-rsvp">
+          <div style="font-size:10px; letter-spacing:0.18em; color:var(--prev-primary); font-weight:600;">KEHADIRAN &amp; AKSES</div>
+          <h3 style="font-family:var(--font-heading); font-size:19px; margin:4px 0 12px;">RSVP &amp; QR Check-in Pass</h3>
+          <div class="prev-themed-card">
+            <div style="font-size:10.5px; color:var(--prev-primary); font-weight:700;">PERSONAL GUEST PASS</div>
+            <div style="font-family:var(--font-heading); font-size:16px; font-weight:700; margin:4px 0 8px;">Budi Santoso</div>
+            <div style="width:88px; height:88px; margin:0 auto; background:#FFF; color:#292722; border:1px solid var(--prev-border); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700;">[ QR PASS ]</div>
+          </div>
+          <div style="font-size:11.5px; color:var(--prev-muted); margin:12px 0;">${escapeHtml(closingText)}</div>
+          <div style="font-family:var(--font-heading); font-size:21px; color:var(--prev-primary); font-weight:600;">${coupleShort}</div>
+        </div>
+      </div>
+    `;
   }
 
   async function handleSaveInvitationEditor(event) {
