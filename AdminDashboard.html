@@ -1,0 +1,1518 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wedding Invitation Management System — Admin Dashboard</title>
+
+  <!-- Google Fonts: Playfair Display, Cormorant Garamond, Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <!-- External Libraries (Chart.js, SweetAlert2, Lucide Icons, QRCode.js, HTML5-QRCode) -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+  <?!= include('StylesAdmin'); ?>
+</head>
+<body>
+
+  <!-- ========================================================================
+       A. LOGIN ADMIN SCREEN (Single-Owner, Tanpa Registrasi Publik)
+       ======================================================================== -->
+  <div id="authScreen" class="auth-screen">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <div class="auth-monogram">W</div>
+        <h1>Wedding Management</h1>
+        <p>Sistem Pengelolaan Undangan Pernikahan Digital</p>
+      </div>
+
+      <form id="loginForm" action="javascript:void(0);" onsubmit="handleLoginSubmit(event); return false;">
+        <div class="form-group">
+          <label class="form-label" for="loginUsername">Username / Email Admin</label>
+          <input type="text" id="loginUsername" class="form-control" placeholder="Masukkan username (default: admin)" required autocomplete="username">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="loginPassword">Password</label>
+          <div class="password-input-wrap">
+            <input type="password" id="loginPassword" class="form-control" placeholder="Masukkan password (default: Admin123!)" required autocomplete="current-password">
+            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('loginPassword', this)" title="Tampilkan / Sembunyikan Password">
+              <i data-lucide="eye" style="width:18px;height:18px;"></i>
+            </button>
+          </div>
+        </div>
+
+        <div id="loginErrorBox" style="display:none; padding:10px 12px; border-radius:8px; background:var(--danger-soft); color:var(--danger); font-size:12.5px; margin-bottom:14px;"></div>
+
+        <button type="button" id="loginSubmitBtn" onclick="handleLoginSubmit(event)" class="btn btn-primary" style="width:100%; padding:12px;">
+          <i data-lucide="log-in" style="width:17px;height:17px;"></i>
+          <span>Masuk ke Dashboard Admin</span>
+        </button>
+      </form>
+
+      <div style="margin-top:22px; padding-top:16px; border-top:1px solid var(--border); text-align:center; font-size:12px; color:var(--text-secondary);">
+        Instalasi pertama: Login dengan <strong>admin</strong> / <strong>Admin123!</strong> lalu segera ubah password di menu Pengaturan.
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MAIN ADMIN APPLICATION SHELL
+       ======================================================================== -->
+  <div id="appShell" class="app-shell" style="display:none;">
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-emblem">W</div>
+        <div class="brand-titles">
+          <h2>Wedding System</h2>
+          <span>Admin Suite</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-group-label">Menu Utama</div>
+        <button type="button" class="nav-item active" data-view="overview" onclick="switchAdminView('overview')">
+          <i data-lucide="layout-dashboard" class="nav-icon"></i>
+          <span>Dashboard Overview</span>
+        </button>
+        <button type="button" class="nav-item" data-view="guests" onclick="switchAdminView('guests')">
+          <i data-lucide="users" class="nav-icon"></i>
+          <span>Manajemen Tamu</span>
+          <span id="navBadgeGuests" class="nav-badge">0</span>
+        </button>
+        <button type="button" class="nav-item" data-view="editor" onclick="switchAdminView('editor')">
+          <i data-lucide="heart-handshake" class="nav-icon"></i>
+          <span>Invitation Editor</span>
+        </button>
+
+        <div class="nav-group-label">Distribusi & Acara</div>
+        <button type="button" class="nav-item" data-view="whatsapp" onclick="switchAdminView('whatsapp')">
+          <i data-lucide="send" class="nav-icon"></i>
+          <span>WhatsApp Management</span>
+        </button>
+        <button type="button" class="nav-item" data-view="rsvp" onclick="switchAdminView('rsvp')">
+          <i data-lucide="mail-check" class="nav-icon"></i>
+          <span>RSVP & Ucapan</span>
+          <span id="navBadgeRsvp" class="nav-badge">0</span>
+        </button>
+        <button type="button" class="nav-item" data-view="checkin" onclick="switchAdminView('checkin')">
+          <i data-lucide="qr-code" class="nav-icon"></i>
+          <span>QR Check-in</span>
+        </button>
+
+        <div class="nav-group-label">Analitik & Sistem</div>
+        <button type="button" class="nav-item" data-view="reports" onclick="switchAdminView('reports')">
+          <i data-lucide="file-spreadsheet" class="nav-icon"></i>
+          <span>Laporan & Export</span>
+        </button>
+        <button type="button" class="nav-item" data-view="settings" onclick="switchAdminView('settings')">
+          <i data-lucide="settings" class="nav-icon"></i>
+          <span>Pengaturan Sistem</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="couple-mini-card">
+          <div class="label">Acara Pernikahan</div>
+          <div id="sidebarCoupleNames" class="names">Romeo & Juliet</div>
+          <div id="sidebarWeddingDate" style="font-size:12px; color:var(--text-secondary); margin-top:2px;">12 Desember 2026</div>
+        </div>
+        <button type="button" class="btn btn-outline" style="width:100%;" onclick="handleLogout()">
+          <i data-lucide="log-out" style="width:16px;height:16px;"></i>
+          <span>Keluar / Logout</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <div class="main-area">
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button type="button" class="mobile-menu-btn" onclick="toggleMobileSidebar()">
+            <i data-lucide="menu" style="width:20px;height:20px;"></i>
+          </button>
+          <div class="page-header-title">
+            <h1 id="topbarTitle">Dashboard Overview</h1>
+            <p id="topbarSubtitle">Ringkasan statistik tamu, pengiriman undangan, dan konfirmasi kehadiran.</p>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="refreshCurrentView()" title="Segarkan Data">
+            <i data-lucide="refresh-cw" style="width:15px;height:15px;"></i>
+            <span>Refresh</span>
+          </button>
+          <div class="admin-pill">
+            <span class="admin-dot"></span>
+            <span id="topbarAdminName">admin</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- CONTENT WRAPPER -->
+      <main class="content-wrapper">
+
+        <!-- ==================================================================
+             B. DASHBOARD OVERVIEW VIEW
+             ================================================================== -->
+        <section id="view-overview" class="view-section active">
+          <!-- 7 Stat Cards + Persentase Kehadiran -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-card-top">
+                <span class="stat-label">Total Tamu</span>
+                <div class="stat-icon-box"><i data-lucide="users" style="width:18px;height:18px;"></i></div>
+              </div>
+              <div id="statTotalGuests" class="stat-value">0</div>
+              <div class="stat-meta">Terdaftar di database</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-top">
+                <span class="stat-label">Undangan Terkirim</span>
+                <div class="stat-icon-box success"><i data-lucide="check-circle-2" style="width:18px;height:18px;"></i></div>
+              </div>
+              <div id="statSent" class="stat-value">0</div>
+              <div class="stat-meta">Via WA Cloud / Manual</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-top">
+                <span class="stat-label">Belum Dikirim</span>
+                <div class="stat-icon-box warning"><i data-lucide="clock" style="width:18px;height:18px;"></i></div>
+              </div>
+              <div id="statUnsent" class="stat-value">0</div>
+              <div id="statQueuedMeta" class="stat-meta">0 dalam antrean</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-top">
+                <span class="stat-label">Gagal Dikirim</span>
+                <div class="stat-icon-box danger"><i data-lucide="alert-triangle" style="width:18px;height:18px;"></i></div>
+              </div>
+              <div id="statFailed" class="stat-value">0</div>
+              <div class="stat-meta">Perlu dikirim ulang</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-top">
+                <span class="stat-label">RSVP Hadir</span>
+                <div class="stat-icon-box success"><i data-lucide="user-check" style="width:18px;height:18px;"></i></div>
+              </div>
+              <div id="statRsvpHadir" class="stat-value">0</div>
+              <div id="statTotalPaxMeta" class="stat-meta">Estimasi 0 orang (pax)</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-top">
+                <span class="stat-label">RSVP Tidak Hadir</span>
+                <div class="stat-icon-box danger"><i data-lucide="user-x" style="width:18px;height:18px;"></i></div>
+              </div>
+              <div id="statRsvpTidakHadir" class="stat-value">0</div>
+              <div class="stat-meta">Berhalangan hadir</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-top">
+                <span class="stat-label">Belum Konfirmasi</span>
+                <div class="stat-icon-box"><i data-lucide="help-circle" style="width:18px;height:18px;"></i></div>
+              </div>
+              <div id="statRsvpPending" class="stat-value">0</div>
+              <div class="stat-meta">Menunggu respon tamu</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-top">
+                <span class="stat-label">Persentase Kehadiran</span>
+                <div class="stat-icon-box"><i data-lucide="percent" style="width:18px;height:18px;"></i></div>
+              </div>
+              <div id="statAttendancePct" class="stat-value">0%</div>
+              <div id="statCheckinMeta" class="stat-meta">0 tamu sudah QR Check-in</div>
+            </div>
+          </div>
+
+          <!-- Quick Actions Bar -->
+          <div class="card">
+            <div class="card-body" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+              <div>
+                <h3 style="font-family:var(--font-heading); font-size:16px;">Aksi Cepat (Quick Actions)</h3>
+                <p style="font-size:12.5px; color:var(--text-secondary);">Kelola tamu, kirim undangan WhatsApp, atau pindai QR Code tamu dengan cepat.</p>
+              </div>
+              <div style="display:flex; flex-wrap:wrap; gap:10px;">
+                <button type="button" class="btn btn-primary" onclick="switchAdminView('guests'); openGuestModal();">
+                  <i data-lucide="user-plus" style="width:16px;height:16px;"></i>
+                  <span>Tambah Tamu Baru</span>
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="switchAdminView('whatsapp')">
+                  <i data-lucide="send" style="width:16px;height:16px;"></i>
+                  <span>Kirim Undangan WA</span>
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="switchAdminView('checkin')">
+                  <i data-lucide="qr-code" style="width:16px;height:16px;"></i>
+                  <span>Buka Scanner Check-in</span>
+                </button>
+                <button type="button" class="btn btn-outline" onclick="openSampleGuestInvitation()">
+                  <i data-lucide="smartphone" style="width:16px;height:16px;"></i>
+                  <span>Lihat Undangan Tamu</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Row (Chart.js) -->
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Grafik Pengiriman Undangan</div>
+                  <div class="card-subtitle">Proporsi status pengiriman pesan undangan WhatsApp</div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="deliveryChartCanvas"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Grafik Konfirmasi RSVP</div>
+                  <div class="card-subtitle">Perbandingan tamu Hadir, Tidak Hadir, dan Belum Konfirmasi</div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="rsvpChartCanvas"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Guests & Recent Activities -->
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Daftar Tamu Terbaru</div>
+                  <div class="card-subtitle">Tamu yang baru ditambahkan ke sistem</div>
+                </div>
+                <button type="button" class="btn btn-outline btn-sm" onclick="switchAdminView('guests')">Lihat Semua</button>
+              </div>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Nama Tamu</th>
+                      <th>Kategori</th>
+                      <th>Pengiriman</th>
+                      <th>RSVP</th>
+                    </tr>
+                  </thead>
+                  <tbody id="overviewRecentGuestsBody">
+                    <tr><td colspan="4" class="empty-state">Memuat data tamu...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Aktivitas Terbaru</div>
+                  <div class="card-subtitle">Log realtime RSVP, Check-in, dan Pengiriman</div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div id="overviewActivitiesList" class="activity-list">
+                  <div class="empty-state">Memuat aktivitas...</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             C. MANAJEMEN DATA TAMU VIEW
+             ================================================================== -->
+        <section id="view-guests" class="view-section">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Database Tamu Undangan</div>
+                <div class="card-subtitle">Kelola daftar tamu, link personal, import CSV/Excel, dan pengiriman WhatsApp</div>
+              </div>
+              <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                <button type="button" class="btn btn-primary" onclick="openGuestModal()">
+                  <i data-lucide="user-plus" style="width:16px;height:16px;"></i>
+                  <span>Tambah Tamu</span>
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="openImportModal()">
+                  <i data-lucide="upload" style="width:16px;height:16px;"></i>
+                  <span>Import CSV / Excel</span>
+                </button>
+                <button type="button" class="btn btn-outline" onclick="handleExportCSV('guests')">
+                  <i data-lucide="download" style="width:16px;height:16px;"></i>
+                  <span>Export CSV</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <!-- Filter & Search Toolbar -->
+              <div class="toolbar-filters">
+                <div class="filter-group">
+                  <div class="search-box">
+                    <i data-lucide="search" class="search-icon"></i>
+                    <input type="text" id="guestSearchInput" class="form-control" placeholder="Cari nama tamu atau nomor WA..." oninput="debounceGuestLoad()">
+                  </div>
+
+                  <select id="guestFilterCategory" class="form-control" style="width:auto;" onchange="loadGuestsTable(1)">
+                    <option value="ALL">Semua Kategori</option>
+                    <option value="Keluarga">Keluarga</option>
+                    <option value="Teman">Teman</option>
+                    <option value="Rekan Kerja">Rekan Kerja</option>
+                    <option value="Kerabat">Kerabat</option>
+                    <option value="Lainnya">Lainnya</option>
+                  </select>
+
+                  <select id="guestFilterDelivery" class="form-control" style="width:auto;" onchange="loadGuestsTable(1)">
+                    <option value="ALL">Semua Status Kirim</option>
+                    <option value="Belum Dikirim">Belum Dikirim</option>
+                    <option value="Dalam Antrean">Dalam Antrean</option>
+                    <option value="Terkirim">Terkirim</option>
+                    <option value="Gagal Dikirim">Gagal Dikirim</option>
+                  </select>
+
+                  <select id="guestFilterRsvp" class="form-control" style="width:auto;" onchange="loadGuestsTable(1)">
+                    <option value="ALL">Semua Status RSVP</option>
+                    <option value="Hadir">Hadir</option>
+                    <option value="Tidak Hadir">Tidak Hadir</option>
+                    <option value="Belum Konfirmasi">Belum Konfirmasi</option>
+                  </select>
+                </div>
+
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <button type="button" id="bulkDeleteBtn" class="btn btn-danger btn-sm" style="display:none;" onclick="handleBulkDeleteGuests()">
+                    <i data-lucide="trash-2" style="width:15px;height:15px;"></i>
+                    <span>Hapus Terpilih (<span id="selectedGuestsCount">0</span>)</span>
+                  </button>
+                  <button type="button" id="bulkQueueBtn" class="btn btn-secondary btn-sm" style="display:none;" onclick="queueSelectedGuestsFromTable()">
+                    <i data-lucide="send" style="width:15px;height:15px;"></i>
+                    <span>Antrekan WA Terpilih</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Guests Data Table -->
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th style="width:36px;">
+                        <input type="checkbox" id="selectAllGuestsCheckbox" onchange="toggleSelectAllGuests(this.checked)">
+                      </th>
+                      <th>ID & Nama Tamu</th>
+                      <th>No. WhatsApp</th>
+                      <th>Kategori</th>
+                      <th>Link Personal & Token</th>
+                      <th>Status Kirim</th>
+                      <th>Status RSVP</th>
+                      <th>Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody id="guestsTableBody">
+                    <tr><td colspan="8" class="empty-state">Memuat daftar tamu...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Pagination Bar -->
+              <div class="pagination-bar">
+                <div id="guestsPaginationInfo" style="font-size:12.5px; color:var(--text-secondary);">Menampilkan 0 tamu</div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <button type="button" id="guestPrevPageBtn" class="btn btn-outline btn-sm" onclick="changeGuestPage(-1)">Sebelumnya</button>
+                  <span id="guestPageIndicator" style="font-size:12.5px; font-weight:600; padding:0 8px;">Hal 1 / 1</span>
+                  <button type="button" id="guestNextPageBtn" class="btn btn-outline btn-sm" onclick="changeGuestPage(1)">Berikutnya</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             D. INVITATION EDITOR VIEW (DENGAN LIVE MOBILE PREVIEW)
+             ================================================================== -->
+        <section id="view-editor" class="view-section">
+          <div class="editor-layout">
+            <!-- Left Column: Editor Forms -->
+            <div>
+              <form id="invitationEditorForm" action="javascript:void(0);" onsubmit="handleSaveInvitationEditor(event); return false;">
+                <input type="hidden" id="edInvitationTheme" value="elegant_floral">
+
+                <!-- 0. Pilihan Template Desain Undangan (5 Desain Berbeda) -->
+                <div class="card" style="border-color:var(--primary);">
+                  <div class="card-header">
+                    <div>
+                      <div class="card-title">Pilih Template Desain Undangan Digital (5 Desain Berbeda)</div>
+                      <div class="card-subtitle">Setiap template memiliki layout, ornamen visual, animasi, dan karakter desain yang berbeda</div>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="handleQuickApplyTheme()">
+                      <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
+                      <span>Terapkan Template Sekarang</span>
+                    </button>
+                  </div>
+                  <div class="card-body">
+                    <div class="theme-selector-grid">
+                      <!-- 1. Elegant Floral -->
+                      <div class="theme-option-card active" data-theme-card="elegant_floral" onclick="selectInvitationTheme('elegant_floral')">
+                        <div class="theme-swatch-row">
+                          <span class="theme-swatch-circle" style="background:#FAF7F0;"></span>
+                          <span class="theme-swatch-circle" style="background:#FFFFFF;"></span>
+                          <span class="theme-swatch-circle" style="background:#B99A62;"></span>
+                          <span class="theme-active-check">Aktif</span>
+                        </div>
+                        <div class="theme-option-title">1. Elegant Floral</div>
+                        <div class="theme-option-desc">Ivory, Cream, Putih &amp; Gold. Dihiasi garland bunga putih, daun natural, animasi kelopak bunga jatuh &amp; tipografi serif romantis.</div>
+                      </div>
+
+                      <!-- 2. Batak Heritage -->
+                      <div class="theme-option-card" data-theme-card="batak_heritage" onclick="selectInvitationTheme('batak_heritage')">
+                        <div class="theme-swatch-row">
+                          <span class="theme-swatch-circle" style="background:#7A1215;"></span>
+                          <span class="theme-swatch-circle" style="background:#141010;"></span>
+                          <span class="theme-swatch-circle" style="background:#F7EFE2;"></span>
+                          <span class="theme-swatch-circle" style="background:#D4AF37;"></span>
+                          <span class="theme-active-check">Aktif</span>
+                        </div>
+                        <div class="theme-option-title">2. Batak Heritage</div>
+                        <div class="theme-option-desc">Merah Marun, Hitam, Cream &amp; Gold. Dilengkapi ukiran Gorga Batak, pita tenun Motif Ulos, siluet Rumah Bolon &amp; bingkai oktagonal.</div>
+                      </div>
+
+                      <!-- 3. Modern Minimalist -->
+                      <div class="theme-option-card" data-theme-card="modern_minimalist" onclick="selectInvitationTheme('modern_minimalist')">
+                        <div class="theme-swatch-row">
+                          <span class="theme-swatch-circle" style="background:#EAE2D6;"></span>
+                          <span class="theme-swatch-circle" style="background:#FFFFFF;"></span>
+                          <span class="theme-swatch-circle" style="background:#8C7055;"></span>
+                          <span class="theme-active-check">Aktif</span>
+                        </div>
+                        <div class="theme-option-title">3. Modern Minimalist</div>
+                        <div class="theme-option-desc">Beige, Putih, Ivory &amp; Cokelat Muda. Layout editorial asimetris rata kiri, Monogram Pasangan (R|J), whitespace luas &amp; garis arsitektural.</div>
+                      </div>
+
+                      <!-- 4. Romantic Sunset -->
+                      <div class="theme-option-card" data-theme-card="romantic_sunset" onclick="selectInvitationTheme('romantic_sunset')">
+                        <div class="theme-swatch-row">
+                          <span class="theme-swatch-circle" style="background:#F4A27E;"></span>
+                          <span class="theme-swatch-circle" style="background:#FAD6BE;"></span>
+                          <span class="theme-swatch-circle" style="background:#D97952;"></span>
+                          <span class="theme-active-check">Aktif</span>
+                        </div>
+                        <div class="theme-option-title">4. Romantic Sunset</div>
+                        <div class="theme-option-desc">Peach, Soft Orange, Champagne &amp; Gold. Visual gradasi langit senja, cahaya matahari hangat &amp; siluet pemandangan bukit romantis.</div>
+                      </div>
+
+                      <!-- 5. Dark Luxury -->
+                      <div class="theme-option-card" data-theme-card="dark_luxury" onclick="selectInvitationTheme('dark_luxury')">
+                        <div class="theme-swatch-row">
+                          <span class="theme-swatch-circle" style="background:#0A1913;"></span>
+                          <span class="theme-swatch-circle" style="background:#050807;"></span>
+                          <span class="theme-swatch-circle" style="background:#F4EFE6;"></span>
+                          <span class="theme-swatch-circle" style="background:#D4AF37;"></span>
+                          <span class="theme-active-check">Aktif</span>
+                        </div>
+                        <div class="theme-option-title">5. Dark Luxury</div>
+                        <div class="theme-option-desc">Forest Green, Hitam, Ivory &amp; Gold. Layout dramatis bertekstur damask emas, ornamen garis emas &amp; kontras malam eksklusif.</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 1. Informasi Pasangan -->
+                <div class="card">
+                  <div class="card-header">
+                    <div>
+                      <div class="card-title">1. Informasi Mempelai Pasangan</div>
+                      <div class="card-subtitle">Data nama mempelai, orang tua, foto pasangan, dan deskripsi pembuka</div>
+                    </div>
+                    <select id="edStatus" class="form-control" style="width:auto; font-weight:600;">
+                      <option value="Published">Status: Published (Aktif)</option>
+                      <option value="Draft">Status: Draft (Sembunyikan)</option>
+                    </select>
+                  </div>
+                  <div class="card-body">
+                    <div class="grid-2">
+                      <div class="form-group">
+                        <label class="form-label">Nama Lengkap Mempelai Pria</label>
+                        <input type="text" id="edGroomName" class="form-control" required oninput="updateLiveMobilePreview()">
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">Nama Panggilan Pria</label>
+                        <input type="text" id="edGroomNickname" class="form-control" required oninput="updateLiveMobilePreview()">
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="form-label">Keterangan Orang Tua Mempelai Pria</label>
+                      <input type="text" id="edGroomParents" class="form-control" oninput="updateLiveMobilePreview()">
+                    </div>
+
+                    <div class="grid-2">
+                      <div class="form-group">
+                        <label class="form-label">Nama Lengkap Mempelai Wanita</label>
+                        <input type="text" id="edBrideName" class="form-control" required oninput="updateLiveMobilePreview()">
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">Nama Panggilan Wanita</label>
+                        <input type="text" id="edBrideNickname" class="form-control" required oninput="updateLiveMobilePreview()">
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="form-label">Keterangan Orang Tua Mempelai Wanita</label>
+                      <input type="text" id="edBrideParents" class="form-control" oninput="updateLiveMobilePreview()">
+                    </div>
+
+                    <div class="form-group">
+                      <label class="form-label">Foto Sampul Utama Pasangan (URL atau Upload ke Google Drive)</label>
+                      <div style="display:flex; gap:8px;">
+                        <input type="url" id="edCoverImage" class="form-control" placeholder="https://..." oninput="updateLiveMobilePreview()">
+                        <label class="btn btn-secondary" style="cursor:pointer; margin:0;">
+                          <i data-lucide="upload-cloud" style="width:16px;height:16px;"></i>
+                          <span>Upload Drive</span>
+                          <input type="file" accept="image/*" style="display:none;" onchange="handleDriveImageUpload(this, 'edCoverImage')">
+                        </label>
+                      </div>
+                    </div>
+
+                    <div class="grid-2">
+                      <div class="form-group">
+                        <label class="form-label">Foto Mempelai Pria</label>
+                        <div style="display:flex; gap:6px;">
+                          <input type="url" id="edGroomPhoto" class="form-control" placeholder="https://..." oninput="updateLiveMobilePreview()">
+                          <label class="btn btn-outline btn-sm" style="cursor:pointer;">
+                            <span>Upload</span>
+                            <input type="file" accept="image/*" style="display:none;" onchange="handleDriveImageUpload(this, 'edGroomPhoto')">
+                          </label>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">Foto Mempelai Wanita</label>
+                        <div style="display:flex; gap:6px;">
+                          <input type="url" id="edBridePhoto" class="form-control" placeholder="https://..." oninput="updateLiveMobilePreview()">
+                          <label class="btn btn-outline btn-sm" style="cursor:pointer;">
+                            <span>Upload</span>
+                            <input type="file" accept="image/*" style="display:none;" onchange="handleDriveImageUpload(this, 'edBridePhoto')">
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="form-label">Deskripsi Singkat / Sambutan Pembuka</label>
+                      <textarea id="edDescription" class="form-control" oninput="updateLiveMobilePreview()"></textarea>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 2. Informasi Acara -->
+                <div class="card">
+                  <div class="card-header">
+                    <div>
+                      <div class="card-title">2. Informasi Waktu & Lokasi Acara</div>
+                      <div class="card-subtitle">Tanggal utama, Akad/Pemberkatan, Resepsi, dan koordinat Google Maps</div>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <div class="grid-2">
+                      <div class="form-group">
+                        <label class="form-label">Tanggal Pernikahan</label>
+                        <input type="date" id="edWeddingDate" class="form-control" required oninput="updateLiveMobilePreview()">
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">Nama Gedung / Venue</label>
+                        <input type="text" id="edVenue" class="form-control" required oninput="updateLiveMobilePreview()">
+                      </div>
+                    </div>
+
+                    <div class="grid-2">
+                      <div class="form-group">
+                        <label class="form-label">Judul Sesi 1 (Akad Nikah / Pemberkatan)</label>
+                        <input type="text" id="edAkadTitle" class="form-control" value="Akad Nikah" oninput="updateLiveMobilePreview()">
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">Waktu Akad / Pemberkatan</label>
+                        <input type="text" id="edAkadTime" class="form-control" placeholder="08:00 - 10:00 WIB" required oninput="updateLiveMobilePreview()">
+                      </div>
+                    </div>
+
+                    <div class="grid-2">
+                      <div class="form-group">
+                        <label class="form-label">Judul Sesi 2 (Resepsi)</label>
+                        <input type="text" id="edReceptionTitle" class="form-control" value="Resepsi Pernikahan" oninput="updateLiveMobilePreview()">
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">Waktu Resepsi</label>
+                        <input type="text" id="edReceptionTime" class="form-control" placeholder="11:00 - 14:00 WIB" required oninput="updateLiveMobilePreview()">
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="form-label">Alamat Lengkap Lokasi Acara</label>
+                      <textarea id="edAddress" class="form-control" style="min-height:70px;" required oninput="updateLiveMobilePreview()"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="form-label">Google Maps URL</label>
+                      <input type="url" id="edMapsUrl" class="form-control" placeholder="https://maps.google.com/..." required oninput="updateLiveMobilePreview()">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 3. Konten, Our Story, Galeri, Musik & Penutup -->
+                <div class="card">
+                  <div class="card-header">
+                    <div>
+                      <div class="card-title">3. Kutipan, Cerita Cinta (Our Story), Musik & Penutup</div>
+                      <div class="card-subtitle">Personalisasi narasi dan suasana undangan tamu</div>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <div class="form-group">
+                      <label class="form-label">Kutipan / Ayat Suci (Opsional)</label>
+                      <textarea id="edQuoteText" class="form-control" style="min-height:70px;" oninput="updateLiveMobilePreview()"></textarea>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Sumber Kutipan / Ayat</label>
+                      <input type="text" id="edQuoteSource" class="form-control" placeholder="Contoh: QS. Ar-Rum: 21" oninput="updateLiveMobilePreview()">
+                    </div>
+
+                    <div class="form-group">
+                      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+                        <label class="form-label" style="margin:0;">Perjalanan Cinta (Our Story)</label>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="addStoryEditorItem()">
+                          <i data-lucide="plus" style="width:14px;height:14px;"></i>
+                          <span>Tambah Bab Cerita</span>
+                        </button>
+                      </div>
+                      <div id="storyEditorList"></div>
+                    </div>
+
+                    <div class="form-group">
+                      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+                        <label class="form-label" style="margin:0;">Galeri Foto Pasangan</label>
+                        <div style="display:flex; gap:8px;">
+                          <label class="btn btn-secondary btn-sm" style="cursor:pointer; margin:0;">
+                            <i data-lucide="upload" style="width:14px;height:14px;"></i>
+                            <span>Upload Foto ke Galeri</span>
+                            <input type="file" accept="image/*" style="display:none;" onchange="handleUploadNewGalleryPhoto(this)">
+                          </label>
+                          <button type="button" class="btn btn-outline btn-sm" onclick="addGalleryEditorItem()">
+                            <i data-lucide="plus" style="width:14px;height:14px;"></i>
+                            <span>Tambah via URL</span>
+                          </button>
+                        </div>
+                      </div>
+                      <div id="galleryEditorList"></div>
+                    </div>
+
+                    <div class="grid-2">
+                      <div class="form-group">
+                        <label class="form-label">URL Musik Latar (.mp3 Opsional)</label>
+                        <input type="url" id="edMusicUrl" class="form-control" placeholder="https://.../music.mp3">
+                        <span class="form-hint">Musik hanya berputar setelah tamu menekan tombol "Buka Undangan".</span>
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">Status Musik Latar</label>
+                        <select id="edMusicEnabled" class="form-control">
+                          <option value="true">Aktifkan Musik Latar</option>
+                          <option value="false">Nonaktifkan Musik</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="form-label">Ucapan Penutup</label>
+                      <textarea id="edClosingText" class="form-control" style="min-height:70px;" oninput="updateLiveMobilePreview()"></textarea>
+                    </div>
+
+                    <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:16px;">
+                      <button type="button" class="btn btn-outline" onclick="openSampleGuestInvitation()">
+                        <i data-lucide="external-link" style="width:16px;height:16px;"></i>
+                        <span>Buka Tab Undangan Penuh</span>
+                      </button>
+                      <button type="submit" class="btn btn-primary">
+                        <i data-lucide="save" style="width:16px;height:16px;"></i>
+                        <span>Simpan & Publikasikan Undangan</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <!-- Right Column: Live Mobile Phone Preview -->
+            <div class="mobile-preview-sticky">
+              <div style="text-align:center; margin-bottom:10px; display:flex; align-items:center; justify-content:center; gap:8px;">
+                <span class="badge badge-gold">LIVE MOBILE PREVIEW (380px)</span>
+                <span id="prevActiveThemeBadge" class="badge badge-neutral">Elegant Floral</span>
+              </div>
+              <div class="phone-mockup">
+                <div class="phone-notch"><div class="phone-speaker"></div></div>
+                <div id="previewPhoneScreen" class="phone-screen" data-theme="elegant_floral">
+                  <!-- Ornamen Header Dinamis di Live Preview -->
+                  <div id="prevThemeOrnamentHeader" style="margin-bottom:8px;"></div>
+
+                  <div style="font-size:10.5px; letter-spacing:0.18em; text-transform:uppercase; color:var(--prev-primary); font-weight:600; margin-bottom:6px;">THE WEDDING OF</div>
+                  <h2 id="prevCoupleTitle" style="font-family:var(--font-heading); font-size:24px; color:var(--prev-text); margin-bottom:12px;">Romeo &amp; Juliet</h2>
+                  <img id="prevCoverImg" class="preview-hero-img" src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80" alt="Preview Cover">
+                  <div class="prev-themed-card">
+                    <div style="font-size:11px; color:var(--prev-muted);">Kepada Yth. Bapak/Ibu/Saudara/i</div>
+                    <div style="font-family:var(--font-heading); font-size:18px; font-weight:600; color:var(--prev-text); margin:4px 0;">Budi Santoso</div>
+                    <div id="prevDescription" style="font-size:12px; color:var(--prev-muted); margin-top:6px;">Tanpa mengurangi rasa hormat, kami mengundang Anda...</div>
+                  </div>
+                  <div class="prev-themed-card" style="text-align:left;">
+                    <div style="font-family:var(--font-heading); font-size:14px; font-weight:600; color:var(--prev-primary); margin-bottom:4px;" id="prevDateText">12 Desember 2026</div>
+                    <div style="font-size:12px; font-weight:600;" id="prevAkadText">Akad Nikah: 08:00 - 10:00 WIB</div>
+                    <div style="font-size:12px; font-weight:600; margin-top:2px;" id="prevReceptionText">Resepsi: 11:00 - 14:00 WIB</div>
+                    <div style="font-size:11.5px; color:var(--prev-muted); margin-top:6px;" id="prevVenueText">The Grand Champagne Ballroom</div>
+                  </div>
+                  <div style="font-family:var(--font-decor); font-style:italic; font-size:14px; color:var(--prev-muted); padding:8px;" id="prevQuoteText"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             E. WHATSAPP MESSAGE MANAGEMENT VIEW
+             ================================================================== -->
+        <section id="view-whatsapp" class="view-section">
+          <!-- Mode Info Banner: Cloud API + 1-Klik Gratis -->
+          <div class="card" style="border-color:var(--primary);">
+            <div class="card-body" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; background:var(--secondary);">
+              <div style="display:flex; align-items:center; gap:14px;">
+                <div class="stat-icon-box" style="background:#FFFFFF; border:1px solid var(--primary); width:44px; height:44px;">
+                  <i data-lucide="message-square" style="width:22px;height:22px;"></i>
+                </div>
+                <div>
+                  <h3 style="font-family:var(--font-heading); font-size:16.5px;">Dual-Mode WhatsApp Dispatcher</h3>
+                  <p style="font-size:12.5px; color:var(--text-secondary);">
+                    Mendukung <strong>1-Klik Kirim WA Gratis (wa.me)</strong> tanpa biaya API, serta <strong>Antrean Otomatis WhatsApp Business Cloud API Resmi</strong>.
+                  </p>
+                </div>
+              </div>
+              <div id="waCloudStatusBadge">
+                <span class="badge badge-neutral">Memeriksa Status Cloud API...</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <!-- Template Editor & Preview -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Template Pesan Undangan WhatsApp</div>
+                  <div class="card-subtitle">Gunakan variabel dinamis untuk personalisasi nama & link unik tamu</div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;">
+                  <span style="font-size:11.5px; color:var(--text-secondary); align-self:center;">Sisipkan Variabel:</span>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="insertWaVariable('{{nama_tamu}}')">+ {{nama_tamu}}</button>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="insertWaVariable('{{link_undangan}}')">+ {{link_undangan}}</button>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="insertWaVariable('{{nama_pasangan}}')">+ {{nama_pasangan}}</button>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="insertWaVariable('{{tanggal_acara}}')">+ {{tanggal_acara}}</button>
+                </div>
+
+                <div class="form-group">
+                  <textarea id="waTemplateTextarea" class="form-control" style="min-height:175px; font-family:var(--font-sans);" oninput="updateWaMessagePreview()"></textarea>
+                </div>
+
+                <div style="background:var(--secondary); border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:14px;">
+                  <div style="font-size:11px; font-weight:600; text-transform:uppercase; color:var(--primary); margin-bottom:6px;">Preview Pesan (Tamu: Budi Santoso)</div>
+                  <pre id="waLivePreviewBox" style="white-space:pre-wrap; font-family:var(--font-sans); font-size:12.5px; color:var(--text-primary);"></pre>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+                  <button type="button" class="btn btn-outline" onclick="handleSendTestWaModal()">
+                    <i data-lucide="flask-conical" style="width:15px;height:15px;"></i>
+                    <span>Kirim Pesan Percobaan (Cloud API)</span>
+                  </button>
+                  <button type="button" class="btn btn-primary" onclick="handleSaveWaTemplateOnly()">
+                    <i data-lucide="save" style="width:15px;height:15px;"></i>
+                    <span>Simpan Template</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Queue Generator & Batch Processor -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Pengiriman Bertahap & Antrean Pesan</div>
+                  <div class="card-subtitle">Masukkan tamu ke antrean pengiriman dan pantau progresnya</div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="form-group">
+                  <label class="form-label">Pilih Target Penerima Undangan</label>
+                  <select id="waQueueSelectionMode" class="form-control" onchange="toggleWaQueueCategorySelect()">
+                    <option value="unsent">Semua Tamu yang Belum Dikirim</option>
+                    <option value="category">Berdasarkan Kategori Tamu Tertentu</option>
+                    <option value="all">Semua Tamu Terdaftar</option>
+                  </select>
+                </div>
+
+                <div id="waQueueCategoryGroup" class="form-group" style="display:none;">
+                  <label class="form-label">Pilih Kategori Tamu</label>
+                  <select id="waQueueCategorySelect" class="form-control">
+                    <option value="Keluarga">Keluarga</option>
+                    <option value="Teman">Teman</option>
+                    <option value="Rekan Kerja">Rekan Kerja</option>
+                    <option value="Kerabat">Kerabat</option>
+                    <option value="Lainnya">Lainnya</option>
+                  </select>
+                </div>
+
+                <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px;">
+                  <button type="button" class="btn btn-primary" onclick="handleCreateMessageQueue()">
+                    <i data-lucide="list-plus" style="width:16px;height:16px;"></i>
+                    <span>Masukkan ke Antrean Pengiriman</span>
+                  </button>
+                  <button type="button" class="btn btn-success" onclick="handleProcessQueueNow()">
+                    <i data-lucide="play" style="width:16px;height:16px;"></i>
+                    <span>Proses Batch Cloud API Sekarang</span>
+                  </button>
+                  <button type="button" class="btn btn-outline" onclick="handleRetryFailedMessages()">
+                    <i data-lucide="rotate-ccw" style="width:16px;height:16px;"></i>
+                    <span>Retry Semua Pesan Gagal</span>
+                  </button>
+                </div>
+
+                <!-- Mini Queue Stats -->
+                <div class="grid-3" style="gap:12px;">
+                  <div style="background:var(--secondary); border:1px solid var(--border); border-radius:10px; padding:12px; text-align:center;">
+                    <div style="font-size:11.5px; color:var(--text-secondary);">Dalam Antrean</div>
+                    <div id="waStatQueued" style="font-family:var(--font-heading); font-size:22px; font-weight:700;">0</div>
+                  </div>
+                  <div style="background:var(--success-soft); border:1px solid var(--border); border-radius:10px; padding:12px; text-align:center;">
+                    <div style="font-size:11.5px; color:var(--success);">Terkirim</div>
+                    <div id="waStatSent" style="font-family:var(--font-heading); font-size:22px; font-weight:700; color:var(--success);">0</div>
+                  </div>
+                  <div style="background:var(--danger-soft); border:1px solid var(--border); border-radius:10px; padding:12px; text-align:center;">
+                    <div style="font-size:11.5px; color:var(--danger);">Gagal</div>
+                    <div id="waStatFailed" style="font-family:var(--font-heading); font-size:22px; font-weight:700; color:var(--danger);">0</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Riwayat & Antrean Pengiriman Tabel -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Riwayat & Antrean Pengiriman Pesan</div>
+                <div class="card-subtitle">Gunakan tombol "1-Klik WA Gratis" untuk mengirim manual via WhatsApp Web/App kapan saja</div>
+              </div>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <select id="waHistoryFilterStatus" class="form-control" style="width:auto;" onchange="loadMessageHistory()">
+                  <option value="ALL">Semua Status</option>
+                  <option value="Dalam Antrean">Dalam Antrean</option>
+                  <option value="Terkirim">Terkirim</option>
+                  <option value="Gagal Dikirim">Gagal Dikirim</option>
+                </select>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Waktu</th>
+                    <th>Nama Tamu</th>
+                    <th>No. WhatsApp</th>
+                    <th>Status</th>
+                    <th>Provider ID / Info Error</th>
+                    <th>Kirim 1-Klik Gratis</th>
+                  </tr>
+                </thead>
+                <tbody id="waHistoryTableBody">
+                  <tr><td colspan="6" class="empty-state">Belum ada riwayat pengiriman pesan.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             F. RSVP MANAGEMENT VIEW
+             ================================================================== -->
+        <section id="view-rsvp" class="view-section">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-label">Konfirmasi Hadir</div>
+              <div id="rsvpViewHadirCount" class="stat-value" style="color:var(--success); margin-top:6px;">0</div>
+              <div id="rsvpViewTotalPax" class="stat-meta">Total 0 orang (pax)</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Konfirmasi Tidak Hadir</div>
+              <div id="rsvpViewTidakHadirCount" class="stat-value" style="color:var(--danger); margin-top:6px;">0</div>
+              <div class="stat-meta">Tamu berhalangan</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Belum Konfirmasi</div>
+              <div id="rsvpViewPendingCount" class="stat-value" style="margin-top:6px;">0</div>
+              <div class="stat-meta">Menunggu pengisian form</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Daftar Konfirmasi Kehadiran (RSVP) & Buku Ucapan</div>
+                <div class="card-subtitle">Data realtime yang dikirim oleh tamu melalui halaman undangan mobile</div>
+              </div>
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <input type="text" id="rsvpSearchInput" class="form-control" style="width:220px;" placeholder="Cari nama atau ucapan..." oninput="loadRSVPManagement()">
+                <select id="rsvpFilterStatus" class="form-control" style="width:auto;" onchange="loadRSVPManagement()">
+                  <option value="ALL">Semua Status RSVP</option>
+                  <option value="Hadir">Hadir</option>
+                  <option value="Tidak Hadir">Tidak Hadir</option>
+                  <option value="Belum Konfirmasi">Belum Konfirmasi</option>
+                </select>
+                <button type="button" class="btn btn-outline" onclick="handleExportCSV('rsvp')">
+                  <i data-lucide="download" style="width:15px;height:15px;"></i>
+                  <span>Export RSVP CSV</span>
+                </button>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Nama Tamu</th>
+                    <th>Kategori</th>
+                    <th>Status Kehadiran</th>
+                    <th>Jumlah Orang</th>
+                    <th>Ucapan & Doa</th>
+                    <th>Waktu Konfirmasi</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="rsvpTableBody">
+                  <tr><td colspan="7" class="empty-state">Memuat data RSVP...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             G. QR CHECK-IN VIEW
+             ================================================================== -->
+        <section id="view-checkin" class="view-section">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-label">Total Tamu Undangan</div>
+              <div id="chkStatTotal" class="stat-value" style="margin-top:6px;">0</div>
+              <div class="stat-meta">Tamu terdaftar</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Konfirmasi RSVP Hadir</div>
+              <div id="chkStatRsvpHadir" class="stat-value" style="margin-top:6px;">0</div>
+              <div class="stat-meta">Diperkirakan hadir</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Sudah Check-in</div>
+              <div id="chkStatCheckedIn" class="stat-value" style="color:var(--success); margin-top:6px;">0</div>
+              <div id="chkStatRate" class="stat-meta">0% telah tiba di lokasi</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Belum Check-in</div>
+              <div id="chkStatRemaining" class="stat-value" style="margin-top:6px;">0</div>
+              <div class="stat-meta">Tamu belum hadir</div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <!-- Camera QR Scanner & Manual Verification -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Scanner QR Code Kehadiran Tamu</div>
+                  <div class="card-subtitle">Gunakan kamera HP/Laptop petugas atau masukkan kode token undangan</div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="form-group">
+                  <label class="form-label">Nama Petugas / Meja Penerima Tamu</label>
+                  <input type="text" id="checkinOfficerName" class="form-control" value="Petugas Meja 1" placeholder="Nama petugas penerima tamu">
+                </div>
+
+                <div id="qrReaderContainer" class="qr-scanner-box">
+                  <div style="text-align:center; padding:24px;">
+                    <i data-lucide="camera" style="width:42px;height:42px; color:var(--primary); margin-bottom:10px;"></i>
+                    <p style="font-size:13px; color:#DDD;">Tekan tombol "Aktifkan Kamera Scanner" untuk memindai QR Code tamu</p>
+                  </div>
+                </div>
+
+                <div style="display:flex; justify-content:center; gap:10px; margin:16px 0;">
+                  <button type="button" id="startQrCameraBtn" class="btn btn-primary" onclick="startQrCameraScanner()">
+                    <i data-lucide="camera" style="width:16px;height:16px;"></i>
+                    <span>Aktifkan Kamera Scanner</span>
+                  </button>
+                  <button type="button" id="stopQrCameraBtn" class="btn btn-outline" style="display:none;" onclick="stopQrCameraScanner()">
+                    <i data-lucide="camera-off" style="width:16px;height:16px;"></i>
+                    <span>Matikan Kamera</span>
+                  </button>
+                </div>
+
+                <form action="javascript:void(0);" onsubmit="handleManualCheckinSubmit(event); return false;" style="margin-top:18px; padding-top:16px; border-top:1px solid var(--border);">
+                  <label class="form-label">Verifikasi Token / Barcode Scanner USB Manual</label>
+                  <div style="display:flex; gap:8px;">
+                    <input type="text" id="manualCheckinInput" class="form-control" placeholder="Tempel token QR, URL undangan, atau ID Tamu...">
+                    <button type="submit" class="btn btn-secondary">
+                      <i data-lucide="check-circle" style="width:16px;height:16px;"></i>
+                      <span>Verifikasi Check-in</span>
+                    </button>
+                  </div>
+                </form>
+
+                <!-- Hasil Verifikasi Check-in -->
+                <div id="checkinResultBox" style="display:none;"></div>
+              </div>
+            </div>
+
+            <!-- Riwayat Tamu yang Sudah Check-in -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Daftar Kehadiran Tamu (Live Check-in Log)</div>
+                  <div class="card-subtitle">Tamu yang telah diverifikasi hadir di lokasi acara</div>
+                </div>
+                <button type="button" class="btn btn-outline btn-sm" onclick="handleExportCSV('checkin')">
+                  <i data-lucide="download" style="width:14px;height:14px;"></i>
+                  <span>Export CSV</span>
+                </button>
+              </div>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Waktu Check-in</th>
+                      <th>Nama Tamu</th>
+                      <th>Kategori</th>
+                      <th>Pax</th>
+                      <th>Petugas</th>
+                      <th>Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody id="checkinHistoryTableBody">
+                    <tr><td colspan="6" class="empty-state">Belum ada tamu yang melakukan check-in.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             H. REPORTS VIEW (LAPORAN LENGKAP, EXPORT CSV & CETAK)
+             ================================================================== -->
+        <section id="view-reports" class="view-section">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Laporan Eksekutif Acara Pernikahan</div>
+                <div class="card-subtitle" id="reportHeaderCoupleInfo">Rekapitulasi menyeluruh pengiriman undangan, RSVP, dan kehadiran</div>
+              </div>
+              <div class="no-print" style="display:flex; flex-wrap:wrap; gap:8px;">
+                <button type="button" class="btn btn-primary" onclick="window.print()">
+                  <i data-lucide="printer" style="width:16px;height:16px;"></i>
+                  <span>Cetak Laporan / Simpan PDF</span>
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="handleExportCSV('guests')">
+                  <i data-lucide="download" style="width:16px;height:16px;"></i>
+                  <span>CSV Semua Tamu</span>
+                </button>
+                <button type="button" class="btn btn-outline" onclick="handleExportCSV('categories')">
+                  <i data-lucide="download" style="width:16px;height:16px;"></i>
+                  <span>CSV Rekap Kategori</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <!-- Summary Metrics Table -->
+              <div class="grid-3" style="margin-bottom:24px;">
+                <div style="padding:16px; border:1px solid var(--border); border-radius:10px; background:var(--secondary);">
+                  <div style="font-size:12px; color:var(--text-secondary);">Distribusi Pesan Undangan</div>
+                  <div style="margin-top:8px; font-size:13.5px;">
+                    <div>Total Tamu: <strong id="repTotalGuests">0</strong></div>
+                    <div>Total Pesan Terkirim: <strong id="repSentCount" style="color:var(--success);">0</strong></div>
+                    <div>Total Pesan Gagal: <strong id="repFailedCount" style="color:var(--danger);">0</strong></div>
+                  </div>
+                </div>
+
+                <div style="padding:16px; border:1px solid var(--border); border-radius:10px; background:var(--secondary);">
+                  <div style="font-size:12px; color:var(--text-secondary);">Rekapitulasi Konfirmasi RSVP</div>
+                  <div style="margin-top:8px; font-size:13.5px;">
+                    <div>Total Respon RSVP: <strong id="repTotalRsvp">0</strong></div>
+                    <div>Konfirmasi Hadir: <strong id="repRsvpHadir" style="color:var(--success);">0</strong></div>
+                    <div>Estimasi Jumlah Kehadiran: <strong id="repTotalPax">0 Orang</strong></div>
+                  </div>
+                </div>
+
+                <div style="padding:16px; border:1px solid var(--border); border-radius:10px; background:var(--secondary);">
+                  <div style="font-size:12px; color:var(--text-secondary);">Aktual Kehadiran Lokasi (QR Check-in)</div>
+                  <div style="margin-top:8px; font-size:13.5px;">
+                    <div>Jumlah Check-in: <strong id="repCheckinCount" style="color:var(--primary-hover);">0 Tamu</strong></div>
+                    <div>Rasio Check-in: <strong id="repCheckinRate">0%</strong></div>
+                    <div>Belum Hadir: <strong id="repRemainingCheckin">0 Tamu</strong></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Rekap Kategori Tamu Table -->
+              <h3 style="font-family:var(--font-heading); font-size:16px; margin-bottom:12px;">Rekapitulasi Berdasarkan Kategori Tamu</h3>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Kategori Tamu</th>
+                      <th>Total Tamu</th>
+                      <th>Undangan Terkirim</th>
+                      <th>Belum Dikirim</th>
+                      <th>Gagal</th>
+                      <th>RSVP Hadir</th>
+                      <th>RSVP Tidak Hadir</th>
+                      <th>Belum Konfirmasi</th>
+                      <th>Estimasi Pax</th>
+                      <th>Sudah Check-in</th>
+                    </tr>
+                  </thead>
+                  <tbody id="reportCategoryTableBody">
+                    <tr><td colspan="10" class="empty-state">Memuat rekap kategori...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             I. SETTINGS VIEW
+             ================================================================== -->
+        <section id="view-settings" class="view-section">
+          <div class="grid-2">
+            <!-- 1. Pengaturan WhatsApp Business Cloud API (Script Properties) -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Pengaturan API WhatsApp (Script Properties)</div>
+                  <div class="card-subtitle">Kredensial disimpan aman di PropertiesService, bukan di Spreadsheet</div>
+                </div>
+              </div>
+              <div class="card-body">
+                <form action="javascript:void(0);" onsubmit="handleSaveWaApiSettings(event); return false;">
+                  <div class="form-group">
+                    <label class="form-label">WhatsApp Phone Number ID (Meta Cloud API)</label>
+                    <input type="text" id="setWaPhoneNumberId" class="form-control" placeholder="Contoh: 109283746510293">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Permanent / System User Access Token</label>
+                    <input type="password" id="setWaAccessToken" class="form-control" placeholder="Biarkan kosong jika tidak ingin mengubah token">
+                    <span id="setWaTokenStatusHint" class="form-hint">Status Token: Belum diatur</span>
+                  </div>
+                  <div class="grid-2">
+                    <div class="form-group">
+                      <label class="form-label">WhatsApp Business Account ID</label>
+                      <input type="text" id="setWaBusinessId" class="form-control" placeholder="Opsional">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Meta Graph API Version</label>
+                      <input type="text" id="setWaApiVersion" class="form-control" value="v20.0">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px;">
+                      <input type="checkbox" id="setWaUseTemplateApi">
+                      <span>Gunakan Meta Approved Template Message (Opsional)</span>
+                    </label>
+                  </div>
+                  <div class="grid-2">
+                    <div class="form-group">
+                      <label class="form-label">Nama Template Meta</label>
+                      <input type="text" id="setWaMetaTemplateName" class="form-control" placeholder="wedding_invitation_id">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Kode Bahasa</label>
+                      <input type="text" id="setWaMetaTemplateLang" class="form-control" value="id">
+                    </div>
+                  </div>
+                  <button type="submit" class="btn btn-primary">
+                    <i data-lucide="shield-check" style="width:16px;height:16px;"></i>
+                    <span>Simpan Kredensial WhatsApp API</span>
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            <!-- 2. Pengaturan Google Spreadsheet & Google Drive -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Integrasi Google Spreadsheet & Google Drive</div>
+                  <div class="card-subtitle">Koneksi database utama (8 sheet) dan folder penyimpanan foto</div>
+                </div>
+              </div>
+              <div class="card-body">
+                <form action="javascript:void(0);" onsubmit="handleSaveSystemIntegration(event); return false;">
+                  <div class="form-group">
+                    <label class="form-label">Google Spreadsheet ID (Database Utama)</label>
+                    <input type="text" id="setSpreadsheetId" class="form-control" placeholder="Otomatis terisi saat inisialisasi database">
+                    <span class="form-hint">ID dari URL Google Sheets: docs.google.com/spreadsheets/d/<strong>SPREADSHEET_ID</strong>/edit</span>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Google Drive Folder ID (Penyimpanan Media)</label>
+                    <input type="text" id="setDriveFolderId" class="form-control" placeholder="Kosongkan untuk buat folder otomatis">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Base URL Deployment Web App (/exec)</label>
+                    <input type="url" id="setWebAppBaseUrl" class="form-control" placeholder="https://script.google.com/macros/s/.../exec">
+                    <span class="form-hint">Digunakan sebagai domain dasar saat men-generate link personal tamu.</span>
+                  </div>
+                  <div style="display:flex; flex-wrap:wrap; gap:10px;">
+                    <button type="submit" class="btn btn-primary">
+                      <i data-lucide="save" style="width:16px;height:16px;"></i>
+                      <span>Simpan Integrasi Google</span>
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="handleInitializeDatabaseClick()">
+                      <i data-lucide="database" style="width:16px;height:16px;"></i>
+                      <span>Inisialisasi / Verifikasi 8 Sheet Database</span>
+                    </button>
+                    <button type="button" class="btn btn-outline" onclick="handleRefreshAllGuestUrls()">
+                      <i data-lucide="link" style="width:16px;height:16px;"></i>
+                      <span>Sinkronkan Semua Link Tamu</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <!-- 3. Pengaturan Akun Admin -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Keamanan & Kredensial Akun Admin</div>
+                  <div class="card-subtitle">Password di-hash menggunakan SHA-256 dan salt unik</div>
+                </div>
+              </div>
+              <div class="card-body">
+                <form action="javascript:void(0);" onsubmit="handleUpdateAdminPassword(event); return false;">
+                  <div class="form-group">
+                    <label class="form-label">Username Admin</label>
+                    <input type="text" id="setAdminUsername" class="form-control" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Password Saat Ini (Wajib untuk verifikasi)</label>
+                    <input type="password" id="setAdminCurrentPassword" class="form-control" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Password Baru (Minimal 8 Karakter)</label>
+                    <input type="password" id="setAdminNewPassword" class="form-control" placeholder="Masukkan password baru">
+                  </div>
+                  <button type="submit" class="btn btn-primary">
+                    <i data-lucide="key-round" style="width:16px;height:16px;"></i>
+                    <span>Perbarui Akun Admin</span>
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            <!-- 4. Pintasan Pengaturan Profil Pasangan, Acara & Template -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Pintasan Konfigurasi Acara & Template</div>
+                  <div class="card-subtitle">Navigasi cepat ke modul pengaturan konten</div>
+                </div>
+              </div>
+              <div class="card-body">
+                <p style="font-size:13px; color:var(--text-secondary); margin-bottom:16px;">
+                  Pengaturan profil pasangan, detail waktu/lokasi acara, galeri foto, serta template pesan WhatsApp terintegrasi langsung dengan Live Preview.
+                </p>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                  <button type="button" class="btn btn-secondary" style="justify-content:flex-start;" onclick="switchAdminView('editor')">
+                    <i data-lucide="heart" style="width:16px;height:16px;"></i>
+                    <span>Buka Pengaturan Profil Pasangan & Detail Acara (Invitation Editor)</span>
+                  </button>
+                  <button type="button" class="btn btn-secondary" style="justify-content:flex-start;" onclick="switchAdminView('whatsapp')">
+                    <i data-lucide="message-square" style="width:16px;height:16px;"></i>
+                    <span>Buka Pengaturan Template Pesan WhatsApp</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODALS (ADD/EDIT TAMU, IMPORT CSV/EXCEL, QR CODE PREVIEW, EDIT RSVP)
+       ======================================================================== -->
+
+  <!-- Modal Tambah / Edit Tamu -->
+  <div id="guestModalBackdrop" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="guestModalTitle">Tambah Tamu Undangan</h3>
+        <button type="button" class="btn btn-icon btn-outline" onclick="closeGuestModal()">✕</button>
+      </div>
+      <form id="guestForm" action="javascript:void(0);" onsubmit="handleGuestFormSubmit(event); return false;">
+        <div class="modal-body">
+          <input type="hidden" id="formGuestId">
+          <div class="form-group">
+            <label class="form-label">Nama Lengkap Tamu (Ditampilkan di Sampul Undangan)</label>
+            <input type="text" id="formGuestName" class="form-control" placeholder="Contoh: Bpk. Budi Santoso & Partner" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nomor WhatsApp Indonesia Aktif</label>
+            <input type="tel" id="formGuestPhone" class="form-control" placeholder="Contoh: 081234567890 atau 6281234567890" required>
+            <span class="form-hint">Otomatis dinormalisasi ke format 628xxx dan dicek agar tidak duplikat.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Kategori Tamu</label>
+            <select id="formGuestCategory" class="form-control">
+              <option value="Keluarga">Keluarga</option>
+              <option value="Teman">Teman</option>
+              <option value="Rekan Kerja">Rekan Kerja</option>
+              <option value="Kerabat">Kerabat</option>
+              <option value="Lainnya">Lainnya</option>
+            </select>
+          </div>
+          <div id="formRegenerateTokenGroup" class="form-group" style="display:none;">
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px;">
+              <input type="checkbox" id="formRegenerateToken">
+              <span>Buat ulang (Regenerate) token & link undangan baru</span>
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeGuestModal()">Batal</button>
+          <button type="button" id="guestFormSubmitBtn" onclick="handleGuestFormSubmit(event)" class="btn btn-primary">Simpan Data Tamu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Import CSV / Excel -->
+  <div id="importModalBackdrop" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>Import Daftar Tamu (CSV / Excel)</h3>
+        <button type="button" class="btn btn-icon btn-outline" onclick="closeImportModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:13px; color:var(--text-secondary); margin-bottom:12px;">
+          Unggah file <strong>.CSV</strong> atau <strong>Excel (.xlsx / .xls)</strong> dengan urutan kolom:
+          <code>guest_name, whatsapp_number, category</code>.
+          File Excel akan dikonversi secara otomatis melalui Google Drive API.
+        </p>
+        <div style="margin-bottom:16px;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="downloadSampleImportCSV()">
+            <i data-lucide="file-down" style="width:14px;height:14px;"></i>
+            <span>Unduh Contoh Template CSV</span>
+          </button>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Pilih File CSV atau Excel (.xlsx / .xls)</label>
+          <input type="file" id="importFileInput" class="form-control" accept=".csv,.xlsx,.xls">
+        </div>
+        <div id="importResultSummary" style="display:none; margin-top:14px; padding:12px; border-radius:8px; background:var(--secondary); border:1px solid var(--border); font-size:12.5px;"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeImportModal()">Tutup</button>
+        <button type="button" id="importSubmitBtn" class="btn btn-primary" onclick="handleProcessImportFile()">Mulai Import Data</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal QR Code & Info Link Personal Tamu -->
+  <div id="qrPreviewModalBackdrop" class="modal-backdrop">
+    <div class="modal-dialog" style="max-width:420px; text-align:center;">
+      <div class="modal-header">
+        <h3 id="qrModalGuestName">QR Code Undangan Tamu</h3>
+        <button type="button" class="btn btn-icon btn-outline" onclick="closeQrPreviewModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="adminGuestQrCanvas" style="display:inline-block; padding:16px; background:#FFF; border:1px solid var(--primary); border-radius:12px; margin-bottom:14px;"></div>
+        <div style="font-size:12px; color:var(--text-secondary); margin-bottom:6px;">Token Unik Tamu:</div>
+        <code id="qrModalTokenText" style="display:block; padding:8px; background:var(--secondary); border-radius:6px; font-size:12px; word-break:break-all; margin-bottom:12px;"></code>
+        <div style="font-size:12px; color:var(--text-secondary); margin-bottom:6px;">Link Undangan Pribadi:</div>
+        <input type="text" id="qrModalUrlInput" class="form-control" readonly style="font-size:12px; text-align:center;">
+      </div>
+      <div class="modal-footer" style="justify-content:center;">
+        <button type="button" class="btn btn-secondary" onclick="copyQrModalUrl()">Salin Link Undangan</button>
+        <button type="button" class="btn btn-primary" onclick="openQrModalUrl()">Buka Undangan Tamu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Edit RSVP oleh Admin -->
+  <div id="rsvpEditModalBackdrop" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="rsvpEditModalTitle">Update RSVP Tamu</h3>
+        <button type="button" class="btn btn-icon btn-outline" onclick="closeRsvpEditModal()">✕</button>
+      </div>
+      <form action="javascript:void(0);" onsubmit="handleAdminRsvpFormSubmit(event); return false;">
+        <div class="modal-body">
+          <input type="hidden" id="adminRsvpGuestId">
+          <div class="form-group">
+            <label class="form-label">Status Kehadiran</label>
+            <select id="adminRsvpStatus" class="form-control">
+              <option value="Hadir">Hadir</option>
+              <option value="Tidak Hadir">Tidak Hadir</option>
+              <option value="Belum Konfirmasi">Belum Konfirmasi</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Jumlah Orang (Pax)</label>
+            <input type="number" id="adminRsvpCount" class="form-control" min="0" max="10" value="1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ucapan & Doa</label>
+            <textarea id="adminRsvpWishes" class="form-control"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeRsvpEditModal()">Batal</button>
+          <button type="submit" class="btn btn-primary">Simpan Perubahan RSVP</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <?!= include('ScriptsAdmin'); ?>
+</body>
+</html>

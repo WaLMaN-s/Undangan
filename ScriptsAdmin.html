@@ -1,0 +1,1903 @@
+<script>
+  
+
+  const MEMORY_STORAGE = {};
+  function safeStorageGet(key) {
+    try {
+      return (window.localStorage && window.localStorage.getItem(key)) || MEMORY_STORAGE[key] || '';
+    } catch (e) {
+      return MEMORY_STORAGE[key] || '';
+    }
+  }
+  function safeStorageSet(key, val) {
+    MEMORY_STORAGE[key] = String(val || '');
+    try {
+      if (window.localStorage) window.localStorage.setItem(key, String(val || ''));
+    } catch (e) {}
+  }
+  function safeStorageRemove(key) {
+    delete MEMORY_STORAGE[key];
+    try {
+      if (window.localStorage) window.localStorage.removeItem(key);
+    } catch (e) {}
+  }
+
+  const ADMIN_STATE = {
+    sessionToken: safeStorageGet('WIMS_ADMIN_SESSION_TOKEN') || '',
+    user: null,
+    currentView: 'overview',
+    guestsList: [],
+    guestsPage: 1,
+    guestsPageSize: 15,
+    guestsTotalPages: 1,
+    selectedGuestIds: new Set(),
+    rsvpList: [],
+    weddingConfig: null,
+    systemConfig: null,
+    storyDraft: [],
+    galleryDraft: [],
+    deliveryChart: null,
+    rsvpChart: null,
+    qrScannerInstance: null,
+    qrScannerActive: false,
+    guestSearchTimer: null
+  };
+
+  const VIEW_META = {
+    overview: {
+      title: 'Dashboard Overview',
+      subtitle: 'Ringkasan statistik tamu, pengiriman undangan, dan konfirmasi kehadiran.'
+    },
+    guests: {
+      title: 'Manajemen Data Tamu',
+      subtitle: 'Kelola database tamu, validasi nomor WhatsApp, import CSV/Excel, dan link personal.'
+    },
+    editor: {
+      title: 'Invitation Editor & Live Preview',
+      subtitle: 'Atur informasi pasangan, jadwal acara, cerita cinta, galeri foto, dan musik latar.'
+    },
+    whatsapp: {
+      title: 'WhatsApp Message Management',
+      subtitle: 'Kelola template pesan, antrean WhatsApp Cloud API resmi, dan 1-Klik Kirim WA Gratis.'
+    },
+    rsvp: {
+      title: 'Manajemen RSVP & Buku Ucapan',
+      subtitle: 'Pantau konfirmasi kehadiran tamu, jumlah pax, serta doa dan ucapan.'
+    },
+    checkin: {
+      title: 'QR Code Check-in Kehadiran',
+      subtitle: 'Verifikasi QR Code tamu di lokasi acara secara realtime dan cegah check-in ganda.'
+    },
+    reports: {
+      title: 'Laporan & Export Data',
+      subtitle: 'Rekapitulasi menyeluruh berdasarkan kategori tamu, export CSV, dan cetak laporan.'
+    },
+    settings: {
+      title: 'Pengaturan Sistem & Integrasi',
+      subtitle: 'Konfigurasi Script Properties WhatsApp Cloud API, Google Sheets, Drive, dan akun Admin.'
+    }
+  };
+
+  
+  function callBackend(action, payload = {}) {
+    return new Promise((resolve, reject) => {
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler((res) => {
+            if (res && res.code === 'AUTH_UNAUTHORIZED') {
+              forceLogoutOnExpiredSession();
+              reject(new Error(res.message || 'Sesi berakhir.'));
+              return;
+            }
+            resolve(res);
+          })
+          .withFailureHandler((err) => {
+            reject(new Error(err && err.message ? err.message : 'Gagal menghubungi server Apps Script.'));
+          })
+          .apiDispatcher(action, payload, ADMIN_STATE.sessionToken);
+      } else {
+        reject(new Error('Lingkungan Google Apps Script (google.script.run) tidak terdeteksi.'));
+      }
+    });
+  }
+
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function formatDateId(isoStr) {
+    if (!isoStr) return '-';
+    try {
+      const d = new Date(isoStr);
+      if (isNaN(d.getTime())) return String(isoStr);
+      return d.toLocaleDateString('id-ID', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (e) {
+      return String(isoStr);
+    }
+  }
+
+  function formatLongWeddingDate(dateStr) {
+    if (!dateStr) return '-';
+    try {
+      const d = new Date(dateStr + 'T00:00:00');
+      if (isNaN(d.getTime())) return String(dateStr);
+      return d.toLocaleDateString('id-ID', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+    } catch (e) {
+      return String(dateStr);
+    }
+  }
+
+  function showToast(icon, title) {
+    if (typeof Swal === "undefined") { console.log(icon, title); return; }
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: icon,
+      title: title,
+      showConfirmButton: false,
+      timer: 3200,
+      timerProgressBar: true
+    });
+  }
+
+  function renderDeliveryBadge(status) {
+    const st = String(status || 'Belum Dikirim');
+    if (st === 'Terkirim') return `<span class="badge badge-success">Terkirim</span>`;
+    if (st === 'Gagal Dikirim') return `<span class="badge badge-danger">Gagal Dikirim</span>`;
+    if (st === 'Dalam Antrean') return `<span class="badge badge-gold">Dalam Antrean</span>`;
+    return `<span class="badge badge-neutral">Belum Dikirim</span>`;
+  }
+
+  function renderRsvpBadge(status, pax) {
+    const st = String(status || 'Belum Konfirmasi');
+    if (st === 'Hadir') {
+      const paxInfo = pax ? ` (${pax} org)` : '';
+      return `<span class="badge badge-success">Hadir${escapeHtml(paxInfo)}</span>`;
+    }
+    if (st === 'Tidak Hadir') return `<span class="badge badge-danger">Tidak Hadir</span>`;
+    return `<span class="badge badge-neutral">Belum Konfirmasi</span>`;
+  }
+
+  function refreshIcons() {
+    try { if (typeof lucide !== "undefined" && lucide.createIcons) lucide.createIcons(); } catch (e) {}
+  }
+
+  
+  document.addEventListener('DOMContentLoaded', async () => {
+    refreshIcons();
+    if (ADMIN_STATE.sessionToken) {
+      try {
+        const res = await callBackend('verifyAdminSession', {});
+        if (res && res.success && res.data && res.data.valid) {
+          ADMIN_STATE.user = res.data.user;
+          enterAuthenticatedShell();
+          return;
+        }
+      } catch (e) {
+
+      }
+    }
+    showLoginScreen();
+  });
+
+  function showLoginScreen() {
+    ADMIN_STATE.sessionToken = '';
+    safeStorageRemove('WIMS_ADMIN_SESSION_TOKEN');
+    document.getElementById('appShell').style.display = 'none';
+    document.getElementById('authScreen').style.display = 'flex';
+    refreshIcons();
+  }
+
+  function forceLogoutOnExpiredSession() {
+    stopQrCameraScanner();
+    showLoginScreen();
+    showToast('warning', 'Sesi login Anda telah berakhir. Silakan login kembali.');
+  }
+
+  function togglePasswordVisibility(inputId, btnEl) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    if (input.type === 'password') {
+      input.type = 'text';
+      btnEl.innerHTML = '<i data-lucide="eye-off" style="width:18px;height:18px;"></i>';
+    } else {
+      input.type = 'password';
+      btnEl.innerHTML = '<i data-lucide="eye" style="width:18px;height:18px;"></i>';
+    }
+    refreshIcons();
+  }
+
+  async function handleLoginSubmit(event) {
+    if (event && event.preventDefault) if (event && event.preventDefault) event.preventDefault();
+    if (event && event.stopPropagation) event.stopPropagation();
+    const username = document.getElementById('loginUsername').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const errBox = document.getElementById('loginErrorBox');
+    const submitBtn = document.getElementById('loginSubmitBtn');
+
+    errBox.style.display = 'none';
+    if (!username || !password) {
+      errBox.textContent = 'Username dan password wajib diisi.';
+      errBox.style.display = 'block';
+      return false;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span>Memverifikasi Kredensial...</span>';
+
+    try {
+      const res = await callBackend('authenticateAdmin', { username, password });
+      if (!res || !res.success) {
+        errBox.textContent = (res && res.message) || 'Login gagal. Periksa username dan password Anda.';
+        errBox.style.display = 'block';
+        return false;
+      }
+
+      ADMIN_STATE.sessionToken = res.data.sessionToken;
+      ADMIN_STATE.user = res.data.user;
+      safeStorageSet('WIMS_ADMIN_SESSION_TOKEN', ADMIN_STATE.sessionToken);
+      document.getElementById('loginPassword').value = '';
+      showToast('success', res.message || 'Login berhasil!');
+      await enterAuthenticatedShell();
+    } catch (err) {
+      errBox.textContent = err.message;
+      errBox.style.display = 'block';
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i data-lucide="log-in" style="width:17px;height:17px;"></i><span>Masuk ke Dashboard Admin</span>';
+      refreshIcons();
+    }
+    return false;
+  }
+
+  async function handleLogout() {
+    const confirm = await Swal.fire({
+      title: 'Keluar dari Dashboard?',
+      text: 'Sesi aktif Anda akan diakhiri dengan aman.',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#B99A62',
+      confirmButtonText: 'Ya, Logout',
+      cancelButtonText: 'Batal'
+    });
+    if (!confirm.isConfirmed) return;
+
+    stopQrCameraScanner();
+    try {
+      await callBackend('logoutAdmin', {});
+    } catch (e) {}
+    showLoginScreen();
+    showToast('info', 'Anda telah keluar dari sistem.');
+  }
+
+  async function enterAuthenticatedShell() {
+    document.getElementById('authScreen').style.display = 'none';
+    document.getElementById('appShell').style.display = 'flex';
+    if (ADMIN_STATE.user && ADMIN_STATE.user.username) {
+      document.getElementById('topbarAdminName').textContent = ADMIN_STATE.user.username;
+      document.getElementById('setAdminUsername').value = ADMIN_STATE.user.username;
+    }
+    await Promise.all([
+      loadOverviewDashboard(),
+      loadInvitationEditorAndSettings()
+    ]);
+  }
+
+  
+  function switchAdminView(viewName) {
+    if (ADMIN_STATE.currentView === 'checkin' && viewName !== 'checkin') {
+      stopQrCameraScanner();
+    }
+    ADMIN_STATE.currentView = viewName;
+
+    document.querySelectorAll('.nav-item').forEach((btn) => {
+      btn.classList.toggle('active', btn.getAttribute('data-view') === viewName);
+    });
+
+    document.querySelectorAll('.view-section').forEach((sec) => {
+      sec.classList.toggle('active', sec.id === 'view-' + viewName);
+    });
+
+    const meta = VIEW_META[viewName] || VIEW_META.overview;
+    document.getElementById('topbarTitle').textContent = meta.title;
+    document.getElementById('topbarSubtitle').textContent = meta.subtitle;
+
+    document.getElementById('sidebar').classList.remove('open');
+
+    refreshCurrentView();
+  }
+
+  function toggleMobileSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+  }
+
+  function refreshCurrentView() {
+    const v = ADMIN_STATE.currentView;
+    if (v === 'overview') loadOverviewDashboard();
+    else if (v === 'guests') loadGuestsTable(ADMIN_STATE.guestsPage);
+    else if (v === 'editor') loadInvitationEditorAndSettings();
+    else if (v === 'whatsapp') {
+      loadInvitationEditorAndSettings();
+      loadMessageHistory();
+    } else if (v === 'rsvp') loadRSVPManagement();
+    else if (v === 'checkin') loadCheckinView();
+    else if (v === 'reports') loadReportsView();
+    else if (v === 'settings') loadInvitationEditorAndSettings();
+  }
+
+  
+  async function loadOverviewDashboard() {
+    try {
+      const res = await callBackend('getDashboardStats', {});
+      if (!res || !res.success) return;
+
+      const d = res.data;
+      const ov = d.overview;
+
+      document.getElementById('statTotalGuests').textContent = ov.totalGuests;
+      document.getElementById('statSent').textContent = ov.sentCount;
+      document.getElementById('statUnsent').textContent = ov.unsentCount;
+      document.getElementById('statQueuedMeta').textContent = `${ov.queuedCount} dalam antrean`;
+      document.getElementById('statFailed').textContent = ov.failedCount;
+      document.getElementById('statRsvpHadir').textContent = ov.rsvpHadir;
+      document.getElementById('statTotalPaxMeta').textContent = `Estimasi ${ov.totalPaxHadir} orang (pax)`;
+      document.getElementById('statRsvpTidakHadir').textContent = ov.rsvpTidakHadir;
+      document.getElementById('statRsvpPending').textContent = ov.rsvpBelumKonfirmasi;
+      document.getElementById('statAttendancePct').textContent = `${ov.attendancePercentage}%`;
+      document.getElementById('statCheckinMeta').textContent = `${ov.checkinCount} tamu sudah QR Check-in`;
+
+      document.getElementById('navBadgeGuests').textContent = ov.totalGuests;
+      document.getElementById('navBadgeRsvp').textContent = ov.rsvpHadir + ov.rsvpTidakHadir;
+
+      if (d.weddingSummary) {
+        document.getElementById('sidebarCoupleNames').textContent = d.weddingSummary.couple;
+        document.getElementById('sidebarWeddingDate').textContent = formatLongWeddingDate(d.weddingSummary.wedding_date);
+      }
+
+      renderOverviewCharts(d.charts);
+      renderOverviewRecentGuests(d.recentGuests || []);
+      renderOverviewActivities(d.recentActivities || []);
+    } catch (err) {
+      showToast('error', err.message);
+    }
+  }
+
+  function renderOverviewCharts(chartsData) {
+    if (typeof Chart === 'undefined' || !chartsData) return;
+
+    const delivCtx = document.getElementById('deliveryChartCanvas');
+    if (delivCtx) {
+      if (ADMIN_STATE.deliveryChart) {
+        ADMIN_STATE.deliveryChart.destroy();
+      }
+      ADMIN_STATE.deliveryChart = new Chart(delivCtx, {
+        type: 'doughnut',
+        data: {
+          labels: chartsData.delivery.labels,
+          datasets: [{
+            data: chartsData.delivery.values,
+            backgroundColor: ['#3B9B72', '#EAE5DB', '#B99A62', '#D95C5C'],
+            borderWidth: 2,
+            borderColor: '#FFFFFF'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom' }
+          }
+        }
+      });
+    }
+
+    const rsvpCtx = document.getElementById('rsvpChartCanvas');
+    if (rsvpCtx) {
+      if (ADMIN_STATE.rsvpChart) {
+        ADMIN_STATE.rsvpChart.destroy();
+      }
+      ADMIN_STATE.rsvpChart = new Chart(rsvpCtx, {
+        type: 'bar',
+        data: {
+          labels: chartsData.rsvp.labels,
+          datasets: [{
+            label: 'Jumlah Tamu',
+            data: chartsData.rsvp.values,
+            backgroundColor: ['#3B9B72', '#D95C5C', '#B99A62'],
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: { beginAtZero: true, ticks: { precision: 0 } }
+          }
+        }
+      });
+    }
+  }
+
+  function renderOverviewRecentGuests(list) {
+    const tbody = document.getElementById('overviewRecentGuestsBody');
+    if (!list.length) {
+      tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Belum ada tamu yang terdaftar.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = list.map((g) => `
+      <tr>
+        <td><strong>${escapeHtml(g.guest_name)}</strong><div style="font-size:11.5px;color:var(--text-secondary);">${escapeHtml(g.whatsapp_number)}</div></td>
+        <td><span class="badge badge-gold">${escapeHtml(g.category)}</span></td>
+        <td>${renderDeliveryBadge(g.delivery_status)}</td>
+        <td>${renderRsvpBadge(g.rsvp_status)}</td>
+      </tr>
+    `).join('');
+  }
+
+  function renderOverviewActivities(activities) {
+    const box = document.getElementById('overviewActivitiesList');
+    if (!activities.length) {
+      box.innerHTML = '<div class="empty-state">Belum ada aktivitas tercatat.</div>';
+      return;
+    }
+    box.innerHTML = activities.map((act) => `
+      <div class="activity-item">
+        <div class="activity-dot"></div>
+        <div style="flex:1;">
+          <div style="font-weight:600; font-size:13px;">${escapeHtml(act.title)}</div>
+          <div style="font-size:12px; color:var(--text-secondary);">${escapeHtml(act.subtitle)}</div>
+        </div>
+        <div style="font-size:11px; color:var(--text-secondary); white-space:nowrap;">${escapeHtml(formatDateId(act.timestamp))}</div>
+      </div>
+    `).join('');
+  }
+
+  
+  function debounceGuestLoad() {
+    clearTimeout(ADMIN_STATE.guestSearchTimer);
+    ADMIN_STATE.guestSearchTimer = setTimeout(() => {
+      loadGuestsTable(1);
+    }, 280);
+  }
+
+  async function loadGuestsTable(page = 1) {
+    ADMIN_STATE.guestsPage = page;
+    const search = document.getElementById('guestSearchInput').value.trim();
+    const category = document.getElementById('guestFilterCategory').value;
+    const delivery_status = document.getElementById('guestFilterDelivery').value;
+    const rsvp_status = document.getElementById('guestFilterRsvp').value;
+
+    try {
+      const res = await callBackend('getGuests', {
+        search,
+        category,
+        delivery_status,
+        rsvp_status,
+        page: ADMIN_STATE.guestsPage,
+        pageSize: ADMIN_STATE.guestsPageSize
+      });
+
+      if (!res || !res.success) {
+        showToast('error', (res && res.message) || 'Gagal memuat daftar tamu.');
+        return;
+      }
+
+      ADMIN_STATE.guestsList = res.data.guests || [];
+      const pg = res.data.pagination;
+      ADMIN_STATE.guestsTotalPages = pg.totalPages || 1;
+      document.getElementById('navBadgeGuests').textContent = pg.totalAllGuests || 0;
+
+      renderGuestsTableRows();
+      document.getElementById('guestsPaginationInfo').textContent =
+        `Menampilkan ${ADMIN_STATE.guestsList.length} dari ${pg.totalItems} tamu terfilter (Total Database: ${pg.totalAllGuests})`;
+      document.getElementById('guestPageIndicator').textContent = `Hal ${pg.page} / ${pg.totalPages}`;
+      document.getElementById('guestPrevPageBtn').disabled = pg.page <= 1;
+      document.getElementById('guestNextPageBtn').disabled = pg.page >= pg.totalPages;
+    } catch (err) {
+      showToast('error', err.message);
+    }
+  }
+
+  function changeGuestPage(delta) {
+    const next = ADMIN_STATE.guestsPage + delta;
+    if (next < 1 || next > ADMIN_STATE.guestsTotalPages) return;
+    loadGuestsTable(next);
+  }
+
+  function renderGuestsTableRows() {
+    const tbody = document.getElementById('guestsTableBody');
+    const list = ADMIN_STATE.guestsList;
+
+    if (!list.length) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="8" class="empty-state">
+            <h4>Tidak Ada Data Tamu</h4>
+            <p>Silakan tambah tamu baru atau import daftar tamu dari file CSV / Excel.</p>
+          </td>
+        </tr>`;
+      updateBulkSelectionUI();
+      return;
+    }
+
+    tbody.innerHTML = list.map((g) => {
+      const checked = ADMIN_STATE.selectedGuestIds.has(g.guest_id) ? 'checked' : '';
+      return `
+        <tr>
+          <td>
+            <input type="checkbox" ${checked} onchange="toggleGuestRowSelect('${escapeHtml(g.guest_id)}', this.checked)">
+          </td>
+          <td>
+            <div style="font-weight:600; color:var(--text-primary);">${escapeHtml(g.guest_name)}</div>
+            <div style="font-size:11px; color:var(--text-secondary);">${escapeHtml(g.guest_id)}</div>
+          </td>
+          <td>
+            <span style="font-family:monospace; font-size:12.5px;">${escapeHtml(g.whatsapp_number)}</span>
+          </td>
+          <td>
+            <span class="badge badge-gold">${escapeHtml(g.category)}</span>
+          </td>
+          <td>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <button type="button" class="btn btn-outline btn-sm" onclick="copyTextToClipboard('${escapeHtml(g.invitation_url)}', 'Link undangan ${escapeHtml(g.guest_name)} disalin!')" title="Salin Link Undangan">
+                <i data-lucide="copy" style="width:13px;height:13px;"></i>
+                <span>Salin Link</span>
+              </button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="openQrPreviewModal('${escapeHtml(g.guest_id)}')" title="Lihat QR Code & Link">
+                <i data-lucide="qr-code" style="width:13px;height:13px;"></i>
+              </button>
+            </div>
+          </td>
+          <td>${renderDeliveryBadge(g.delivery_status)}</td>
+          <td>${renderRsvpBadge(g.rsvp_status, g.guest_count)}</td>
+          <td>
+            <div class="table-actions">
+              <button type="button" class="btn btn-success btn-sm" onclick="handleOneClickWhatsApp('${escapeHtml(g.guest_id)}')" title="1-Klik Kirim WhatsApp Gratis (wa.me)">
+                <i data-lucide="send" style="width:13px;height:13px;"></i>
+                <span>Kirim WA</span>
+              </button>
+              <button type="button" class="btn btn-outline btn-icon" onclick="openEditGuestById('${escapeHtml(g.guest_id)}')" title="Edit Data Tamu">
+                <i data-lucide="pencil" style="width:14px;height:14px;"></i>
+              </button>
+              <button type="button" class="btn btn-outline btn-icon" style="color:var(--danger);" onclick="handleDeleteSingleGuest('${escapeHtml(g.guest_id)}', '${escapeHtml(g.guest_name)}')" title="Hapus Tamu">
+                <i data-lucide="trash-2" style="width:14px;height:14px;"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    updateBulkSelectionUI();
+    refreshIcons();
+  }
+
+  function toggleGuestRowSelect(guestId, isChecked) {
+    if (isChecked) ADMIN_STATE.selectedGuestIds.add(guestId);
+    else ADMIN_STATE.selectedGuestIds.delete(guestId);
+    updateBulkSelectionUI();
+  }
+
+  function toggleSelectAllGuests(isChecked) {
+    ADMIN_STATE.guestsList.forEach((g) => {
+      if (isChecked) ADMIN_STATE.selectedGuestIds.add(g.guest_id);
+      else ADMIN_STATE.selectedGuestIds.delete(g.guest_id);
+    });
+    renderGuestsTableRows();
+  }
+
+  function updateBulkSelectionUI() {
+    const count = ADMIN_STATE.selectedGuestIds.size;
+    document.getElementById('selectedGuestsCount').textContent = count;
+    document.getElementById('bulkDeleteBtn').style.display = count > 0 ? 'inline-flex' : 'none';
+    document.getElementById('bulkQueueBtn').style.display = count > 0 ? 'inline-flex' : 'none';
+  }
+
+  function openGuestModal(guest = null) {
+    document.getElementById('guestForm').reset();
+    if (guest) {
+      document.getElementById('guestModalTitle').textContent = 'Edit Data Tamu';
+      document.getElementById('formGuestId').value = guest.guest_id;
+      document.getElementById('formGuestName').value = guest.guest_name;
+      document.getElementById('formGuestPhone').value = guest.whatsapp_number;
+      document.getElementById('formGuestCategory').value = guest.category || 'Lainnya';
+      document.getElementById('formRegenerateTokenGroup').style.display = 'block';
+      document.getElementById('formRegenerateToken').checked = false;
+    } else {
+      document.getElementById('guestModalTitle').textContent = 'Tambah Tamu Undangan Baru';
+      document.getElementById('formGuestId').value = '';
+      document.getElementById('formRegenerateTokenGroup').style.display = 'none';
+    }
+    document.getElementById('guestModalBackdrop').classList.add('open');
+  }
+
+  function openEditGuestById(guestId) {
+    const found = ADMIN_STATE.guestsList.find((g) => g.guest_id === guestId);
+    if (found) openGuestModal(found);
+  }
+
+  function closeGuestModal() {
+    document.getElementById('guestModalBackdrop').classList.remove('open');
+  }
+
+  async function handleGuestFormSubmit(event) {
+    if (event && event.preventDefault) event.preventDefault();
+    const guestId = document.getElementById('formGuestId').value.trim();
+    const guest_name = document.getElementById('formGuestName').value.trim();
+    const whatsapp_number = document.getElementById('formGuestPhone').value.trim();
+    const category = document.getElementById('formGuestCategory').value;
+    const regenerateToken = document.getElementById('formRegenerateToken').checked;
+
+    const cleanDigits = whatsapp_number.replace(/[^0-9+]/g, '');
+    if (!/^(\+62|62|0)?8[1-9][0-9]{7,11}$/.test(cleanDigits)) {
+      Swal.fire('Nomor WhatsApp Tidak Valid', 'Gunakan nomor WhatsApp Indonesia aktif (contoh: 081234567890 atau 6281234567890).', 'warning');
+      return;
+    }
+
+    const btn = document.getElementById('guestFormSubmitBtn');
+    btn.disabled = true;
+
+    try {
+      const action = guestId ? 'updateGuest' : 'addGuest';
+      const res = await callBackend(action, {
+        guest_id: guestId,
+        guest_name,
+        whatsapp_number,
+        category,
+        regenerateToken
+      });
+
+      if (!res || !res.success) {
+        Swal.fire('Gagal Menyimpan', (res && res.message) || 'Terjadi kesalahan.', 'error');
+        return;
+      }
+
+      closeGuestModal();
+      showToast('success', res.message);
+      loadGuestsTable(guestId ? ADMIN_STATE.guestsPage : 1);
+    } catch (err) {
+      Swal.fire('Error', err.message, 'error');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  async function handleDeleteSingleGuest(guestId, guestName) {
+    const conf = await Swal.fire({
+      title: `Hapus Tamu "${guestName}"?`,
+      text: 'Data tamu beserta riwayat RSVP dan check-in miliknya akan dihapus permanen.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#D95C5C',
+      confirmButtonText: 'Ya, Hapus',
+      cancelButtonText: 'Batal'
+    });
+    if (!conf.isConfirmed) return;
+
+    try {
+      const res = await callBackend('deleteGuest', { guest_id: guestId });
+      if (!res || !res.success) {
+        Swal.fire('Gagal', (res && res.message) || 'Gagal menghapus tamu.', 'error');
+        return;
+      }
+      ADMIN_STATE.selectedGuestIds.delete(guestId);
+      showToast('success', res.message);
+      loadGuestsTable(ADMIN_STATE.guestsPage);
+    } catch (err) {
+      Swal.fire('Error', err.message, 'error');
+    }
+  }
+
+  async function handleBulkDeleteGuests() {
+    const ids = Array.from(ADMIN_STATE.selectedGuestIds);
+    if (!ids.length) return;
+
+    const conf = await Swal.fire({
+      title: `Hapus ${ids.length} Tamu Terpilih?`,
+      text: 'Tindakan ini tidak dapat dibatalkan.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#D95C5C',
+      confirmButtonText: `Ya, Hapus ${ids.length} Tamu`,
+      cancelButtonText: 'Batal'
+    });
+    if (!conf.isConfirmed) return;
+
+    try {
+      const res = await callBackend('bulkDeleteGuests', { guestIds: ids });
+      if (!res || !res.success) {
+        Swal.fire('Gagal', res.message, 'error');
+        return;
+      }
+      ADMIN_STATE.selectedGuestIds.clear();
+      document.getElementById('selectAllGuestsCheckbox').checked = false;
+      showToast('success', res.message);
+      loadGuestsTable(1);
+    } catch (err) {
+      Swal.fire('Error', err.message, 'error');
+    }
+  }
+
+  async function queueSelectedGuestsFromTable() {
+    const ids = Array.from(ADMIN_STATE.selectedGuestIds);
+    if (!ids.length) return;
+
+    try {
+      const res = await callBackend('createMessageQueue', {
+        selectionMode: 'selected',
+        guestIds: ids
+      });
+      if (!res || !res.success) {
+        Swal.fire('Gagal', res.message, 'error');
+        return;
+      }
+      ADMIN_STATE.selectedGuestIds.clear();
+      showToast('success', res.message);
+      switchAdminView('whatsapp');
+    } catch (err) {
+      Swal.fire('Error', err.message, 'error');
+    }
+  }
+
+  
+  async function handleOneClickWhatsApp(guestId) {
+    const guest = ADMIN_STATE.guestsList.find((g) => g.guest_id === guestId);
+    if (guest && guest.wa_me_url) {
+      window.open(guest.wa_me_url, '_blank', 'noopener,noreferrer');
+    }
+
+    try {
+      const res = await callBackend('recordManualWhatsAppSend', { guest_id: guestId });
+      if (res && res.success) {
+        if (!guest && res.data && res.data.wa_me_url) {
+          window.open(res.data.wa_me_url, '_blank', 'noopener,noreferrer');
+        }
+        showToast('success', res.message);
+        if (ADMIN_STATE.currentView === 'guests') loadGuestsTable(ADMIN_STATE.guestsPage);
+        else if (ADMIN_STATE.currentView === 'whatsapp') loadMessageHistory();
+      }
+    } catch (err) {
+      showToast('error', err.message);
+    }
+  }
+
+  
+  function openImportModal() {
+    document.getElementById('importFileInput').value = '';
+    document.getElementById('importResultSummary').style.display = 'none';
+    document.getElementById('importModalBackdrop').classList.add('open');
+  }
+
+  function closeImportModal() {
+    document.getElementById('importModalBackdrop').classList.remove('open');
+  }
+
+  function downloadSampleImportCSV() {
+    const sample =
+      'guest_name,whatsapp_number,category\r\n' +
+      '"Andi Pratama","081234567801","Teman"\r\n' +
+      '"Dewi Sartika","6281234567802","Keluarga"\r\n' +
+      '"Hendra Kusuma","081398765432","Rekan Kerja"';
+    triggerBrowserDownload('template_import_tamu.csv', sample, 'text/csv;charset=utf-8;');
+  }
+
+  async function handleProcessImportFile() {
+    const fileInput = document.getElementById('importFileInput');
+    const file = fileInput.files && fileInput.files[0];
+    if (!file) {
+      Swal.fire('Pilih File', 'Silakan pilih file .CSV atau Excel (.xlsx / .xls) terlebih dahulu.', 'warning');
+      return;
+    }
+
+    const btn = document.getElementById('importSubmitBtn');
+    const summaryBox = document.getElementById('importResultSummary');
+    btn.disabled = true;
+    btn.textContent = 'Memproses Import...';
+
+    try {
+      const fileName = file.name.toLowerCase();
+      let payload = {};
+
+      if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+        const base64 = await readFileAsBase64(file);
+        payload = {
+          excelBase64: base64,
+          fileName: file.name,
+          mimeType: file.type || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        };
+      } else {
+        const csvText = await readFileAsText(file);
+        payload = { csvText };
+      }
+
+      const res = await callBackend('importGuests', payload);
+      if (!res || !res.success) {
+        Swal.fire('Import Gagal', (res && res.message) || 'Gagal memproses file.', 'error');
+        return;
+      }
+
+      const d = res.data;
+      summaryBox.style.display = 'block';
+      summaryBox.innerHTML = `
+        <div style="font-weight:600; color:var(--success); margin-bottom:6px;">${escapeHtml(res.message)}</div>
+        <div>• Berhasil ditambahkan: <strong>${d.importedCount}</strong> tamu</div>
+        <div>• Nomor WA duplikat dilewati: <strong>${d.duplicateCount}</strong> baris</div>
+        <div>• Format tidak valid dilewati: <strong>${d.invalidCount}</strong> baris</div>
+      `;
+
+      showToast('success', `${d.importedCount} tamu berhasil di-import!`);
+      loadGuestsTable(1);
+    } catch (err) {
+      Swal.fire('Error Import', err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Mulai Import Data';
+    }
+  }
+
+  function readFileAsText(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(new Error('Gagal membaca teks file.'));
+      reader.readAsText(file);
+    });
+  }
+
+  function readFileAsBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const res = String(reader.result || '');
+        const clean = res.replace(/^data:[^;]+;base64,/, '');
+        resolve(clean);
+      };
+      reader.onerror = () => reject(new Error('Gagal membaca file Excel.'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function openQrPreviewModal(guestId) {
+    const guest = ADMIN_STATE.guestsList.find((g) => g.guest_id === guestId);
+    if (!guest) return;
+
+    document.getElementById('qrModalGuestName').textContent = `QR Undangan — ${guest.guest_name}`;
+    document.getElementById('qrModalTokenText').textContent = guest.invitation_token || guest.guest_id;
+    document.getElementById('qrModalUrlInput').value = guest.invitation_url;
+
+    const qrBox = document.getElementById('adminGuestQrCanvas');
+    qrBox.innerHTML = '';
+    if (typeof QRCode !== 'undefined') {
+      new QRCode(qrBox, {
+        text: guest.invitation_token || guest.invitation_url,
+        width: 180,
+        height: 180,
+        colorDark: '#292722',
+        colorLight: '#FFFFFF'
+      });
+    }
+    document.getElementById('qrPreviewModalBackdrop').classList.add('open');
+  }
+
+  function closeQrPreviewModal() {
+    document.getElementById('qrPreviewModalBackdrop').classList.remove('open');
+  }
+
+  function copyQrModalUrl() {
+    const url = document.getElementById('qrModalUrlInput').value;
+    copyTextToClipboard(url, 'Link undangan pribadi berhasil disalin!');
+  }
+
+  function openQrModalUrl() {
+    const url = document.getElementById('qrModalUrlInput').value;
+    if (url) window.open(url, '_blank', 'noopener,noreferrer');
+  }
+
+  function copyTextToClipboard(text, successMsg) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('success', successMsg || 'Disalin ke clipboard!');
+      });
+    } else {
+      const temp = document.createElement('textarea');
+      temp.value = text;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand('copy');
+      document.body.removeChild(temp);
+      showToast('success', successMsg || 'Disalin ke clipboard!');
+    }
+  }
+
+  
+  async function loadInvitationEditorAndSettings() {
+    try {
+      const res = await callBackend('getWeddingSettingsAdmin', {});
+      if (!res || !res.success) return;
+
+      const w = res.data.wedding;
+      const sys = res.data.system;
+      ADMIN_STATE.weddingConfig = w;
+      ADMIN_STATE.systemConfig = sys;
+
+      document.getElementById('edStatus').value = w.status || 'Published';
+      const activeTheme = w.invitation_theme || 'elegant_floral';
+      document.getElementById('edInvitationTheme').value = activeTheme;
+      selectInvitationTheme(activeTheme);
+      document.getElementById('edGroomName').value = w.groom_name || '';
+      document.getElementById('edGroomNickname').value = w.groom_nickname || '';
+      document.getElementById('edGroomParents').value = w.groom_parents || '';
+      document.getElementById('edBrideName').value = w.bride_name || '';
+      document.getElementById('edBrideNickname').value = w.bride_nickname || '';
+      document.getElementById('edBrideParents').value = w.bride_parents || '';
+      document.getElementById('edCoverImage').value = w.cover_image || '';
+      document.getElementById('edGroomPhoto').value = w.groom_photo || '';
+      document.getElementById('edBridePhoto').value = w.bride_photo || '';
+      document.getElementById('edDescription').value = w.description || '';
+      document.getElementById('edWeddingDate').value = w.wedding_date || '';
+      document.getElementById('edVenue').value = w.venue || '';
+      document.getElementById('edAkadTitle').value = w.akad_title || 'Akad Nikah';
+      document.getElementById('edAkadTime').value = w.akad_time || '';
+      document.getElementById('edReceptionTitle').value = w.reception_title || 'Resepsi Pernikahan';
+      document.getElementById('edReceptionTime').value = w.reception_time || '';
+      document.getElementById('edAddress').value = w.address || '';
+      document.getElementById('edMapsUrl').value = w.maps_url || '';
+      document.getElementById('edQuoteText').value = w.quote_text || '';
+      document.getElementById('edQuoteSource').value = w.quote_source || '';
+      document.getElementById('edMusicUrl').value = w.music_url || '';
+      document.getElementById('edMusicEnabled').value = String(w.music_enabled !== false);
+      document.getElementById('edClosingText').value = w.closing_text || '';
+
+      ADMIN_STATE.storyDraft = Array.isArray(w.our_story) ? JSON.parse(JSON.stringify(w.our_story)) : [];
+      ADMIN_STATE.galleryDraft = Array.isArray(w.gallery) ? JSON.parse(JSON.stringify(w.gallery)) : [];
+
+      renderStoryEditorList();
+      renderGalleryEditorList();
+      updateLiveMobilePreview();
+
+      document.getElementById('waTemplateTextarea').value = w.wa_message_template || '';
+      updateWaMessagePreview();
+
+      document.getElementById('setSpreadsheetId').value = sys.spreadsheetId || '';
+      document.getElementById('setDriveFolderId').value = sys.driveFolderId || '';
+      document.getElementById('setWebAppBaseUrl').value = sys.webAppBaseUrl || '';
+      document.getElementById('setWaPhoneNumberId').value = sys.waPhoneNumberId || '';
+      document.getElementById('setWaBusinessId').value = sys.waBusinessAccountId || '';
+      document.getElementById('setWaApiVersion').value = sys.waApiVersion || 'v20.0';
+      document.getElementById('setWaUseTemplateApi').checked = !!sys.waUseTemplateApi;
+      document.getElementById('setWaMetaTemplateName').value = sys.waMetaTemplateName || '';
+      document.getElementById('setWaMetaTemplateLang').value = sys.waMetaTemplateLang || 'id';
+
+      const tokenHint = document.getElementById('setWaTokenStatusHint');
+      const waBadge = document.getElementById('waCloudStatusBadge');
+      if (sys.waHasAccessToken && sys.waPhoneNumberId) {
+        tokenHint.textContent = 'Status Token: Tersimpan aman di Script Properties (✓ Aktif)';
+        tokenHint.style.color = 'var(--success)';
+        waBadge.innerHTML = '<span class="badge badge-success">Cloud API Resmi: Terhubung + 1-Klik Gratis Aktif</span>';
+      } else {
+        tokenHint.textContent = 'Status Token: Belum diatur di Script Properties';
+        tokenHint.style.color = 'var(--text-secondary)';
+        waBadge.innerHTML = '<span class="badge badge-gold">Mode 1-Klik WA Gratis Aktif (Cloud API Belum Diatur)</span>';
+      }
+    } catch (err) {
+      showToast('error', err.message);
+    }
+  }
+
+  function renderStoryEditorList() {
+    const container = document.getElementById('storyEditorList');
+    if (!ADMIN_STATE.storyDraft.length) {
+      container.innerHTML = '<div style="font-size:12.5px; color:var(--text-secondary); padding:8px 0;">Belum ada bab cerita pasangan.</div>';
+      return;
+    }
+    container.innerHTML = ADMIN_STATE.storyDraft.map((item, idx) => `
+      <div class="story-item-editor">
+        <div style="display:flex; justify-content:space-between; gap:10px; margin-bottom:8px;">
+          <input type="text" class="form-control" style="max-width:140px;" placeholder="Tahun / Tanggal" value="${escapeHtml(item.year)}" oninput="updateStoryItemField(${idx}, 'year', this.value)">
+          <input type="text" class="form-control" placeholder="Judul Momen (Contoh: Pertemuan Pertama)" value="${escapeHtml(item.title)}" oninput="updateStoryItemField(${idx}, 'title', this.value)">
+          <button type="button" class="btn btn-outline btn-icon" style="color:var(--danger);" onclick="removeStoryEditorItem(${idx})">✕</button>
+        </div>
+        <textarea class="form-control" style="min-height:60px;" placeholder="Ceritakan momen singkat..." oninput="updateStoryItemField(${idx}, 'story', this.value)">${escapeHtml(item.story)}</textarea>
+      </div>
+    `).join('');
+  }
+
+  function addStoryEditorItem() {
+    ADMIN_STATE.storyDraft.push({ year: '2026', title: 'Momen Spesial', story: '' });
+    renderStoryEditorList();
+  }
+
+  function removeStoryEditorItem(idx) {
+    ADMIN_STATE.storyDraft.splice(idx, 1);
+    renderStoryEditorList();
+  }
+
+  function updateStoryItemField(idx, field, val) {
+    if (ADMIN_STATE.storyDraft[idx]) {
+      ADMIN_STATE.storyDraft[idx][field] = val;
+    }
+  }
+
+  function renderGalleryEditorList() {
+    const container = document.getElementById('galleryEditorList');
+    if (!ADMIN_STATE.galleryDraft.length) {
+      container.innerHTML = '<div style="font-size:12.5px; color:var(--text-secondary); padding:8px 0;">Belum ada foto di galeri.</div>';
+      return;
+    }
+    container.innerHTML = ADMIN_STATE.galleryDraft.map((img, idx) => `
+      <div class="gallery-item-editor" style="display:flex; align-items:center; gap:12px;">
+        <img src="${escapeHtml(img.image_url)}" alt="Thumb" style="width:58px; height:58px; object-fit:cover; border-radius:8px; border:1px solid var(--border); flex-shrink:0;">
+        <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
+          <input type="url" class="form-control" placeholder="URL Gambar (https:\/\/...)" value="${escapeHtml(img.image_url)}" oninput="updateGalleryItemField(${idx}, 'image_url', this.value)">
+          <input type="text" class="form-control" placeholder="Caption Foto" value="${escapeHtml(img.caption)}" oninput="updateGalleryItemField(${idx}, 'caption', this.value)">
+        </div>
+        <button type="button" class="btn btn-outline btn-icon" style="color:var(--danger);" onclick="removeGalleryEditorItem(${idx})">✕</button>
+      </div>
+    `).join('');
+  }
+
+  function addGalleryEditorItem() {
+    ADMIN_STATE.galleryDraft.push({
+      image_id: 'GAL-' + Date.now(),
+      image_url: 'https:\/\/images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=900&q=80',
+      caption: 'Momen Bahagia',
+      display_order: ADMIN_STATE.galleryDraft.length + 1
+    });
+    renderGalleryEditorList();
+  }
+
+  function removeGalleryEditorItem(idx) {
+    ADMIN_STATE.galleryDraft.splice(idx, 1);
+    renderGalleryEditorList();
+  }
+
+  function updateGalleryItemField(idx, field, val) {
+    if (ADMIN_STATE.galleryDraft[idx]) {
+      ADMIN_STATE.galleryDraft[idx][field] = val;
+    }
+  }
+
+  async function handleDriveImageUpload(fileInputEl, targetInputId) {
+    const file = fileInputEl.files && fileInputEl.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      Swal.fire('File Terlalu Besar', 'Ukuran maksimal foto adalah 5 MB.', 'warning');
+      return;
+    }
+
+    showToast('info', 'Mengunggah gambar ke Google Drive...');
+    try {
+      const base64Data = await readFileAsBase64(file);
+      const res = await callBackend('uploadImageToDrive', {
+        base64Data,
+        fileName: file.name,
+        mimeType: file.type
+      });
+      if (!res || !res.success) {
+        Swal.fire('Upload Gagal', res.message, 'error');
+        return;
+      }
+      document.getElementById(targetInputId).value = res.data.imageUrl;
+      updateLiveMobilePreview();
+      showToast('success', 'Gambar berhasil diunggah ke Google Drive!');
+    } catch (err) {
+      Swal.fire('Error Upload', err.message, 'error');
+    } finally {
+      fileInputEl.value = '';
+    }
+  }
+
+  async function handleUploadNewGalleryPhoto(fileInputEl) {
+    const file = fileInputEl.files && fileInputEl.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      Swal.fire('File Terlalu Besar', 'Ukuran maksimal foto adalah 5 MB.', 'warning');
+      return;
+    }
+
+    showToast('info', 'Mengunggah foto galeri ke Google Drive...');
+    try {
+      const base64Data = await readFileAsBase64(file);
+      const res = await callBackend('uploadImageToDrive', {
+        base64Data,
+        fileName: file.name,
+        mimeType: file.type
+      });
+      if (!res || !res.success) {
+        Swal.fire('Upload Gagal', res.message, 'error');
+        return;
+      }
+      ADMIN_STATE.galleryDraft.push({
+        image_id: 'GAL-' + Date.now(),
+        image_url: res.data.imageUrl,
+        caption: file.name.replace(/\.[^.]+$/, ''),
+        display_order: ADMIN_STATE.galleryDraft.length + 1
+      });
+      renderGalleryEditorList();
+      showToast('success', 'Foto berhasil ditambahkan ke galeri!');
+    } catch (err) {
+      Swal.fire('Error Upload', err.message, 'error');
+    } finally {
+      fileInputEl.value = '';
+    }
+  }
+
+  const THEME_LABELS = {
+    elegant_floral: '1. Elegant Floral',
+    batak_heritage: '2. Batak Heritage',
+    modern_minimalist: '3. Modern Minimalist',
+    romantic_sunset: '4. Romantic Sunset',
+    dark_luxury: '5. Dark Luxury'
+  };
+
+  function renderPreviewOrnamentHtml(themeId, groomNick, brideNick) {
+    const gInit = String(groomNick || 'R').trim().charAt(0).toUpperCase();
+    const bInit = String(brideNick || 'J').trim().charAt(0).toUpperCase();
+    if (themeId === 'batak_heritage') {
+      return `
+        <div style="height:10px; background:repeating-linear-gradient(90deg,#7A1215 0 10px,#D4AF37 10px 14px,#121010 14px 22px); border-top:1px solid #D4AF37; border-bottom:1px solid #D4AF37; margin-bottom:6px;"></div>
+        <div style="font-size:10px; color:#D4AF37; letter-spacing:0.15em; font-weight:700;">✦ HORAS • GORGA BATAK HERITAGE ✦</div>
+      `;
+    }
+    if (themeId === 'modern_minimalist') {
+      return `
+        <div style="width:46px; height:46px; border:1.5px solid #8C7055; background:#FFF; display:flex; align-items:center; justify-content:center; font-family:var(--font-heading); font-size:15px; font-weight:600; color:#23201D; margin-bottom:6px;">${escapeHtml(gInit)}|${escapeHtml(bInit)}</div>
+      `;
+    }
+    if (themeId === 'romantic_sunset') {
+      return `
+        <div style="width:68px; height:34px; border-radius:68px 68px 0 0; background:radial-gradient(circle at 50% 100%, #FFF7D6 0%, #F4A27E 80%); margin:0 auto 6px; box-shadow:0 0 20px rgba(255,198,138,0.85);"></div>
+      `;
+    }
+    if (themeId === 'dark_luxury') {
+      return `
+        <div style="font-size:11px; color:#D4AF37; letter-spacing:0.2em; margin-bottom:4px;">─── ◆ ❖ ◆ ───</div>
+      `;
+    }
+    return `
+      <div style="font-size:12px; color:#B99A62; letter-spacing:0.15em; margin-bottom:4px;">✿ ─── ❀ ─── ✿</div>
+    `;
+  }
+
+  function selectInvitationTheme(themeId) {
+    const chosen = THEME_LABELS[themeId] ? themeId : 'elegant_floral';
+    const hiddenInput = document.getElementById('edInvitationTheme');
+    if (hiddenInput) hiddenInput.value = chosen;
+
+    document.querySelectorAll('[data-theme-card]').forEach((card) => {
+      card.classList.toggle('active', card.getAttribute('data-theme-card') === chosen);
+    });
+
+    const screen = document.getElementById('previewPhoneScreen');
+    if (screen) {
+      screen.setAttribute('data-theme', chosen);
+    }
+
+    const badge = document.getElementById('prevActiveThemeBadge');
+    if (badge) {
+      badge.textContent = THEME_LABELS[chosen] || '1. Elegant Floral';
+    }
+
+    const ornamentBox = document.getElementById('prevThemeOrnamentHeader');
+    if (ornamentBox) {
+      const gNick = (document.getElementById('edGroomNickname') && document.getElementById('edGroomNickname').value) || 'Romeo';
+      const bNick = (document.getElementById('edBrideNickname') && document.getElementById('edBrideNickname').value) || 'Juliet';
+      ornamentBox.innerHTML = renderPreviewOrnamentHtml(chosen, gNick, bNick);
+    }
+  }
+
+  async function handleQuickApplyTheme() {
+    const themeId = document.getElementById('edInvitationTheme').value || 'elegant_floral';
+    try {
+      const res = await callBackend('updateWeddingSettings', { invitation_theme: themeId });
+      if (!res || !res.success) {
+        Swal.fire('Gagal', res.message, 'error');
+        return;
+      }
+      showToast('success', 'Template "' + (THEME_LABELS[themeId] || themeId) + '" berhasil diterapkan ke seluruh undangan tamu!');
+    } catch (err) {
+      Swal.fire('Error', err.message, 'error');
+    }
+  }
+
+  function updateLiveMobilePreview() {
+    const themeId = (document.getElementById('edInvitationTheme') && document.getElementById('edInvitationTheme').value) || 'elegant_floral';
+    const groomNick = document.getElementById('edGroomNickname').value || document.getElementById('edGroomName').value || 'Romeo';
+    const brideNick = document.getElementById('edBrideNickname').value || document.getElementById('edBrideName').value || 'Juliet';
+    selectInvitationTheme(themeId);
+    const coverImg = document.getElementById('edCoverImage').value;
+    const desc = document.getElementById('edDescription').value;
+    const wDate = document.getElementById('edWeddingDate').value;
+    const akadTitle = document.getElementById('edAkadTitle').value || 'Akad Nikah';
+    const akadTime = document.getElementById('edAkadTime').value;
+    const recTitle = document.getElementById('edReceptionTitle').value || 'Resepsi';
+    const recTime = document.getElementById('edReceptionTime').value;
+    const venue = document.getElementById('edVenue').value;
+    const quote = document.getElementById('edQuoteText').value;
+
+    document.getElementById('prevCoupleTitle').textContent = `${groomNick} & ${brideNick}`;
+    if (coverImg) document.getElementById('prevCoverImg').src = coverImg;
+    document.getElementById('prevDescription').textContent = desc;
+    document.getElementById('prevDateText').textContent = formatLongWeddingDate(wDate);
+    document.getElementById('prevAkadText').textContent = `${akadTitle}: ${akadTime}`;
+    document.getElementById('prevReceptionText').textContent = `${recTitle}: ${recTime}`;
+    document.getElementById('prevVenueText').textContent = venue;
+    document.getElementById('prevQuoteText').textContent = quote;
+  }
+
+  async function handleSaveInvitationEditor(event) {
+    if (event && event.preventDefault) event.preventDefault();
+    const payload = {
+      invitation_theme: document.getElementById('edInvitationTheme').value || 'elegant_floral',
+      status: document.getElementById('edStatus').value,
+      groom_name: document.getElementById('edGroomName').value.trim(),
+      groom_nickname: document.getElementById('edGroomNickname').value.trim(),
+      groom_parents: document.getElementById('edGroomParents').value.trim(),
+      bride_name: document.getElementById('edBrideName').value.trim(),
+      bride_nickname: document.getElementById('edBrideNickname').value.trim(),
+      bride_parents: document.getElementById('edBrideParents').value.trim(),
+      cover_image: document.getElementById('edCoverImage').value.trim(),
+      groom_photo: document.getElementById('edGroomPhoto').value.trim(),
+      bride_photo: document.getElementById('edBridePhoto').value.trim(),
+      description: document.getElementById('edDescription').value.trim(),
+      wedding_date: document.getElementById('edWeddingDate').value,
+      venue: document.getElementById('edVenue').value.trim(),
+      akad_title: document.getElementById('edAkadTitle').value.trim(),
+      akad_time: document.getElementById('edAkadTime').value.trim(),
+      reception_title: document.getElementById('edReceptionTitle').value.trim(),
+      reception_time: document.getElementById('edReceptionTime').value.trim(),
+      address: document.getElementById('edAddress').value.trim(),
+      maps_url: document.getElementById('edMapsUrl').value.trim(),
+      quote_text: document.getElementById('edQuoteText').value.trim(),
+      quote_source: document.getElementById('edQuoteSource').value.trim(),
+      our_story: ADMIN_STATE.storyDraft,
+      gallery: ADMIN_STATE.galleryDraft,
+      music_url: document.getElementById('edMusicUrl').value.trim(),
+      music_enabled: document.getElementById('edMusicEnabled').value === 'true',
+      closing_text: document.getElementById('edClosingText').value.trim()
+    };
+
+    try {
+      const res = await callBackend('updateWeddingSettings', payload);
+      if (!res || !res.success) {
+        Swal.fire('Gagal Menyimpan', res.message, 'error');
+        return;
+      }
+      ADMIN_STATE.weddingConfig = res.data.wedding;
+      document.getElementById('sidebarCoupleNames').textContent = `${payload.groom_name} & ${payload.bride_name}`;
+      document.getElementById('sidebarWeddingDate').textContent = formatLongWeddingDate(payload.wedding_date);
+      showToast('success', res.message);
+    } catch (err) {
+      Swal.fire('Error', err.message, 'error');
+    }
+  }
+
+  async function openSampleGuestInvitation() {
+    try {
+      const res = await callBackend('getGuests', { page: 1, pageSize: 5 });
+      if (res && res.success && res.data.guests && res.data.guests.length > 0) {
+        const firstGuest = res.data.guests[0];
+        if (firstGuest.invitation_url) {
+          window.open(firstGuest.invitation_url, '_blank', 'noopener,noreferrer');
+          return;
+        }
+      }
+      Swal.fire('Info', 'Tambahkan minimal 1 tamu terlebih dahulu untuk membuka link undangan personal.', 'info');
+    } catch (err) {
+      Swal.fire('Error', err.message, 'error');
+    }
+  }
+
+  
+  function insertWaVariable(varToken) {
+    const ta = document.getElementById('waTemplateTextarea');
+    const start = ta.selectionStart || 0;
+    const end = ta.selectionEnd || 0;
+    const val = ta.value;
+    ta.value = val.substring(0, start) + varToken + val.substring(end);
+    ta.focus();
+    updateWaMessagePreview();
+  }
+
+  function updateWaMessagePreview() {
+    const tpl = document.getElementById('waTemplateTextarea').value;
+    const w = ADMIN_STATE.weddingConfig || {};
+    const couple = `${w.groom_name || 'Romeo'} & ${w.bride_name || 'Juliet'}`;
+    const baseUrl = (ADMIN_STATE.systemConfig && ADMIN_STATE.systemConfig.webAppBaseUrl) || 'https:\/\/script.google.com/macros/s/.../exec';
+    const rendered = tpl
+      .replace(/\{\{\s*nama_tamu\s*\}\}/gi, 'Budi Santoso')
+      .replace(/\{\{\s*link_undangan\s*\}\}/gi, baseUrl + '?token=CONTOH_TOKEN_UNIK')
+      .replace(/\{\{\s*nama_pasangan\s*\}\}/gi, couple)
+      .replace(/\{\{\s*tanggal_acara\s*\}\}/gi, formatLongWeddingDate(w.wedding_date || '2026-12-12'))
+      .replace(/\{\{\s*lokasi_acara\s*\}\}/gi, w.venue || 'The Grand Ballroom');
+    document.getElementById('waLivePreviewBox').textContent = rendered;
+  }
+
+  async function handleSaveWaTemplateOnly() {
+    const wa_message_template = document.getElementById('waTemplateTextarea').value;
+    try {
+      const res = await callBackend('saveWhatsAppCredentials', { wa_message_template });
+      if (!res || !res.success) {
+        Swal.fire('Gagal', res.message, 'error');
+        return;
+      }
+      showToast('success', 'Template pesan WhatsApp berhasil disimpan.');
+    } catch (err) {
+      Swal.fire('Error', err.message, 'error');
+    }
+  }
+
+  async function handleSendTestWaModal() {
+    const { value: phone } = await Swal.fire({
+      title: 'Kirim Pesan Percobaan (WhatsApp Cloud API)',
+      input: 'text',
+      inputLabel: 'Masukkan nomor WhatsApp tujuan (contoh: 081234567890)',
+      inputPlaceholder: '081234567890',
+      showCancelButton: true,
+      confirmButtonColor: '#B99A62',
+      confirmButtonText: 'Kirim Test Cloud API'
+    });
+    if (!phone) return;
+
+    const template = document.getElementById('waTemplateTextarea').value;
+    try {
+      const res = await callBackend('sendTestWhatsAppMessage', { phone, template });
+      if (!res || !res.success) {
+        Swal.fire('Kirim Percobaan Gagal', res.message, 'warning');
+        return;
+      }
+      Swal.fire('Berhasil Terkirim!', res.message, 'success');
+    } catch (err) {
+      Swal.fire('Error', err.message, 'error');
+    }
+  }
+
+  function toggleWaQueueCategorySelect() {
+    const mode = document.getElementById('waQueueSelectionMode').value;
+    document.getElementById('waQueueCategoryGroup').style.display = mode === 'category' ? 'block' : 'none';
+  }
+
+  async function handleCreateMessageQueue() {
+    const selectionMode = document.getElementById('waQueueSelectionMode').value;
+    const category = document.getElementById('waQueueCategorySelect').value;
+    const template = document.getElementById('waTemplateTextarea').value;
+
+    try {
+      const res = await callBackend('createMessageQueue', {
+        selectionMode,
+        category,
+        template
+      });
+      if (!res || !res.success) {
+        Swal.fire('Gagal Membuat Antrean', res.message, 'warning');
+        return;
+      }
+      showToast('success', res.message);
+      loadMessageHistory();
+    } catch (err) {
+      Swal.fire('Error', err.message, 'error');
+    }
+  }
+
+  async function handleProcessQueueNow() {
+    try {
+      const res = await callBackend('processMessageQueue', {});
+      if (!res || !res.success) {
+        Swal.fire('Info Pemrosesan Cloud API', res.message, 'info');
+        return;
+      }
+      showToast('success', res.message);
+      loadMessageHistory();
+    } catch (err) {
+      Swal.fire('Error', err.message, 'error');
+    }
+  }
+
+  async function handleRetryFailedMessages() {
+    try {
+      const res = await callBackend('retryFailedMessages', {});
+      if (!res || !res.success) {
+        Swal.fire('Info Retry', res.message, 'info');
+        return;
+      }
+      showToast('success', res.message);
+      loadMessageHistory();
+    } catch (err) {
+      Swal.fire('Error', err.message, 'error');
+    }
+  }
+
+  async function loadMessageHistory() {
+    const status = document.getElementById('waHistoryFilterStatus').value;
+    try {
+      const res = await callBackend('getMessageHistory', { status });
+      if (!res || !res.success) return;
+
+      const st = res.data.stats;
+      document.getElementById('waStatQueued').textContent = st.queued;
+      document.getElementById('waStatSent').textContent = st.sent;
+      document.getElementById('waStatFailed').textContent = st.failed;
+
+      const list = res.data.messages || [];
+      const tbody = document.getElementById('waHistoryTableBody');
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Belum ada riwayat antrean atau pengiriman pesan.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = list.map((m) => `
+        <tr>
+          <td style="font-size:12px; color:var(--text-secondary);">${escapeHtml(formatDateId(m.sent_at))}</td>
+          <td><strong>${escapeHtml(m.guest_name)}</strong><div style="font-size:11px; color:var(--text-secondary);">${escapeHtml(m.category)}</div></td>
+          <td style="font-family:monospace;">${escapeHtml(m.whatsapp_number)}</td>
+          <td>${renderDeliveryBadge(m.status)}</td>
+          <td style="font-size:12px; max-width:260px;">
+            ${m.error_message
+              ? `<span style="color:var(--danger);">${escapeHtml(m.error_message)}</span>`
+              : `<span style="color:var(--text-secondary);">${escapeHtml(m.provider_message_id || 'Menunggu dikirim')}</span>`}
+          </td>
+          <td>
+            <button type="button" class="btn btn-success btn-sm" onclick="handleOneClickWhatsApp('${escapeHtml(m.guest_id)}')">
+              <i data-lucide="external-link" style="width:13px;height:13px;"></i>
+              <span>1-Klik WA Gratis</span>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+      refreshIcons();
+    } catch (err) {
+      showToast('error', err.message);
+    }
+  }
+
+  
+  async function loadRSVPManagement() {
+    const search = document.getElementById('rsvpSearchInput').value.trim();
+    const status = document.getElementById('rsvpFilterStatus').value;
+
+    try {
+      const res = await callBackend('getRSVPList', { search, status });
+      if (!res || !res.success) return;
+
+      ADMIN_STATE.rsvpList = res.data.items || [];
+      const sum = res.data.summary;
+
+      document.getElementById('rsvpViewHadirCount').textContent = sum.hadirCount;
+      document.getElementById('rsvpViewTotalPax').textContent = `Total ${sum.totalPaxHadir} orang (pax)`;
+      document.getElementById('rsvpViewTidakHadirCount').textContent = sum.tidakHadirCount;
+      document.getElementById('rsvpViewPendingCount').textContent = sum.belumKonfirmasiCount;
+
+      const tbody = document.getElementById('rsvpTableBody');
+      if (!ADMIN_STATE.rsvpList.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Tidak ada data RSVP yang cocok dengan filter.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = ADMIN_STATE.rsvpList.map((item) => `
+        <tr>
+          <td><strong>${escapeHtml(item.guest_name)}</strong><div style="font-size:11px;color:var(--text-secondary);">${escapeHtml(item.whatsapp_number)}</div></td>
+          <td><span class="badge badge-gold">${escapeHtml(item.category)}</span></td>
+          <td>${renderRsvpBadge(item.attendance_status)}</td>
+          <td><strong>${item.guest_count || 0}</strong> org</td>
+          <td style="max-width:300px; font-size:12.5px;">${item.wishes ? `"${escapeHtml(item.wishes)}"` : '<span style="color:var(--text-secondary);">-</span>'}</td>
+          <td style="font-size:12px; color:var(--text-secondary);">${escapeHtml(formatDateId(item.confirmed_at))}</td>
+          <td>
+            <button type="button" class="btn btn-outline btn-sm" onclick="openRsvpEditModal('${escapeHtml(item.guest_id)}')">
+              <i data-lucide="edit-3" style="width:13px;height:13px;"></i>
+              <span>Ubah</span>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+      refreshIcons();
+    } catch (err) {
+      showToast('error', err.message);
+    }
+  }
+
+  function openRsvpEditModal(guestId) {
+    const item = ADMIN_STATE.rsvpList.find((r) => r.guest_id === guestId);
+    if (!item) return;
+
+    document.getElementById('rsvpEditModalTitle').textContent = `Update RSVP — ${item.guest_name}`;
+    document.getElementById('adminRsvpGuestId').value = item.guest_id;
+    document.getElementById('adminRsvpStatus').value = item.attendance_status || 'Hadir';
+    document.getElementById('adminRsvpCount').value = item.guest_count || 1;
+    document.getElementById('adminRsvpWishes').value = item.wishes || '';
+    document.getElementById('rsvpEditModalBackdrop').classList.add('open');
+  }
+
+  function closeRsvpEditModal() {
+    document.getElementById('rsvpEditModalBackdrop').classList.remove('open');
+  }
+
+  async function handleAdminRsvpFormSubmit(event) {
+    if (event && event.preventDefault) event.preventDefault();
+    const guest_id = document.getElementById('adminRsvpGuestId').value;
+    const attendance_status = document.getElementById('adminRsvpStatus').value;
+    const guest_count = document.getElementById('adminRsvpCount').value;
+    const wishes = document.getElementById('adminRsvpWishes').value;
+
+    try {
+      const res = await callBackend('updateRSVPByAdmin', {
+        guest_id,
+        attendance_status,
+        guest_count,
+        wishes
+      });
+      if (!res || !res.success) {
+        Swal.fire('Gagal', res.message, 'error');
+        return;
+      }
+      closeRsvpEditModal();
+      showToast('success', res.message);
+      loadRSVPManagement();
+    } catch (err) {
+      Swal.fire('Error', err.message, 'error');
+    }
+  }
+
+  
+  async function loadCheckinView() {
+    try {
+      const res = await callBackend('getCheckinDashboardData', {});
+      if (!res || !res.success) return;
+
+      const st = res.data.stats;
+      document.getElementById('chkStatTotal').textContent = st.totalGuests;
+      document.getElementById('chkStatRsvpHadir').textContent = st.rsvpHadirCount;
+      document.getElementById('chkStatCheckedIn').textContent = st.checkedInCount;
+      document.getElementById('chkStatRate').textContent = `${st.checkinPercentage}% telah tiba di lokasi`;
+      document.getElementById('chkStatRemaining').textContent = st.remainingGuests;
+
+      const list = res.data.checkins || [];
+      const tbody = document.getElementById('checkinHistoryTableBody');
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Belum ada tamu yang melakukan check-in.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = list.map((c) => `
+        <tr>
+          <td style="font-size:12px;">${escapeHtml(formatDateId(c.checkin_time))}</td>
+          <td><strong>${escapeHtml(c.guest_name)}</strong></td>
+          <td><span class="badge badge-gold">${escapeHtml(c.category)}</span></td>
+          <td>${c.guest_count} org</td>
+          <td style="font-size:12px; color:var(--text-secondary);">${escapeHtml(c.checked_by)}</td>
+          <td>
+            <button type="button" class="btn btn-outline btn-sm" style="color:var(--danger);" onclick="handleUndoCheckin('${escapeHtml(c.checkin_id)}')">
+              Batal
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    } catch (err) {
+      showToast('error', err.message);
+    }
+  }
+
+  function startQrCameraScanner() {
+    if (typeof Html5Qrcode === 'undefined') {
+      Swal.fire('Library Kamera Tidak Tersedia', 'Gunakan kolom input verifikasi token manual di bawah.', 'warning');
+      return;
+    }
+
+    const container = document.getElementById('qrReaderContainer');
+    container.innerHTML = '<div id="html5QrReaderMount" style="width:100%;"></div>';
+
+    const html5QrCode = new Html5Qrcode('html5QrReaderMount');
+    ADMIN_STATE.qrScannerInstance = html5QrCode;
+
+    html5QrCode
+      .start(
+        { facingMode: 'environment' },
+        { fps: 10, qrbox: { width: 230, height: 230 } },
+        async (decodedText) => {
+
+          if (ADMIN_STATE.qrScannerActive) {
+            ADMIN_STATE.qrScannerActive = false;
+            await executeCheckinVerification(decodedText);
+            setTimeout(() => {
+              ADMIN_STATE.qrScannerActive = true;
+            }, 2500);
+          }
+        },
+        () => {}
+      )
+      .then(() => {
+        ADMIN_STATE.qrScannerActive = true;
+        document.getElementById('startQrCameraBtn').style.display = 'none';
+        document.getElementById('stopQrCameraBtn').style.display = 'inline-flex';
+      })
+      .catch((err) => {
+        Swal.fire(
+          'Tidak Dapat Mengakses Kamera',
+          'Pastikan izin kamera diberikan di browser Anda atau gunakan input token manual di bawah. Detail: ' + err,
+          'warning'
+        );
+      });
+  }
+
+  function stopQrCameraScanner() {
+    ADMIN_STATE.qrScannerActive = false;
+    if (ADMIN_STATE.qrScannerInstance) {
+      try {
+        ADMIN_STATE.qrScannerInstance.stop().then(() => {
+          ADMIN_STATE.qrScannerInstance.clear();
+          ADMIN_STATE.qrScannerInstance = null;
+        }).catch(() => {});
+      } catch (e) {}
+    }
+    const startBtn = document.getElementById('startQrCameraBtn');
+    const stopBtn = document.getElementById('stopQrCameraBtn');
+    if (startBtn) startBtn.style.display = 'inline-flex';
+    if (stopBtn) stopBtn.style.display = 'none';
+  }
+
+  function handleManualCheckinSubmit(event) {
+    if (event && event.preventDefault) event.preventDefault();
+    const input = document.getElementById('manualCheckinInput');
+    const val = input.value.trim();
+    if (!val) return;
+    executeCheckinVerification(val);
+    input.value = '';
+  }
+
+  async function executeCheckinVerification(qrInput) {
+    const checkedBy = document.getElementById('checkinOfficerName').value.trim() || 'Admin';
+    const resultBox = document.getElementById('checkinResultBox');
+    resultBox.style.display = 'block';
+    resultBox.className = 'checkin-result-banner';
+    resultBox.innerHTML = 'Memverifikasi token QR Code...';
+
+    try {
+      const res = await callBackend('verifyCheckin', { qrInput, checkedBy });
+      if (res && res.success) {
+        const g = res.data.guest;
+        resultBox.className = 'checkin-result-banner success';
+        resultBox.innerHTML = `
+          <div style="font-weight:700; color:var(--success); font-size:15px; margin-bottom:4px;">✓ CHECK-IN BERHASIL</div>
+          <div style="font-family:var(--font-heading); font-size:20px; font-weight:700;">${escapeHtml(g.guest_name)}</div>
+          <div style="font-size:13px; margin-top:4px;">Kategori: <strong>${escapeHtml(g.category)}</strong> | Status RSVP: <strong>${escapeHtml(g.rsvp_status)} (${g.guest_count} Pax)</strong></div>
+        `;
+        showToast('success', res.message);
+        loadCheckinView();
+      } else if (res && res.alreadyCheckedIn) {
+        const g = (res.data && res.data.guest) || {};
+        resultBox.className = 'checkin-result-banner warning';
+        resultBox.innerHTML = `
+          <div style="font-weight:700; color:var(--warning); font-size:15px; margin-bottom:4px;">⚠️ PERINGATAN: CHECK-IN GANDA DICEGAH</div>
+          <div style="font-family:var(--font-heading); font-size:18px; font-weight:700;">${escapeHtml(g.guest_name || '')}</div>
+          <div style="font-size:13px; margin-top:4px;">${escapeHtml(res.message)}</div>
+        `;
+        showToast('warning', 'Tamu sudah pernah check-in sebelumnya!');
+      } else {
+        resultBox.className = 'checkin-result-banner danger';
+        resultBox.innerHTML = `
+          <div style="font-weight:700; color:var(--danger); font-size:15px; margin-bottom:4px;">✕ TOKEN TIDAK VALID</div>
+          <div style="font-size:13px;">${escapeHtml((res && res.message) || 'QR Code tidak dikenali.')}</div>
+        `;
+        showToast('error', (res && res.message) || 'Token tidak valid.');
+      }
+    } catch (err) {
+      resultBox.className = 'checkin-result-banner danger';
+      resultBox.textContent = err.message;
+    }
+  }
+
+  async function handleUndoCheckin(checkinId) {
+    const conf = await Swal.fire({
+      title: 'Batalkan Data Check-in Ini?',
+      text: 'Status kehadiran tamu ini akan direset sehingga bisa di-scan ulang.',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#D95C5C',
+      confirmButtonText: 'Ya, Batalkan Check-in'
+    });
+    if (!conf.isConfirmed) return;
+
+    try {
+      const res = await callBackend('deleteCheckinRecord', { checkin_id: checkinId });
+      if (res && res.success) {
+        showToast('success', res.message);
+        loadCheckinView();
+      }
+    } catch (err) {
+      showToast('error', err.message);
+    }
+  }
+
+  
+  async function loadReportsView() {
+    try {
+      const res = await callBackend('getDashboardStats', {});
+      if (!res || !res.success) return;
+
+      const ov = res.data.overview;
+      const cats = res.data.categoryBreakdown || [];
+      const w = res.data.weddingSummary || {};
+
+      document.getElementById('reportHeaderCoupleInfo').textContent =
+        `${w.couple || 'Romeo & Juliet'} — Tanggal Acara: ${formatLongWeddingDate(w.wedding_date)} (${w.venue || ''})`;
+
+      document.getElementById('repTotalGuests').textContent = ov.totalGuests;
+      document.getElementById('repSentCount').textContent = ov.sentCount;
+      document.getElementById('repFailedCount').textContent = ov.failedCount;
+      document.getElementById('repTotalRsvp').textContent = ov.rsvpHadir + ov.rsvpTidakHadir;
+      document.getElementById('repRsvpHadir').textContent = ov.rsvpHadir;
+      document.getElementById('repTotalPax').textContent = `${ov.totalPaxHadir} Orang`;
+      document.getElementById('repCheckinCount').textContent = `${ov.checkinCount} Tamu`;
+      document.getElementById('repCheckinRate').textContent = `${ov.checkinPercentage}%`;
+      document.getElementById('repRemainingCheckin').textContent = `${Math.max(0, ov.totalGuests - ov.checkinCount)} Tamu`;
+
+      const tbody = document.getElementById('reportCategoryTableBody');
+      tbody.innerHTML = cats.map((c) => `
+        <tr>
+          <td><strong>${escapeHtml(c.category)}</strong></td>
+          <td>${c.totalGuests}</td>
+          <td style="color:var(--success); font-weight:600;">${c.sent}</td>
+          <td>${c.unsent}</td>
+          <td style="color:var(--danger);">${c.failed}</td>
+          <td style="color:var(--success); font-weight:600;">${c.rsvpHadir}</td>
+          <td style="color:var(--danger);">${c.rsvpTidakHadir}</td>
+          <td>${c.rsvpPending}</td>
+          <td><strong>${c.totalPax}</strong> org</td>
+          <td><strong>${c.checkedIn}</strong></td>
+        </tr>
+      `).join('');
+    } catch (err) {
+      showToast('error', err.message);
+    }
+  }
+
+  async function handleExportCSV(reportType) {
+    showToast('info', 'Menyiapkan file CSV...');
+    try {
+      const res = await callBackend('exportReport', { reportType });
+      if (!res || !res.success) {
+        Swal.fire('Gagal Export', res.message, 'error');
+        return;
+      }
+      triggerBrowserDownload(res.data.fileName, res.data.csvContent, 'text/csv;charset=utf-8;');
+      showToast('success', `File ${res.data.fileName} berhasil diunduh.`);
+    } catch (err) {
+      Swal.fire('Error Export', err.message, 'error');
+    }
+  }
+
+  function triggerBrowserDownload(fileName, content, mimeType) {
+    const blob = new Blob(['\uFEFF' + content], { type: mimeType || 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  
+  async function handleSaveWaApiSettings(event) {
+    if (event && event.preventDefault) event.preventDefault();
+    const payload = {
+      phoneNumberId: document.getElementById('setWaPhoneNumberId').value.trim(),
+      accessToken: document.getElementById('setWaAccessToken').value.trim(),
+      businessAccountId: document.getElementById('setWaBusinessId').value.trim(),
+      apiVersion: document.getElementById('setWaApiVersion').value.trim(),
+      useTemplateApi: document.getElementById('setWaUseTemplateApi').checked,
+      metaTemplateName: document.getElementById('setWaMetaTemplateName').value.trim(),
+      metaTemplateLang: document.getElementById('setWaMetaTemplateLang').value.trim()
+    };
+
+    try {
+      const res = await callBackend('saveWhatsAppCredentials', payload);
+      if (!res || !res.success) {
+        Swal.fire('Gagal', res.message, 'error');
+        return;
+      }
+      document.getElementById('setWaAccessToken').value = '';
+      showToast('success', res.message);
+      loadInvitationEditorAndSettings();
+    } catch (err) {
+      Swal.fire('Error', err.message, 'error');
+    }
+  }
+
+  async function handleSaveSystemIntegration(event) {
+    if (event && event.preventDefault) event.preventDefault();
+    const payload = {
+      spreadsheetId: document.getElementById('setSpreadsheetId').value.trim(),
+      driveFolderId: document.getElementById('setDriveFolderId').value.trim(),
+      webAppBaseUrl: document.getElementById('setWebAppBaseUrl').value.trim()
+    };
+
+    try {
+      const res = await callBackend('saveSystemIntegrationSettings', payload);
+      if (!res || !res.success) {
+        Swal.fire('Gagal', res.message, 'error');
+        return;
+      }
+      showToast('success', res.message);
+    } catch (err) {
+      Swal.fire('Error', err.message, 'error');
+    }
+  }
+
+  async function handleInitializeDatabaseClick() {
+    try {
+      const res = await callBackend('initializeDatabase', {});
+      if (!res || !res.success) {
+        Swal.fire('Gagal Inisialisasi', res.message, 'error');
+        return;
+      }
+      document.getElementById('setSpreadsheetId').value = res.data.spreadsheetId || '';
+      Swal.fire(
+        'Database Siap!',
+        `Seluruh 8 Sheet (Users, Weddings, Guests, Messages, RSVP, Gallery, Checkin, Settings) telah diverifikasi. Spreadsheet ID: ${res.data.spreadsheetId}`,
+        'success'
+      );
+      loadOverviewDashboard();
+    } catch (err) {
+      Swal.fire('Error', err.message, 'error');
+    }
+  }
+
+  async function handleRefreshAllGuestUrls() {
+    try {
+      const res = await callBackend('refreshAllGuestInvitationUrls', {});
+      if (!res || !res.success) {
+        Swal.fire('Gagal', res.message, 'error');
+        return;
+      }
+      showToast('success', res.message);
+    } catch (err) {
+      Swal.fire('Error', err.message, 'error');
+    }
+  }
+
+  async function handleUpdateAdminPassword(event) {
+    if (event && event.preventDefault) event.preventDefault();
+    const newUsername = document.getElementById('setAdminUsername').value.trim();
+    const currentPassword = document.getElementById('setAdminCurrentPassword').value;
+    const newPassword = document.getElementById('setAdminNewPassword').value;
+
+    try {
+      const res = await callBackend('updateAdminCredentials', {
+        newUsername,
+        currentPassword,
+        newPassword
+      });
+      if (!res || !res.success) {
+        Swal.fire('Gagal Memperbarui Akun', res.message, 'error');
+        return;
+      }
+      document.getElementById('setAdminCurrentPassword').value = '';
+      document.getElementById('setAdminNewPassword').value = '';
+      document.getElementById('topbarAdminName').textContent = res.data.user.username;
+      Swal.fire('Berhasil!', res.message, 'success');
+    } catch (err) {
+      Swal.fire('Error', err.message, 'error');
+    }
+  }
+</script>

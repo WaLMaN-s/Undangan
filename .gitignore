@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+package.json
+package-lock.json
+
+# Google Clasp Private Project IDs & Auth Tokens
+.clasp.json
+.clasprc.json
+
+# Environment & OS files
+.env
+.env.*
+.DS_Store
+Thumbs.db
+*.log

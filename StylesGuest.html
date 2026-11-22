@@ -1,0 +1,1158 @@
+<style>
+  :root {
+    --primary: #B99A62;
+    --primary-dark: #9D7F49;
+    --primary-soft: rgba(185, 154, 98, 0.14);
+    --secondary: #FAF7F0;
+    --bg-card: #FFFFFF;
+    --text-primary: #292722;
+    --text-secondary: #89847B;
+    --border: #EAE5DB;
+    --success: #3B9B72;
+    --danger: #D95C5C;
+    --font-heading: 'Playfair Display', Georgia, serif;
+    --font-decor: 'Cormorant Garamond', Georgia, serif;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: #EFECE4;
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.4s ease, color 0.4s ease;
+  }
+
+  /* ==========================================================================
+     MOBILE-ONLY FRAME (360px - 430px)
+     ========================================================================== */
+  .mobile-frame {
+    width: 100%;
+    max-width: 430px;
+    min-height: 100vh;
+    background-color: var(--secondary);
+    position: relative;
+    overflow-x: hidden;
+    box-shadow: 0 0 48px rgba(41, 39, 34, 0.16);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+  }
+
+  /* ==========================================================================
+     THEME-SPECIFIC ORNAMENT VISIBILITY (DEFAULT HIDDEN, ACTIVATED PER THEME)
+     ========================================================================== */
+  .theme-ornament {
+    display: none;
+  }
+
+  body[data-theme="elegant_floral"] .ornament-floral,
+  body[data-theme="batak_heritage"] .ornament-batak,
+  body[data-theme="modern_minimalist"] .ornament-minimalist,
+  body[data-theme="romantic_sunset"] .ornament-sunset,
+  body[data-theme="dark_luxury"] .ornament-darkluxury {
+    display: block;
+  }
+
+  /* ==========================================================================
+     LOADING SKELETON & INVALID TOKEN STATE
+     ========================================================================== */
+  .state-screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 36px 28px;
+    text-align: center;
+    background: var(--secondary);
+  }
+
+  .spinner-ring {
+    width: 46px;
+    height: 46px;
+    border: 2.5px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spinRing 0.9s linear infinite;
+    margin-bottom: 18px;
+  }
+
+  @keyframes spinRing {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ==========================================================================
+     A. PERSONALIZED OPENING COVER PAGE
+     ========================================================================== */
+  .opening-cover {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    height: 100vh;
+    z-index: 120;
+    background-color: var(--secondary);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 34px 24px 30px;
+    text-align: center;
+    transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.7s ease;
+    overflow-y: auto;
+  }
+
+  .opening-cover.opened {
+    transform: translate(-50%, -105%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .opening-ornament-line {
+    width: 64px;
+    height: 1px;
+    background: var(--primary);
+    margin: 10px auto;
+  }
+
+  .opening-label {
+    font-size: 11px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--primary);
+    font-weight: 600;
+    position: relative;
+    z-index: 2;
+  }
+
+  .opening-couple {
+    font-family: var(--font-heading);
+    font-size: 33px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.2;
+    margin: 6px 0 4px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .opening-photo-arch {
+    width: 205px;
+    height: 245px;
+    margin: 12px auto;
+    border-radius: 110px 110px 18px 18px;
+    padding: 6px;
+    border: 1.5px solid var(--primary);
+    background: var(--bg-card);
+    box-shadow: 0 12px 28px rgba(41, 39, 34, 0.08);
+    position: relative;
+    z-index: 2;
+    transition: all 0.4s ease;
+  }
+
+  .opening-photo-arch img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 104px 104px 13px 13px;
+  }
+
+  .guest-greeting-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px 16px;
+    box-shadow: 0 6px 20px rgba(41, 39, 34, 0.05);
+    margin: 8px 0 14px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .guest-greeting-card .to-label {
+    font-family: var(--font-decor);
+    font-size: 17px;
+    font-style: italic;
+    color: var(--text-secondary);
+  }
+
+  .guest-greeting-card .guest-name {
+    font-family: var(--font-heading);
+    font-size: 21px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 5px 0 8px;
+    word-break: break-word;
+  }
+
+  .guest-greeting-card .invite-note {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    line-height: 1.55;
+  }
+
+  .open-invitation-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 14px 24px;
+    border-radius: 99px;
+    background: var(--primary);
+    color: #FFFFFF;
+    border: none;
+    font-family: var(--font-sans);
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(185, 154, 98, 0.32);
+    transition: all 0.25s ease;
+    position: relative;
+    z-index: 2;
+  }
+
+  .open-invitation-btn:active {
+    transform: scale(0.98);
+    background: var(--primary-dark);
+  }
+
+  .opening-date-footer {
+    font-family: var(--font-decor);
+    font-size: 16px;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+    margin-top: 10px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ==========================================================================
+     B. MAIN INVITATION SECTIONS (13 URUTAN SEKSI)
+     ========================================================================== */
+  .main-invitation {
+    display: none;
+    padding-bottom: 92px;
+    animation: fadeInMain 0.65s ease;
+  }
+
+  .main-invitation.visible {
+    display: block;
+  }
+
+  @keyframes fadeInMain {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .inv-section {
+    padding: 36px 22px;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+    position: relative;
+  }
+
+  .inv-section.bg-white {
+    background: var(--bg-card);
+  }
+
+  .sec-eyebrow {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 6px;
+  }
+
+  .sec-title {
+    font-family: var(--font-heading);
+    font-size: 25px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+  }
+
+  .sec-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.65;
+  }
+
+  .hero-banner {
+    position: relative;
+    padding: 38px 22px 34px;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .hero-frame {
+    width: 100%;
+    height: 340px;
+    border-radius: 180px 180px 20px 20px;
+    padding: 7px;
+    border: 1.5px solid var(--primary);
+    margin-bottom: 20px;
+    background: var(--secondary);
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 174px 174px 14px 14px;
+  }
+
+  .couple-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 24px 18px;
+    margin-top: 16px;
+    box-shadow: 0 4px 14px rgba(41, 39, 34, 0.04);
+    position: relative;
+  }
+
+  .couple-avatar {
+    width: 118px;
+    height: 118px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--primary);
+    padding: 4px;
+    background: var(--secondary);
+    margin-bottom: 12px;
+  }
+
+  .couple-fullname {
+    font-family: var(--font-heading);
+    font-size: 21px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+  }
+
+  .couple-parents {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .ampersand-divider {
+    font-family: var(--font-decor);
+    font-size: 36px;
+    font-style: italic;
+    color: var(--primary);
+    margin: 14px 0 0;
+  }
+
+  .countdown-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .countdown-box {
+    background: var(--bg-card);
+    border: 1px solid var(--primary);
+    border-radius: 14px;
+    padding: 14px 6px;
+  }
+
+  .countdown-num {
+    font-family: var(--font-heading);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.1;
+  }
+
+  .countdown-unit {
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 4px;
+  }
+
+  .event-detail-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px 18px;
+    margin-top: 16px;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(41, 39, 34, 0.04);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .event-badge-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--secondary);
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+  }
+
+  .event-card-title {
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .event-meta-line {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--primary-dark);
+    margin: 4px 0;
+  }
+
+  .story-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 18px;
+    text-align: left;
+  }
+
+  .story-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--primary);
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .story-year {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--primary);
+  }
+
+  .story-card h4 {
+    font-family: var(--font-heading);
+    font-size: 17px;
+    margin: 4px 0 6px;
+  }
+
+  .story-card p {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .gallery-thumb {
+    width: 100%;
+    height: 165px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+
+  .gallery-thumb:active {
+    transform: scale(0.97);
+  }
+
+  .lightbox-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 19, 17, 0.92);
+    z-index: 300;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .lightbox-overlay.open {
+    display: flex;
+  }
+
+  .lightbox-Overlay-img {
+    max-width: 100%;
+    max-height: 75vh;
+    border-radius: 12px;
+    border: 1px solid var(--primary);
+  }
+
+  .rsvp-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px 18px;
+    margin-top: 16px;
+    text-align: left;
+  }
+
+  .guest-form-group {
+    margin-bottom: 14px;
+  }
+
+  .guest-form-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+  }
+
+  .guest-input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--secondary);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 13.5px;
+  }
+
+  .guest-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: var(--bg-card);
+  }
+
+  .wishes-feed {
+    max-height: 360px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 16px;
+    text-align: left;
+  }
+
+  .wish-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+  }
+
+  .wish-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+
+  .wish-sender {
+    font-weight: 600;
+    font-size: 13.5px;
+    color: var(--text-primary);
+  }
+
+  .wish-badge {
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 99px;
+  }
+
+  .wish-badge.hadir {
+    background: rgba(59, 155, 114, 0.14);
+    color: var(--success);
+  }
+
+  .wish-badge.absen {
+    background: rgba(217, 92, 92, 0.14);
+    color: var(--danger);
+  }
+
+  .qr-pass-card {
+    background: var(--bg-card);
+    border: 1.5px solid var(--primary);
+    border-radius: 18px;
+    padding: 24px 18px;
+    margin-top: 16px;
+    box-shadow: 0 8px 24px rgba(185, 154, 98, 0.12);
+  }
+
+  .floating-music-btn {
+    position: fixed;
+    bottom: 78px;
+    right: max(16px, calc(50% - 198px));
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 1.5px solid var(--primary);
+    color: var(--primary);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 95;
+    box-shadow: 0 4px 14px rgba(41, 39, 34, 0.15);
+  }
+
+  .floating-music-btn.playing {
+    animation: spinRing 6s linear infinite;
+  }
+
+  .bottom-touch-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    height: 62px;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid var(--border);
+    display: none;
+    grid-template-columns: repeat(5, 1fr);
+    z-index: 90;
+  }
+
+  .bottom-touch-nav.visible {
+    display: grid;
+  }
+
+  .touch-nav-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: 10.5px;
+    font-weight: 500;
+  }
+
+  .touch-nav-link:active, .touch-nav-link.active {
+    color: var(--primary-dark);
+    font-weight: 600;
+  }
+
+  /* ==========================================================================
+     1. ELEGANT FLORAL THEME
+     Ivory, Cream, Putih, Gold + Bunga Putih, Daun Natural, Animasi Bunga Lembut
+     ========================================================================== */
+  body[data-theme="elegant_floral"] {
+    background-color: #EFECE4;
+    --primary: #B99A62;
+    --primary-dark: #9A7B45;
+    --secondary: #FAF7F0;
+    --bg-card: #FFFFFF;
+    --text-primary: #2C2822;
+    --text-secondary: #857E73;
+    --border: #EAE3D5;
+  }
+
+  .floral-garland-svg {
+    width: 100%;
+    max-width: 340px;
+    height: 46px;
+    margin: 0 auto 4px;
+    animation: floralSway 5s ease-in-out infinite alternate;
+    transform-origin: top center;
+  }
+
+  @keyframes floralSway {
+    0% { transform: rotate(-1.2deg) scale(1); }
+    100% { transform: rotate(1.2deg) scale(1.02); }
+  }
+
+  .floral-petal-container {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  .floral-petal {
+    position: absolute;
+    width: 14px;
+    height: 18px;
+    background: radial-gradient(circle at 30% 30%, #FFFFFF 40%, #EFE6D5 100%);
+    border: 1px solid rgba(185, 154, 98, 0.35);
+    border-radius: 80% 0 80% 0;
+    opacity: 0.65;
+    animation: petalFall 10s linear infinite;
+  }
+
+  .floral-petal.p1 { left: 10%; animation-duration: 9s; animation-delay: 0s; }
+  .floral-petal.p2 { left: 28%; animation-duration: 12s; animation-delay: 2s; width: 11px; height: 15px; }
+  .floral-petal.p3 { left: 52%; animation-duration: 10.5s; animation-delay: 4s; }
+  .floral-petal.p4 { left: 74%; animation-duration: 11s; animation-delay: 1s; width: 12px; height: 16px; }
+  .floral-petal.p5 { left: 88%; animation-duration: 9.5s; animation-delay: 3s; }
+
+  @keyframes petalFall {
+    0% { top: -10%; transform: translateX(0) rotate(0deg); opacity: 0; }
+    20% { opacity: 0.7; }
+    80% { opacity: 0.65; }
+    100% { top: 105%; transform: translateX(28px) rotate(220deg); opacity: 0; }
+  }
+
+  body[data-theme="elegant_floral"] .opening-photo-arch {
+    border-radius: 120px 120px 22px 22px;
+    box-shadow: 0 12px 32px rgba(185, 154, 98, 0.18), 0 0 0 5px rgba(255, 255, 255, 0.7);
+  }
+
+  body[data-theme="elegant_floral"] .couple-card,
+  body[data-theme="elegant_floral"] .event-detail-card {
+    border-radius: 22px;
+    border: 1px solid #EAE2D3;
+    box-shadow: 0 10px 26px rgba(185, 154, 98, 0.08);
+  }
+
+  /* ==========================================================================
+     2. BATAK HERITAGE MODERN THEME
+     Merah Marun, Hitam, Cream, Gold + Ornamen Gorga Batak, Motif Ulos & Rumah Bolon
+     ========================================================================== */
+  body[data-theme="batak_heritage"] {
+    background-color: #0D0A0A;
+    --primary: #D4AF37;
+    --primary-dark: #E8C547;
+    --primary-soft: rgba(212, 175, 55, 0.2);
+    --secondary: #161111;
+    --bg-card: #221717;
+    --text-primary: #F7EFE2;
+    --text-secondary: #CBBBA6;
+    --border: #6E181B;
+  }
+
+  body[data-theme="batak_heritage"] .opening-cover {
+    background:
+      radial-gradient(circle at 50% 18%, rgba(122, 18, 21, 0.55) 0%, rgba(22, 17, 17, 0.98) 70%),
+      #161111;
+    padding-top: 18px;
+  }
+
+  /* Motif Ulos Ragi Hotang / Sadum Woven Geometric Border Ribbon */
+  .ulos-woven-ribbon {
+    width: 100%;
+    height: 14px;
+    background:
+      repeating-linear-gradient(
+        90deg,
+        #7A1215 0px,
+        #7A1215 12px,
+        #D4AF37 12px,
+        #D4AF37 16px,
+        #121010 16px,
+        #121010 24px,
+        #F7EFE2 24px,
+        #F7EFE2 26px,
+        #7A1215 26px,
+        #7A1215 34px,
+        #D4AF37 34px,
+        #D4AF37 38px
+      );
+    border-top: 1.5px solid #D4AF37;
+    border-bottom: 1.5px solid #D4AF37;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+    margin-bottom: 10px;
+  }
+
+  .gorga-batak-crest {
+    width: 100%;
+    max-width: 330px;
+    height: 58px;
+    margin: 0 auto 4px;
+    animation: gorgaGlow 3.2s ease-in-out infinite alternate;
+  }
+
+  @keyframes gorgaGlow {
+    0% { filter: drop-shadow(0 0 2px rgba(212, 175, 55, 0.3)); transform: scale(1); }
+    100% { filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.7)); transform: scale(1.015); }
+  }
+
+  body[data-theme="batak_heritage"] .opening-photo-arch {
+    border-radius: 16px;
+    border: 2px solid #D4AF37;
+    background: linear-gradient(135deg, #7A1215 0%, #161111 100%);
+    padding: 8px;
+    clip-path: polygon(10% 0, 90% 0, 100% 10%, 100% 90%, 90% 100%, 10% 100%, 0 90%, 0 10%);
+  }
+
+  body[data-theme="batak_heritage"] .opening-photo-arch img {
+    border-radius: 10px;
+    clip-path: polygon(10% 0, 90% 0, 100% 10%, 100% 90%, 90% 100%, 10% 100%, 0 90%, 0 10%);
+  }
+
+  body[data-theme="batak_heritage"] .hero-banner {
+    background: linear-gradient(180deg, #4A0D10 0%, #161111 100%);
+  }
+
+  body[data-theme="batak_heritage"] .hero-frame {
+    border-radius: 18px;
+    border: 2px solid #D4AF37;
+    background: #7A1215;
+    box-shadow: 0 0 0 3px #161111, 0 0 0 5px #D4AF37;
+  }
+
+  body[data-theme="batak_heritage"] .hero-frame img {
+    border-radius: 12px;
+  }
+
+  body[data-theme="batak_heritage"] .guest-greeting-card,
+  body[data-theme="batak_heritage"] .couple-card,
+  body[data-theme="batak_heritage"] .event-detail-card,
+  body[data-theme="batak_heritage"] .rsvp-card,
+  body[data-theme="batak_heritage"] .qr-pass-card {
+    background: linear-gradient(160deg, #271818 0%, #181111 100%);
+    border: 1.5px solid #8B1E22;
+    box-shadow: inset 0 0 0 1px rgba(212, 175, 55, 0.28), 0 8px 24px rgba(0, 0, 0, 0.45);
+  }
+
+  body[data-theme="batak_heritage"] .open-invitation-btn {
+    background: linear-gradient(90deg, #8B1A1D 0%, #B8860B 50%, #8B1A1D 100%);
+    border: 1.5px solid #D4AF37;
+    color: #F7EFE2;
+    font-weight: 700;
+  }
+
+  body[data-theme="batak_heritage"] .bottom-touch-nav {
+    background: rgba(22, 17, 17, 0.96);
+    border-top: 2px solid #D4AF37;
+  }
+
+  body[data-theme="batak_heritage"] #rsvpFormGuestName {
+    background: #140E0E !important;
+    color: #F7EFE2 !important;
+  }
+
+  /* ==========================================================================
+     3. MODERN MINIMALIST THEME
+     Beige, Putih, Ivory, Cokelat Muda + Layout Asimetris, Monogram Pasangan, Whitespace Luas
+     ========================================================================== */
+  body[data-theme="modern_minimalist"] {
+    background-color: #DFD7CA;
+    --primary: #8C7055;
+    --primary-dark: #6D553E;
+    --primary-soft: rgba(140, 112, 85, 0.12);
+    --secondary: #F6F3EE;
+    --bg-card: #FFFFFF;
+    --text-primary: #23201D;
+    --text-secondary: #7A7167;
+    --border: #E2DBD0;
+  }
+
+  .minimalist-monogram-badge {
+    width: 64px;
+    height: 64px;
+    margin: 0 0 14px 0;
+    border: 1.5px solid #8C7055;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-heading);
+    font-size: 20px;
+    letter-spacing: 0.12em;
+    color: #23201D;
+    background: #FFFFFF;
+    position: relative;
+  }
+
+  .minimalist-monogram-badge::after {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border: 1px solid #E2DBD0;
+  }
+
+  /* Asymmetric Editorial Layout for Modern Minimalist */
+  body[data-theme="modern_minimalist"] .opening-cover {
+    text-align: left;
+    padding: 42px 30px 34px;
+    background: #F6F3EE;
+  }
+
+  body[data-theme="modern_minimalist"] .opening-ornament-line {
+    margin: 12px 0;
+    width: 48px;
+    height: 2px;
+  }
+
+  body[data-theme="modern_minimalist"] .opening-photo-arch {
+    width: 92%;
+    height: 235px;
+    margin: 12px 0 16px auto;
+    border-radius: 2px;
+    border: 1px solid #8C7055;
+    padding: 0;
+    box-shadow: -14px 14px 0px #E5DDD0;
+  }
+
+  body[data-theme="modern_minimalist"] .opening-photo-arch img {
+    border-radius: 2px;
+  }
+
+  body[data-theme="modern_minimalist"] .guest-greeting-card {
+    border-radius: 2px;
+    border: none;
+    border-left: 3px solid #8C7055;
+    text-align: left;
+    background: #FFFFFF;
+    box-shadow: 0 4px 18px rgba(35, 32, 29, 0.04);
+  }
+
+  body[data-theme="modern_minimalist"] .open-invitation-btn {
+    border-radius: 2px;
+    background: #23201D;
+    color: #F6F3EE;
+    letter-spacing: 0.2em;
+    box-shadow: none;
+  }
+
+  body[data-theme="modern_minimalist"] .hero-banner,
+  body[data-theme="modern_minimalist"] .inv-section {
+    text-align: left;
+    padding: 44px 28px;
+  }
+
+  body[data-theme="modern_minimalist"] .hero-frame {
+    border-radius: 2px;
+    padding: 0;
+    border: 1px solid #8C7055;
+    box-shadow: 12px 12px 0px #E5DDD0;
+  }
+
+  body[data-theme="modern_minimalist"] .hero-frame img {
+    border-radius: 2px;
+  }
+
+  body[data-theme="modern_minimalist"] .couple-card,
+  body[data-theme="modern_minimalist"] .event-detail-card,
+  body[data-theme="modern_minimalist"] .rsvp-card,
+  body[data-theme="modern_minimalist"] .qr-pass-card {
+    border-radius: 2px;
+    text-align: left;
+    border: 1px solid #E2DBD0;
+    box-shadow: 8px 8px 0px #EFEAE1;
+  }
+
+  body[data-theme="modern_minimalist"] .ampersand-divider {
+    text-align: left;
+    padding-left: 12px;
+  }
+
+  body[data-theme="modern_minimalist"] .countdown-box {
+    border-radius: 2px;
+    text-align: center;
+  }
+
+  /* ==========================================================================
+     4. ROMANTIC SUNSET THEME
+     Peach, Soft Orange, Champagne, Gold + Langit Senja, Matahari, Siluet Pemandangan
+     ========================================================================== */
+  body[data-theme="romantic_sunset"] {
+    background-color: #E8C5B0;
+    --primary: #D97952;
+    --primary-dark: #B85D38;
+    --primary-soft: rgba(217, 121, 82, 0.18);
+    --secondary: #FFF6EE;
+    --bg-card: rgba(255, 255, 255, 0.88);
+    --text-primary: #3D2226;
+    --text-secondary: #8C5E58;
+    --border: #F3D5C1;
+  }
+
+  body[data-theme="romantic_sunset"] .opening-cover {
+    background: linear-gradient(
+      180deg,
+      #F4A27E 0%,
+      #FAD4B8 38%,
+      #FDE9D9 72%,
+      #FFF6EE 100%
+    );
+  }
+
+  body[data-theme="romantic_sunset"] .hero-banner {
+    background: linear-gradient(
+      180deg,
+      #FAD1B4 0%,
+      #FDE8D7 55%,
+      #FFF6EE 100%
+    );
+  }
+
+  .sunset-sky-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 290px;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  .sunset-sun-orb {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      rgba(255, 247, 214, 0.95) 0%,
+      rgba(255, 198, 138, 0.65) 48%,
+      rgba(244, 162, 126, 0) 75%
+    );
+    margin: 18px auto 0;
+    animation: sunOrbPulse 4s ease-in-out infinite alternate;
+  }
+
+  @keyframes sunOrbPulse {
+    0% { transform: scale(0.96); opacity: 0.85; }
+    100% { transform: scale(1.1); opacity: 1; }
+  }
+
+  .sunset-horizon-svg {
+    width: 100%;
+    height: 56px;
+    display: block;
+    margin-top: -12px;
+    opacity: 0.85;
+  }
+
+  body[data-theme="romantic_sunset"] .opening-photo-arch {
+    border-radius: 999px 999px 28px 28px;
+    border: 2px solid #E2955A;
+    box-shadow: 0 0 36px rgba(255, 183, 120, 0.65);
+  }
+
+  body[data-theme="romantic_sunset"] .opening-photo-arch img {
+    border-radius: 999px 999px 22px 22px;
+  }
+
+  body[data-theme="romantic_sunset"] .guest-greeting-card,
+  body[data-theme="romantic_sunset"] .couple-card,
+  body[data-theme="romantic_sunset"] .event-detail-card,
+  body[data-theme="romantic_sunset"] .rsvp-card {
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(226, 149, 90, 0.38);
+    box-shadow: 0 10px 28px rgba(217, 121, 82, 0.12);
+    border-radius: 22px;
+  }
+
+  body[data-theme="romantic_sunset"] .open-invitation-btn {
+    background: linear-gradient(90deg, #D97952 0%, #E09F5A 100%);
+    box-shadow: 0 8px 22px rgba(217, 121, 82, 0.38);
+  }
+
+  /* ==========================================================================
+     5. DARK LUXURY THEME
+     Forest Green, Hitam, Ivory, Gold + Dekorasi Bunga Emas, Tekstur Elegan, Dramatis
+     ========================================================================== */
+  body[data-theme="dark_luxury"] {
+    background-color: #050807;
+    --primary: #D4AF37;
+    --primary-dark: #F0CC55;
+    --primary-soft: rgba(212, 175, 55, 0.18);
+    --secondary: #0A1913;
+    --bg-card: #10261D;
+    --text-primary: #F4EFE6;
+    --text-secondary: #A6B8B0;
+    --border: #274D3C;
+  }
+
+  body[data-theme="dark_luxury"] .mobile-frame,
+  body[data-theme="dark_luxury"] .opening-cover {
+    background-color: #091712;
+    background-image:
+      radial-gradient(circle at 50% 0%, rgba(22, 64, 48, 0.65) 0%, rgba(8, 15, 12, 0.96) 75%),
+      repeating-linear-gradient(45deg, rgba(212, 175, 55, 0.025) 0px, rgba(212, 175, 55, 0.025) 1px, transparent 1px, transparent 18px);
+  }
+
+  .darkluxury-gold-crest {
+    width: 100%;
+    max-width: 320px;
+    height: 48px;
+    margin: 0 auto 6px;
+  }
+
+  body[data-theme="dark_luxury"] .opening-couple,
+  body[data-theme="dark_luxury"] .sec-title {
+    color: #F4EFE6;
+    text-shadow: 0 2px 14px rgba(212, 175, 55, 0.22);
+  }
+
+  body[data-theme="dark_luxury"] .opening-photo-arch {
+    border-radius: 105px 105px 12px 12px;
+    border: 2px solid #D4AF37;
+    background: #08120E;
+    box-shadow: 0 0 0 4px #091712, 0 0 0 5px rgba(212, 175, 55, 0.55), 0 18px 42px rgba(0, 0, 0, 0.65);
+  }
+
+  body[data-theme="dark_luxury"] .hero-banner {
+    background: linear-gradient(180deg, #0F291F 0%, #091712 100%);
+  }
+
+  body[data-theme="dark_luxury"] .hero-frame {
+    border: 2px solid #D4AF37;
+    box-shadow: 0 0 0 4px #091712, 0 0 0 5px rgba(212, 175, 55, 0.5), 0 16px 36px rgba(0, 0, 0, 0.6);
+  }
+
+  body[data-theme="dark_luxury"] .guest-greeting-card,
+  body[data-theme="dark_luxury"] .couple-card,
+  body[data-theme="dark_luxury"] .event-detail-card,
+  body[data-theme="dark_luxury"] .rsvp-card,
+  body[data-theme="dark_luxury"] .qr-pass-card {
+    background: linear-gradient(145deg, #122B21 0%, #0B1A14 100%);
+    border: 1px solid rgba(212, 175, 55, 0.45);
+    box-shadow: inset 0 0 18px rgba(212, 175, 55, 0.06), 0 12px 30px rgba(0, 0, 0, 0.5);
+  }
+
+  body[data-theme="dark_luxury"] .open-invitation-btn {
+    background: linear-gradient(90deg, #B89024 0%, #E5C453 50%, #B89024 100%);
+    color: #08120E;
+    font-weight: 700;
+    box-shadow: 0 8px 24px rgba(212, 175, 55, 0.3);
+  }
+
+  body[data-theme="dark_luxury"] .bottom-touch-nav {
+    background: rgba(9, 23, 18, 0.96);
+    border-top: 1px solid rgba(212, 175, 55, 0.45);
+  }
+
+  body[data-theme="dark_luxury"] #rsvpFormGuestName {
+    background: #08140F !important;
+    color: #F4EFE6 !important;
+  }
+</style>

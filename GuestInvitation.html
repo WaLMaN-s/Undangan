@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Undangan Pernikahan Digital</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <!-- External Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <?!= include('StylesGuest'); ?>
+</head>
+<body data-theme="elegant_floral">
+
+  <!-- BINGKAI MOBILE-ONLY (360-430px) -->
+  <div class="mobile-frame" data-theme="elegant_floral">
+
+    <!-- 1. LOADING SCREEN -->
+    <div id="guestLoadingScreen" class="state-screen">
+      <div class="spinner-ring"></div>
+      <div style="font-family:var(--font-heading); font-size:18px; margin-bottom:4px;">Memuat Undangan Pribadi</div>
+      <div style="font-size:12.5px; color:var(--text-secondary);">Mohon tunggu sebentar...</div>
+    </div>
+
+    <!-- 2. INVALID / NOT FOUND TOKEN SCREEN -->
+    <div id="guestErrorScreen" class="state-screen" style="display:none;">
+      <div style="width:58px; height:58px; border-radius:50%; background:var(--bg-card); border:1px solid var(--primary); color:var(--primary); display:flex; align-items:center; justify-content:center; margin-bottom:16px;">
+        <i data-lucide="mail-warning" style="width:26px;height:26px;"></i>
+      </div>
+      <div class="sec-eyebrow">UNDANGAN DIGITAL</div>
+      <h1 style="font-family:var(--font-heading); font-size:24px; margin-bottom:10px;">Undangan Tidak Ditemukan</h1>
+      <p id="guestErrorMessage" style="font-size:13px; color:var(--text-secondary); line-height:1.6; margin-bottom:20px;">
+        Maaf, tautan undangan yang Anda buka tidak valid atau tidak terdaftar. Pastikan Anda membuka link undangan pribadi lengkap yang dikirimkan oleh penyelenggara acara.
+      </p>
+    </div>
+
+    <!-- ======================================================================
+         A. PERSONALIZED OPENING PAGE (SAMPUL PEMBUKA DENGAN ORNAMEN TEMA)
+         ====================================================================== -->
+    <section id="openingCoverPage" class="opening-cover" style="display:none;">
+
+      <!-- [TEMA 1: ELEGANT FLORAL] Animasi Kelopak Bunga Jatuh -->
+      <div class="theme-ornament ornament-floral floral-petal-container">
+        <span class="floral-petal p1"></span>
+        <span class="floral-petal p2"></span>
+        <span class="floral-petal p3"></span>
+        <span class="floral-petal p4"></span>
+        <span class="floral-petal p5"></span>
+      </div>
+
+      <!-- [TEMA 4: ROMANTIC SUNSET] Langit Senja & Cahaya Matahari -->
+      <div class="theme-ornament ornament-sunset sunset-sky-backdrop">
+        <div class="sunset-sun-orb"></div>
+      </div>
+
+      <div style="position:relative; z-index:2;">
+        <!-- [TEMA 1: ELEGANT FLORAL] Ornamen Bunga Putih & Daun Natural SVG -->
+        <div class="theme-ornament ornament-floral">
+          <svg class="floral-garland-svg" viewBox="0 0 320 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 38C75 12 120 26 160 16C200 26 245 12 300 38" stroke="#B99A62" stroke-width="1.2" stroke-linecap="round"/>
+            <path d="M115 22C102 12 88 15 82 24C94 28 106 26 115 22Z" fill="#DCE3D6" stroke="#B99A62" stroke-width="0.9"/>
+            <path d="M205 22C218 12 232 15 238 24C226 28 214 26 205 22Z" fill="#DCE3D6" stroke="#B99A62" stroke-width="0.9"/>
+            <circle cx="160" cy="18" r="11" fill="#FFFFFF" stroke="#B99A62" stroke-width="1.2"/>
+            <circle cx="160" cy="18" r="4" fill="#B99A62"/>
+            <circle cx="134" cy="21" r="7" fill="#FFFFFF" stroke="#B99A62" stroke-width="1"/>
+            <circle cx="186" cy="21" r="7" fill="#FFFFFF" stroke="#B99A62" stroke-width="1"/>
+          </svg>
+        </div>
+
+        <!-- [TEMA 2: BATAK HERITAGE] Motif Ulos & Ornamen Gorga Batak + Rumah Bolon SVG -->
+        <div class="theme-ornament ornament-batak">
+          <div class="ulos-woven-ribbon"></div>
+          <svg class="gorga-batak-crest" viewBox="0 0 340 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Siluet Atap Rumah Bolon & Ukiran Gorga Sitompi -->
+            <path d="M95 44C135 32 155 14 170 4C185 14 205 32 245 44H95Z" fill="#7A1215" stroke="#D4AF37" stroke-width="1.6"/>
+            <path d="M170 10L152 38H188L170 10Z" fill="#141010" stroke="#F7EFE2" stroke-width="1"/>
+            <!-- Spiral Gorga Kiri & Kanan -->
+            <path d="M20 46C38 22 68 22 82 40C74 48 60 44 64 34" stroke="#D4AF37" stroke-width="2" stroke-linecap="round"/>
+            <path d="M320 46C302 22 272 22 258 40C266 48 280 44 276 34" stroke="#D4AF37" stroke-width="2" stroke-linecap="round"/>
+            <line x1="15" y1="53" x2="325" y2="53" stroke="#D4AF37" stroke-width="1.2"/>
+          </svg>
+        </div>
+
+        <!-- [TEMA 3: MODERN MINIMALIST] Monogram Pasangan Dinamis -->
+        <div class="theme-ornament ornament-minimalist">
+          <div id="openMinimalistMonogram" class="minimalist-monogram-badge">R|J</div>
+        </div>
+
+        <!-- [TEMA 5: DARK LUXURY] Ornamen Garis Emas & Bunga Premium SVG -->
+        <div class="theme-ornament ornament-darkluxury">
+          <svg class="darkluxury-gold-crest" viewBox="0 0 320 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 24H118L136 10L160 36L184 10L202 24H310" stroke="#D4AF37" stroke-width="1.3"/>
+            <polygon points="160,6 168,18 160,30 152,18" fill="#0A1913" stroke="#D4AF37" stroke-width="1.4"/>
+            <circle cx="160" cy="18" r="3" fill="#D4AF37"/>
+          </svg>
+        </div>
+
+        <div class="opening-label">THE WEDDING OF</div>
+        <h1 id="openCoupleNames" class="opening-couple">Romeo &amp; Juliet</h1>
+        <div class="opening-ornament-line"></div>
+
+        <div class="opening-photo-arch">
+          <img id="openCoverPhoto" src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=900&q=80" alt="Couple Cover">
+        </div>
+
+        <!-- [TEMA 4: ROMANTIC SUNSET] Siluet Pemandangan Senja Romantis SVG -->
+        <div class="theme-ornament ornament-sunset">
+          <svg class="sunset-horizon-svg" viewBox="0 0 360 54" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 44L55 22L115 38L185 14L255 36L310 20L360 40V54H0V44Z" fill="#E59A76" fill-opacity="0.45"/>
+            <path d="M0 48L75 30L145 44L225 24L295 42L360 32V54H0V48Z" fill="#D97952" fill-opacity="0.55"/>
+          </svg>
+        </div>
+      </div>
+
+      <div style="position:relative; z-index:2;">
+        <div class="guest-greeting-card">
+          <div class="to-label">Kepada Yth.</div>
+          <div id="openGuestName" class="guest-name">-</div>
+          <p class="invite-note">
+            Tanpa mengurangi rasa hormat, kami mengundang Anda untuk menghadiri hari bahagia kami.
+          </p>
+        </div>
+
+        <button type="button" class="open-invitation-btn" onclick="handleOpenInvitationClick()">
+          <i data-lucide="mail-open" style="width:17px;height:17px;"></i>
+          <span>BUKA UNDANGAN</span>
+        </button>
+
+        <div id="openWeddingDate" class="opening-date-footer">12 Desember 2026</div>
+
+        <!-- [TEMA 2: BATAK HERITAGE] Pita Ulos Bawah -->
+        <div class="theme-ornament ornament-batak" style="margin-top:10px;">
+          <div class="ulos-woven-ribbon" style="margin-bottom:0;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         B. MAIN INVITATION PAGE (13 URUTAN SEKSI WAJIB)
+         ====================================================================== -->
+    <main id="mainInvitationPage" class="main-invitation">
+
+      <!-- SEKSI 1: HERO PASANGAN -->
+      <section id="sec-hero" class="hero-banner">
+        <!-- Ornamen Atas Hero Sesuai Tema -->
+        <div class="theme-ornament ornament-batak">
+          <div class="ulos-woven-ribbon"></div>
+        </div>
+        <div class="theme-ornament ornament-minimalist">
+          <div id="heroMinimalistMonogram" class="minimalist-monogram-badge">R|J</div>
+        </div>
+
+        <div class="sec-eyebrow">THE WEDDING CELEBRATION</div>
+        <h2 id="mainHeroCoupleTitle" style="font-family:var(--font-heading); font-size:30px; margin-bottom:16px;">Romeo &amp; Juliet</h2>
+        <div class="hero-frame">
+          <img id="mainHeroPhoto" src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=900&q=80" alt="Hero Couple">
+        </div>
+        <p id="mainHeroDescription" class="sec-desc"></p>
+      </section>
+
+      <!-- SEKSI 2: NAMA LENGKAP PASANGAN -->
+      <section id="sec-couple" class="inv-section">
+        <div class="sec-eyebrow">MEMPELAI BERBAHAGIA</div>
+        <h3 class="sec-title">Pasangan Mempelai</h3>
+
+        <div class="couple-card">
+          <img id="mainGroomPhoto" class="couple-avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80" alt="Mempelai Pria" loading="lazy">
+          <div id="mainGroomFullName" class="couple-fullname">Romeo Montague</div>
+          <p id="mainGroomParents" class="couple-parents"></p>
+        </div>
+
+        <div class="ampersand-divider">&amp;</div>
+
+        <div class="couple-card">
+          <img id="mainBridePhoto" class="couple-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80" alt="Mempelai Wanita" loading="lazy">
+          <div id="mainBrideFullName" class="couple-fullname">Juliet Capulet</div>
+          <p id="mainBrideParents" class="couple-parents"></p>
+        </div>
+      </section>
+
+      <!-- SEKSI 3: COUNTDOWN PERNIKAHAN REALTIME -->
+      <section id="sec-countdown" class="inv-section bg-white">
+        <div class="sec-eyebrow">MENUJU HARI BAHAGIA</div>
+        <h3 class="sec-title">Hitung Mundur Acara</h3>
+        <p id="mainCountdownDateText" class="sec-desc"></p>
+
+        <div class="countdown-grid">
+          <div class="countdown-box">
+            <div id="cdDays" class="countdown-num">00</div>
+            <div class="countdown-unit">Hari</div>
+          </div>
+          <div class="countdown-box">
+            <div id="cdHours" class="countdown-num">00</div>
+            <div class="countdown-unit">Jam</div>
+          </div>
+          <div class="countdown-box">
+            <div id="cdMinutes" class="countdown-num">00</div>
+            <div class="countdown-unit">Menit</div>
+          </div>
+          <div class="countdown-box">
+            <div id="cdSeconds" class="countdown-num">00</div>
+            <div class="countdown-unit">Detik</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SEKSI 4: INFORMASI ACARA & KUTIPAN -->
+      <section id="sec-event-info" class="inv-section">
+        <div class="sec-eyebrow">RANGKAIAN ACARA</div>
+        <h3 class="sec-title">Waktu &amp; Tempat</h3>
+        <div id="mainQuoteWrapper" style="background:var(--bg-card); border:1px solid var(--border); border-radius:14px; padding:18px; margin-bottom:16px;">
+          <p id="mainQuoteText" style="font-family:var(--font-decor); font-style:italic; font-size:16px; color:var(--text-primary); line-height:1.55;"></p>
+          <div id="mainQuoteSource" style="font-size:12px; font-weight:600; color:var(--primary); margin-top:8px;"></div>
+        </div>
+        <p class="sec-desc">
+          Dengan memohon rahmat dan ridho Tuhan Yang Maha Esa, kami bermaksud menyelenggarakan acara pernikahan kami pada:
+        </p>
+
+        <!-- SEKSI 5: DETAIL AKAD ATAU PEMBERKATAN -->
+        <div class="event-detail-card">
+          <div class="theme-ornament ornament-batak"><div class="ulos-woven-ribbon"></div></div>
+          <div class="event-badge-icon">
+            <i data-lucide="sparkles" style="width:20px;height:20px;"></i>
+          </div>
+          <h4 id="mainAkadTitle" class="event-card-title">Akad Nikah</h4>
+          <div id="mainAkadDate" class="event-meta-line">Sabtu, 12 Desember 2026</div>
+          <div id="mainAkadTime" style="font-size:13px; color:var(--text-secondary);">Pukul 08:00 - 10:00 WIB</div>
+        </div>
+
+        <!-- SEKSI 6: DETAIL RESEPSI -->
+        <div class="event-detail-card">
+          <div class="theme-ornament ornament-batak"><div class="ulos-woven-ribbon"></div></div>
+          <div class="event-badge-icon">
+            <i data-lucide="wine" style="width:20px;height:20px;"></i>
+          </div>
+          <h4 id="mainReceptionTitle" class="event-card-title">Resepsi Pernikahan</h4>
+          <div id="mainReceptionDate" class="event-meta-line">Sabtu, 12 Desember 2026</div>
+          <div id="mainReceptionTime" style="font-size:13px; color:var(--text-secondary);">Pukul 11:00 - 14:00 WIB</div>
+        </div>
+
+        <!-- SEKSI 7: LOKASI & TOMBOL GOOGLE MAPS -->
+        <div class="event-detail-card" style="border-color:var(--primary);">
+          <div class="event-badge-icon">
+            <i data-lucide="map-pin" style="width:20px;height:20px;"></i>
+          </div>
+          <h4 id="mainVenueName" class="event-card-title">The Grand Champagne Ballroom</h4>
+          <p id="mainVenueAddress" class="sec-desc" style="margin:6px 0 16px;"></p>
+          <a id="mainGoogleMapsBtn" href="https://maps.google.com" target="_blank" rel="noopener noreferrer" class="open-invitation-btn" style="text-decoration:none; padding:12px 20px; font-size:12.5px;">
+            <i data-lucide="navigation" style="width:16px;height:16px;"></i>
+            <span>Petunjuk Arah Google Maps</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- SEKSI 8: OUR STORY -->
+      <section id="sec-story" class="inv-section bg-white">
+        <div class="sec-eyebrow">PERJALANAN CINTA</div>
+        <h3 class="sec-title">Our Love Story</h3>
+        <div id="mainStoryList" class="story-timeline"></div>
+      </section>
+
+      <!-- SEKSI 9: GALERI FOTO DENGAN LIGHTBOX -->
+      <section id="sec-gallery" class="inv-section">
+        <div class="sec-eyebrow">MOMEN BAHAGIA</div>
+        <h3 class="sec-title">Galeri Foto</h3>
+        <p class="sec-desc">Ketuk foto untuk memperbesar tampilan</p>
+        <div id="mainGalleryGrid" class="gallery-grid"></div>
+      </section>
+
+      <!-- SEKSI 10: FORMULIR RSVP -->
+      <section id="sec-rsvp" class="inv-section bg-white">
+        <div class="sec-eyebrow">KONFIRMASI KEHADIRAN</div>
+        <h3 class="sec-title">Formulir RSVP</h3>
+        <p class="sec-desc">Mohon konfirmasikan kehadiran Bapak/Ibu/Saudara/i beserta doa restu untuk kedua mempelai.</p>
+
+        <form id="guestRsvpForm" class="rsvp-card" action="javascript:void(0);" onsubmit="handleGuestRsvpSubmit(event); return false;">
+          <div class="guest-form-group">
+            <label class="guest-form-label">Nama Tamu Undangan (Terverifikasi Token)</label>
+            <input type="text" id="rsvpFormGuestName" class="guest-input" readonly style="font-weight:600; background:#F2EFE9;">
+          </div>
+
+          <div class="guest-form-group">
+            <label class="guest-form-label">Konfirmasi Kehadiran</label>
+            <select id="rsvpFormAttendance" class="guest-input" required onchange="handleRsvpAttendanceChange()">
+              <option value="Hadir">Ya, Saya Akan Hadir</option>
+              <option value="Tidak Hadir">Maaf, Berhalangan Hadir</option>
+            </select>
+          </div>
+
+          <div id="rsvpGuestCountWrapper" class="guest-form-group">
+            <label class="guest-form-label">Jumlah Orang yang Hadir</label>
+            <select id="rsvpFormGuestCount" class="guest-input">
+              <option value="1">1 Orang</option>
+              <option value="2">2 Orang</option>
+              <option value="3">3 Orang</option>
+              <option value="4">4 Orang</option>
+              <option value="5">5 Orang</option>
+            </select>
+          </div>
+
+          <div class="guest-form-group">
+            <label class="guest-form-label">Ucapan &amp; Doa Restu</label>
+            <textarea id="rsvpFormWishes" class="guest-input" style="min-height:95px;" placeholder="Tuliskan ucapan selamat dan doa untuk kedua mempelai..." required></textarea>
+          </div>
+
+          <button type="button" id="rsvpSubmitBtn" onclick="handleGuestRsvpSubmit(event)" class="open-invitation-btn" style="padding:13px 20px;">
+            <i data-lucide="send" style="width:16px;height:16px;"></i>
+            <span>Kirim Konfirmasi &amp; Ucapan</span>
+          </button>
+        </form>
+      </section>
+
+      <!-- SEKSI 11: BUKU UCAPAN -->
+      <section id="sec-wishes" class="inv-section">
+        <div class="sec-eyebrow">DOA &amp; HARAPAN</div>
+        <h3 class="sec-title">Buku Ucapan Tamu</h3>
+        <p id="wishesTotalLabel" class="sec-desc">0 ucapan dari keluarga dan sahabat</p>
+        <div id="mainWishesFeed" class="wishes-feed"></div>
+      </section>
+
+      <!-- SEKSI 12: QR CODE UNDANGAN PRIBADI -->
+      <section id="sec-qrcode" class="inv-section bg-white">
+        <div class="sec-eyebrow">AKSES MASUK ACARA</div>
+        <h3 class="sec-title">QR Code Check-in</h3>
+        <p class="sec-desc">Tunjukkan QR Code unik ini kepada petugas penerima tamu di pintu masuk lokasi acara.</p>
+
+        <div class="qr-pass-card">
+          <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.12em; color:var(--primary); font-weight:600;">PERSONAL GUEST PASS</div>
+          <div id="qrPassGuestName" style="font-family:var(--font-heading); font-size:20px; font-weight:700; margin:4px 0 14px;">-</div>
+          <div id="guestQrCodeContainer" style="display:inline-block; padding:14px; background:#FFFFFF; border:1px solid var(--border); border-radius:14px;"></div>
+          <div id="qrPassCategoryBadge" style="margin-top:12px;"></div>
+          <div id="qrPassCheckinStatus" style="margin-top:8px; font-size:12px; color:var(--text-secondary);"></div>
+        </div>
+      </section>
+
+      <!-- SEKSI 13: PENUTUP -->
+      <section id="sec-closing" class="inv-section">
+        <div class="sec-eyebrow">TERIMA KASIH</div>
+        <p id="mainClosingText" class="sec-desc" style="margin-bottom:18px;"></p>
+        <div style="font-family:var(--font-decor); font-style:italic; font-size:18px; color:var(--text-secondary);">Kami yang berbahagia,</div>
+        <h3 id="mainClosingCouple" style="font-family:var(--font-heading); font-size:28px; color:var(--primary-dark); margin-top:6px;">Romeo &amp; Juliet</h3>
+      </section>
+
+    </main>
+
+    <!-- LIGHTBOX GALERI MODAL -->
+    <div id="galleryLightbox" class="lightbox-overlay" onclick="closeGalleryLightbox()">
+      <img id="lightboxImgEl" class="lightbox-Overlay-img" src="" alt="Gallery Large">
+      <div id="lightboxCaptionEl" style="color:#FFF; font-family:var(--font-heading); font-size:15px; margin-top:12px;"></div>
+      <button type="button" class="open-invitation-btn" style="width:auto; margin-top:18px; padding:8px 20px; font-size:11.5px;" onclick="closeGalleryLightbox()">Tutup Foto</button>
+    </div>
+
+    <!-- AUDIO MUSIK LATAR -->
+    <audio id="bgMusicAudio" loop preload="none"></audio>
+    <button type="button" id="floatingMusicBtn" class="floating-music-btn" onclick="toggleBackgroundMusic()" title="Putar / Hentikan Musik">
+      <i data-lucide="music" style="width:19px;height:19px;"></i>
+    </button>
+
+    <!-- TOUCH BOTTOM NAVIGATION BAR -->
+    <nav id="bottomTouchNav" class="bottom-touch-nav">
+      <a href="#sec-couple" class="touch-nav-link">
+        <i data-lucide="heart" style="width:17px;height:17px;"></i>
+        <span>Mempelai</span>
+      </a>
+      <a href="#sec-event-info" class="touch-nav-link">
+        <i data-lucide="calendar" style="width:17px;height:17px;"></i>
+        <span>Acara</span>
+      </a>
+      <a href="#sec-gallery" class="touch-nav-link">
+        <i data-lucide="image" style="width:17px;height:17px;"></i>
+        <span>Galeri</span>
+      </a>
+      <a href="#sec-rsvp" class="touch-nav-link">
+        <i data-lucide="mail-check" style="width:17px;height:17px;"></i>
+        <span>RSVP</span>
+      </a>
+      <a href="#sec-qrcode" class="touch-nav-link">
+        <i data-lucide="qr-code" style="width:17px;height:17px;"></i>
+        <span>QR Pass</span>
+      </a>
+    </nav>
+
+  </div>
+
+  <script>
+    window.__INITIAL_INVITATION_TOKEN__ = "<?= initialToken ?>";
+  </script>
+
+  <?!= include('ScriptsGuest'); ?>
+</body>
+</html>

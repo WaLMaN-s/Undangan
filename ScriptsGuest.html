@@ -1,0 +1,438 @@
+<script>
+  
+
+  const GUEST_STATE = {
+    token: '',
+    guest: null,
+    wedding: null,
+    wishes: [],
+    countdownTimer: null,
+    musicPlaying: false
+  };
+
+  function callGuestBackend(action, payload = {}) {
+    return new Promise((resolve, reject) => {
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler((res) => resolve(res))
+          .withFailureHandler((err) =>
+            reject(new Error(err && err.message ? err.message : 'Gagal memuat data undangan.'))
+          )
+          .apiDispatcher(action, payload, '');
+      } else {
+        reject(new Error('Lingkungan Google Apps Script tidak ditemukan.'));
+      }
+    });
+  }
+
+  function escapeGuestHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function formatFullIndoDate(dateStr) {
+    if (!dateStr) return '-';
+    try {
+      const d = new Date(dateStr + 'T00:00:00');
+      if (isNaN(d.getTime())) return String(dateStr);
+      return d.toLocaleDateString('id-ID', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+    } catch (e) {
+      return String(dateStr);
+    }
+  }
+
+  function formatShortDate(dateStr) {
+    if (!dateStr) return '-';
+    try {
+      const d = new Date(dateStr + 'T00:00:00');
+      if (isNaN(d.getTime())) return String(dateStr);
+      return d.toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+    } catch (e) {
+      return String(dateStr);
+    }
+  }
+
+  function showGuestToast(icon, title) {
+    Swal.fire({
+      toast: true,
+      position: 'top',
+      icon: icon,
+      title: title,
+      showConfirmButton: false,
+      timer: 3000
+    });
+  }
+
+  function resolveTokenFromUrl() {
+    if (
+      window.__INITIAL_INVITATION_TOKEN__ &&
+      !window.__INITIAL_INVITATION_TOKEN__.includes('initialToken')
+    ) {
+      return window.__INITIAL_INVITATION_TOKEN__.trim();
+    }
+    const params = new URLSearchParams(window.location.search);
+    return (params.get('token') || '').trim();
+  }
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    if (typeof lucide !== 'undefined' && lucide.createIcons) {
+      lucide.createIcons();
+    }
+
+    GUEST_STATE.token = resolveTokenFromUrl();
+    if (!GUEST_STATE.token) {
+      showInvalidInvitationScreen(
+        'Token undangan tidak disertakan pada link. Pastikan Anda membuka link undangan pribadi yang lengkap.'
+      );
+      return;
+    }
+
+    try {
+      const res = await callGuestBackend('getInvitationByToken', { token: GUEST_STATE.token });
+      if (!res || !res.success || !res.data) {
+        showInvalidInvitationScreen(
+          (res && res.message) || 'Maaf, undangan tidak ditemukan atau link tidak valid.'
+        );
+        return;
+      }
+
+      GUEST_STATE.guest = res.data.guest;
+      GUEST_STATE.wedding = res.data.wedding;
+      GUEST_STATE.wishes = res.data.wishes || [];
+
+      populateInvitationContent();
+      document.getElementById('guestLoadingScreen').style.display = 'none';
+      document.getElementById('openingCoverPage').style.display = 'flex';
+
+      if (typeof lucide !== 'undefined' && lucide.createIcons) {
+        lucide.createIcons();
+      }
+    } catch (err) {
+      showInvalidInvitationScreen(err.message);
+    }
+  });
+
+  function showInvalidInvitationScreen(message) {
+    document.getElementById('guestLoadingScreen').style.display = 'none';
+    document.getElementById('openingCoverPage').style.display = 'none';
+    document.getElementById('mainInvitationPage').classList.remove('visible');
+    document.getElementById('guestErrorMessage').textContent = message;
+    document.getElementById('guestErrorScreen').style.display = 'flex';
+    if (typeof lucide !== 'undefined' && lucide.createIcons) {
+      lucide.createIcons();
+    }
+  }
+
+  function populateInvitationContent() {
+    const g = GUEST_STATE.guest;
+    const w = GUEST_STATE.wedding;
+
+    const VALID_THEMES = {
+      elegant_floral: true,
+      batak_heritage: true,
+      modern_minimalist: true,
+      romantic_sunset: true,
+      dark_luxury: true
+    };
+    const activeTheme = VALID_THEMES[w.invitation_theme] ? w.invitation_theme : 'elegant_floral';
+    document.body.setAttribute('data-theme', activeTheme);
+    const frameEl = document.querySelector('.mobile-frame');
+    if (frameEl) frameEl.setAttribute('data-theme', activeTheme);
+
+    const gInitial = String(w.groom_nickname || w.groom_name || 'R').trim().charAt(0).toUpperCase();
+    const bInitial = String(w.bride_nickname || w.bride_name || 'J').trim().charAt(0).toUpperCase();
+    const monogramText = `${gInitial}|${bInitial}`;
+    const m1 = document.getElementById('openMinimalistMonogram');
+    const m2 = document.getElementById('heroMinimalistMonogram');
+    if (m1) m1.textContent = monogramText;
+    if (m2) m2.textContent = monogramText;
+
+    const coupleShort = `${w.groom_nickname || 'Romeo'} & ${w.bride_nickname || 'Juliet'}`;
+    const fullIndoDate = formatFullIndoDate(w.wedding_date);
+    const shortIndoDate = formatShortDate(w.wedding_date);
+
+    document.title = `The Wedding of ${coupleShort} — Kepada Yth. ${g.guest_name}`;
+    document.getElementById('openCoupleNames').textContent = coupleShort;
+    document.getElementById('openGuestName').textContent = g.guest_name;
+    document.getElementById('openWeddingDate').textContent = shortIndoDate;
+    if (w.cover_image) {
+      document.getElementById('openCoverPhoto').src = w.cover_image;
+      document.getElementById('mainHeroPhoto').src = w.cover_image;
+    }
+
+    document.getElementById('mainHeroCoupleTitle').textContent = coupleShort;
+    document.getElementById('mainHeroDescription').textContent = w.description || '';
+
+    document.getElementById('mainGroomFullName').textContent = w.groom_name;
+    document.getElementById('mainGroomParents').textContent = w.groom_parents || '';
+    if (w.groom_photo) document.getElementById('mainGroomPhoto').src = w.groom_photo;
+
+    document.getElementById('mainBrideFullName').textContent = w.bride_name;
+    document.getElementById('mainBrideParents').textContent = w.bride_parents || '';
+    if (w.bride_photo) document.getElementById('mainBridePhoto').src = w.bride_photo;
+
+    document.getElementById('mainCountdownDateText').textContent = fullIndoDate;
+    startRealtimeCountdown(w.wedding_date);
+
+    if (w.quote_text) {
+      document.getElementById('mainQuoteWrapper').style.display = 'block';
+      document.getElementById('mainQuoteText').textContent = w.quote_text;
+      document.getElementById('mainQuoteSource').textContent = w.quote_source || '';
+    } else {
+      document.getElementById('mainQuoteWrapper').style.display = 'none';
+    }
+
+    document.getElementById('mainAkadTitle').textContent = w.akad_title || 'Akad Nikah';
+    document.getElementById('mainAkadDate').textContent = fullIndoDate;
+    document.getElementById('mainAkadTime').textContent = `Pukul ${w.akad_time}`;
+
+    document.getElementById('mainReceptionTitle').textContent = w.reception_title || 'Resepsi Pernikahan';
+    document.getElementById('mainReceptionDate').textContent = fullIndoDate;
+    document.getElementById('mainReceptionTime').textContent = `Pukul ${w.reception_time}`;
+
+    document.getElementById('mainVenueName').textContent = w.venue;
+    document.getElementById('mainVenueAddress').textContent = w.address;
+    document.getElementById('mainGoogleMapsBtn').href = w.maps_url || 'https:\/\/maps.google.com';
+
+    const storyBox = document.getElementById('mainStoryList');
+    const stories = Array.isArray(w.our_story) ? w.our_story : [];
+    if (!stories.length) {
+      document.getElementById('sec-story').style.display = 'none';
+    } else {
+      storyBox.innerHTML = stories.map((st) => `
+        <div class="story-card">
+          <div class="story-year">${escapeGuestHtml(st.year)}</div>
+          <h4>${escapeGuestHtml(st.title)}</h4>
+          <p>${escapeGuestHtml(st.story)}</p>
+        </div>
+      `).join('');
+    }
+
+    const galleryGrid = document.getElementById('mainGalleryGrid');
+    const gallery = Array.isArray(w.gallery) ? w.gallery : [];
+    if (!gallery.length) {
+      document.getElementById('sec-gallery').style.display = 'none';
+    } else {
+      galleryGrid.innerHTML = gallery.map((img) => `
+        <img
+          src="${escapeGuestHtml(img.image_url)}"
+          alt="${escapeGuestHtml(img.caption)}"
+          class="gallery-thumb"
+          loading="lazy"
+          onclick="openGalleryLightbox('${escapeGuestHtml(img.image_url)}', '${escapeGuestHtml(img.caption)}')"
+        >
+      `).join('');
+    }
+
+    document.getElementById('rsvpFormGuestName').value = g.guest_name;
+    if (g.rsvp) {
+      if (g.rsvp.attendance_status === 'Hadir' || g.rsvp.attendance_status === 'Tidak Hadir') {
+        document.getElementById('rsvpFormAttendance').value = g.rsvp.attendance_status;
+      }
+      if (g.rsvp.guest_count > 0) {
+        document.getElementById('rsvpFormGuestCount').value = String(Math.min(5, g.rsvp.guest_count));
+      }
+      document.getElementById('rsvpFormWishes').value = g.rsvp.wishes || '';
+      handleRsvpAttendanceChange();
+    }
+
+    renderWishesFeed();
+
+    document.getElementById('qrPassGuestName').textContent = g.guest_name;
+    document.getElementById('qrPassCategoryBadge').innerHTML =
+      `<span style="display:inline-block; padding:4px 12px; border-radius:99px; background:var(--secondary); border:1px solid var(--primary); font-size:11.5px; font-weight:600; color:var(--primary-dark);">Kategori: ${escapeGuestHtml(g.category)}</span>`;
+
+    if (g.checkin && g.checkin.checked_in) {
+      document.getElementById('qrPassCheckinStatus').innerHTML =
+        `<span style="color:var(--success); font-weight:600;">✓ Sudah Check-in di Lokasi Acara</span>`;
+    } else {
+      document.getElementById('qrPassCheckinStatus').textContent = 'Status: Siap dipindai saat tiba di lokasi acara';
+    }
+
+    const qrContainer = document.getElementById('guestQrCodeContainer');
+    qrContainer.innerHTML = '';
+    if (typeof QRCode !== 'undefined') {
+      new QRCode(qrContainer, {
+        text: g.qr_token || GUEST_STATE.token,
+        width: 175,
+        height: 175,
+        colorDark: '#292722',
+        colorLight: '#FFFFFF'
+      });
+    }
+
+    document.getElementById('mainClosingText').textContent = w.closing_text || '';
+    document.getElementById('mainClosingCouple').textContent = coupleShort;
+  }
+
+  
+  function handleOpenInvitationClick() {
+    document.getElementById('openingCoverPage').classList.add('opened');
+    document.getElementById('mainInvitationPage').classList.add('visible');
+    document.getElementById('bottomTouchNav').classList.add('visible');
+
+    const w = GUEST_STATE.wedding;
+    if (w && w.music_enabled && w.music_url) {
+      const audio = document.getElementById('bgMusicAudio');
+      const musicBtn = document.getElementById('floatingMusicBtn');
+      audio.src = w.music_url;
+      musicBtn.style.display = 'inline-flex';
+      audio.play().then(() => {
+        GUEST_STATE.musicPlaying = true;
+        musicBtn.classList.add('playing');
+      }).catch(() => {
+        GUEST_STATE.musicPlaying = false;
+      });
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function toggleBackgroundMusic() {
+    const audio = document.getElementById('bgMusicAudio');
+    const btn = document.getElementById('floatingMusicBtn');
+    if (!audio.src) return;
+
+    if (GUEST_STATE.musicPlaying) {
+      audio.pause();
+      GUEST_STATE.musicPlaying = false;
+      btn.classList.remove('playing');
+    } else {
+      audio.play().then(() => {
+        GUEST_STATE.musicPlaying = true;
+        btn.classList.add('playing');
+      }).catch(() => {});
+    }
+  }
+
+  function startRealtimeCountdown(weddingDateStr) {
+    if (GUEST_STATE.countdownTimer) clearInterval(GUEST_STATE.countdownTimer);
+    const targetTime = new Date((weddingDateStr || '2026-12-12') + 'T08:00:00+07:00').getTime();
+
+    const tick = () => {
+      const now = Date.now();
+      const diff = Math.max(0, targetTime - now);
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+
+      document.getElementById('cdDays').textContent = String(days).padStart(2, '0');
+      document.getElementById('cdHours').textContent = String(hours).padStart(2, '0');
+      document.getElementById('cdMinutes').textContent = String(minutes).padStart(2, '0');
+      document.getElementById('cdSeconds').textContent = String(seconds).padStart(2, '0');
+    };
+
+    tick();
+    GUEST_STATE.countdownTimer = setInterval(tick, 1000);
+  }
+
+  function openGalleryLightbox(url, caption) {
+    document.getElementById('lightboxImgEl').src = url;
+    document.getElementById('lightboxCaptionEl').textContent = caption || '';
+    document.getElementById('galleryLightbox').classList.add('open');
+  }
+
+  function closeGalleryLightbox() {
+    document.getElementById('galleryLightbox').classList.remove('open');
+  }
+
+  function handleRsvpAttendanceChange() {
+    const val = document.getElementById('rsvpFormAttendance').value;
+    document.getElementById('rsvpGuestCountWrapper').style.display = val === 'Hadir' ? 'block' : 'none';
+  }
+
+  async function handleGuestRsvpSubmit(event) {
+    if (event && event.preventDefault) event.preventDefault();
+    const attendance_status = document.getElementById('rsvpFormAttendance').value;
+    const guest_count = attendance_status === 'Hadir'
+      ? parseInt(document.getElementById('rsvpFormGuestCount').value, 10) || 1
+      : 0;
+    const wishes = document.getElementById('rsvpFormWishes').value.trim();
+
+    if (!wishes || wishes.length < 3) {
+      showGuestToast('warning', 'Mohon tuliskan ucapan & doa restu singkat.');
+      return;
+    }
+
+    const btn = document.getElementById('rsvpSubmitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span>Mengirim Konfirmasi...</span>';
+
+    try {
+      const res = await callGuestBackend('submitRSVP', {
+        token: GUEST_STATE.token,
+        rsvpData: {
+          attendance_status,
+          guest_count,
+          wishes
+        }
+      });
+
+      if (!res || !res.success) {
+        Swal.fire('Gagal Mengirim RSVP', (res && res.message) || 'Terjadi kesalahan.', 'error');
+        return;
+      }
+
+      showGuestToast('success', res.message);
+
+      if (res.data && res.data.wishEntry) {
+        const newEntry = res.data.wishEntry;
+        GUEST_STATE.wishes = GUEST_STATE.wishes.filter(
+          (w) => w.sender_name !== newEntry.sender_name
+        );
+        GUEST_STATE.wishes.unshift(newEntry);
+        renderWishesFeed();
+      }
+    } catch (err) {
+      Swal.fire('Error', err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i data-lucide="send" style="width:16px;height:16px;"></i><span>Kirim Konfirmasi &amp; Ucapan</span>';
+      if (typeof lucide !== 'undefined' && lucide.createIcons) {
+        lucide.createIcons();
+      }
+    }
+  }
+
+  function renderWishesFeed() {
+    const feed = document.getElementById('mainWishesFeed');
+    const list = GUEST_STATE.wishes || [];
+    document.getElementById('wishesTotalLabel').textContent =
+      `${list.length} ucapan dari keluarga dan sahabat`;
+
+    if (!list.length) {
+      feed.innerHTML = `
+        <div class="wish-item" style="text-align:center; color:var(--text-secondary);">
+          Jadilah yang pertama memberikan ucapan dan doa restu untuk kedua mempelai.
+        </div>`;
+      return;
+    }
+
+    feed.innerHTML = list.map((item) => {
+      const isHadir = item.attendance_status === 'Hadir';
+      return `
+        <div class="wish-item">
+          <div class="wish-header">
+            <span class="wish-sender">${escapeGuestHtml(item.sender_name)}</span>
+            <span class="wish-badge ${isHadir ? 'hadir' : 'absen'}">${escapeGuestHtml(item.attendance_status)}</span>
+          </div>
+          <p style="font-size:13px; color:var(--text-primary); line-height:1.55;">"${escapeGuestHtml(item.wishes)}"</p>
+        </div>
+      `;
+    }).join('');
+  }
+</script>
