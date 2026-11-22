@@ -435,20 +435,31 @@
         html, body {
           width: 100% !important;
           max-width: 100% !important;
+          margin: 0 !important;
+          padding: 0 !important;
           overflow-x: hidden !important;
           overscroll-behavior-x: none;
         }
         .mobile-frame {
-          perspective: 1200px;
-          transform-style: preserve-3d;
           overflow-x: hidden !important;
-          overflow-x: clip !important;
           width: 100%;
+          max-width: 430px;
+          margin: 0 auto !important;
+        }
+        .opening-cover, .bottom-touch-nav {
+          left: 0 !important;
+          right: 0 !important;
+          margin-left: auto !important;
+          margin-right: auto !important;
+          width: 100% !important;
+          max-width: 430px !important;
+        }
+        .opening-cover:not(.opened), .bottom-touch-nav {
+          transform: none !important;
         }
         .opening-cover {
           will-change: transform, opacity;
           backface-visibility: hidden;
-          transform-style: preserve-3d;
         }
         
         body[data-theme="elegant_floral"] .opening-cover {
@@ -456,7 +467,7 @@
           transition: transform 1.15s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.9s ease;
         }
         body[data-theme="elegant_floral"] .opening-cover.opened {
-          transform: translateX(-50%) perspective(1500px) rotateY(-110deg) translateZ(40px);
+          transform: perspective(1500px) rotateY(-108deg) !important;
           opacity: 0;
         }
         
@@ -465,7 +476,7 @@
           transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.85s ease;
         }
         body[data-theme="batak_heritage"] .opening-cover.opened {
-          transform: translateX(-50%) perspective(1400px) rotateX(78deg) scale(0.92) translateZ(80px);
+          transform: perspective(1400px) rotateX(78deg) scale(0.92) !important;
           opacity: 0;
         }
         
@@ -473,7 +484,7 @@
           transition: transform 1.05s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
         }
         body[data-theme="modern_minimalist"] .opening-cover.opened {
-          transform: translate3d(-115%, 0, -140px) perspective(1400px) rotateY(26deg);
+          transform: perspective(1400px) translate3d(0, -105%, -120px) rotateX(18deg) !important;
           opacity: 0;
         }
         
@@ -481,7 +492,7 @@
           transition: transform 1.15s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.9s ease;
         }
         body[data-theme="romantic_sunset"] .opening-cover.opened {
-          transform: translate3d(-50%, -104%, 90px) perspective(1300px) rotateX(-22deg);
+          transform: perspective(1300px) translate3d(0, -104%, 60px) rotateX(-20deg) !important;
           opacity: 0;
         }
         
@@ -489,7 +500,7 @@
           transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.85s ease;
         }
         body[data-theme="dark_luxury"] .opening-cover.opened {
-          transform: translate3d(-50%, 0, 340px) perspective(1200px) scale(1.28);
+          transform: perspective(1200px) translate3d(0, 0, 260px) scale(1.22) !important;
           opacity: 0;
         }
         
@@ -497,7 +508,7 @@
           transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.85s ease;
         }
         body[data-theme="thelove_cinematic"] .opening-cover.opened {
-          transform: translate3d(-50%, -102%, 0) scale(1.1);
+          transform: translate3d(0, -102%, 0) scale(1.08) !important;
           opacity: 0;
         }
         #sec-hero {

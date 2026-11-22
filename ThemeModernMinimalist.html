@@ -35,6 +35,7 @@
       justify-content: center;
     }
     .mobile-frame {
+      margin: 0 auto;
       width: 100%; max-width: 430px; min-height: 100vh;
       background: var(--ivory);
       position: relative; overflow-x: hidden;
@@ -65,7 +66,7 @@
       content: ''; position: absolute; inset: 4px; border: 1px solid var(--border);
     }
     .opening-cover {
-      position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+      position: fixed; top: 0; left: 0; right: 0; margin: 0 auto;
       width: 100%; max-width: 430px; height: 100vh; z-index: 120;
       background: var(--ivory);
       display: flex; flex-direction: column; justify-content: space-between;
@@ -73,12 +74,12 @@
       transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.7s ease;
       overflow-y: auto;
     }
-    .opening-cover.opened { transform: translate(-50%, -105%); opacity: 0; pointer-events: none; }
+    .opening-cover.opened { transform: translate3d(0, -105%, 0); opacity: 0; pointer-events: none; }
     .offset-photo-box {
       width: 90%; height: 230px;
-      margin: 14px 0 18px auto;
+      margin: 14px auto 18px auto;
       border: 1px solid var(--taupe);
-      box-shadow: -14px 14px 0px var(--beige);
+      box-shadow: 0 12px 0px var(--beige);
     }
     .offset-photo-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .minimal-guest-box {
@@ -107,7 +108,7 @@
     .minimal-card {
       background: var(--white);
       border: 1px solid var(--border);
-      box-shadow: 10px 10px 0px var(--beige);
+      box-shadow: 0 8px 0px var(--beige);
       padding: 24px 20px;
       margin-top: 18px;
     }
@@ -135,7 +136,7 @@
     .lightbox-Overlay-img { max-width: 100%; max-height: 75vh; }
     .floating-music-btn { position: fixed; bottom: 78px; right: max(16px, calc(50% - 198px)); width: 42px; height: 42px; background: var(--charcoal); color: var(--ivory); border: none; display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 95; }
     .floating-music-btn.playing { animation: spin 6s linear infinite; }
-    .bottom-touch-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; height: 60px; background: rgba(247, 244, 239, 0.96); border-top: 1px solid var(--border); display: none; grid-template-columns: repeat(5, 1fr); z-index: 90; }
+    .bottom-touch-nav { position: fixed; bottom: 0; left: 0; right: 0; margin: 0 auto; width: 100%; max-width: 430px; height: 60px; background: rgba(247, 244, 239, 0.96); border-top: 1px solid var(--border); display: none; grid-template-columns: repeat(5, 1fr); z-index: 90; }
     .bottom-touch-nav.visible { display: grid; }
     .touch-nav-link { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: var(--muted); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; }
   
@@ -158,6 +159,7 @@
     }
     @media (max-width: 480px) {
       .mobile-frame {
+      margin: 0 auto;
         width: 100% !important;
         max-width: 100% !important;
         border-left: none !important;
@@ -217,7 +219,7 @@
         <div id="heroMinimalistMonogram" class="monogram-seal">R|J</div>
         <div class="sec-index">01 / CELEBRATION</div>
         <h2 id="mainHeroCoupleTitle" class="sec-heading" style="font-size:32px;"></h2>
-        <div style="border:1px solid var(--taupe); box-shadow:12px 12px 0px var(--beige); margin:18px 0 22px;">
+        <div style="border:1px solid var(--taupe); box-shadow: 0 10px 0px var(--beige); margin:18px 0 22px;">
           <img id="mainHeroPhoto" src="" alt="Hero" style="width:100%; height:330px; object-fit:cover; display:block;">
         </div>
         <p id="mainHeroDescription" class="sec-text"></p>

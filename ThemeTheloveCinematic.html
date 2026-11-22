@@ -40,6 +40,7 @@
       -webkit-font-smoothing: antialiased;
     }
     .mobile-frame {
+      margin: 0 auto;
       width: 100%;
       max-width: 430px;
       min-height: 100vh;
@@ -66,7 +67,7 @@
        ======================================================================== */
     .opening-cover {
       position: fixed;
-      top: 0; left: 50%; transform: translateX(-50%);
+      top: 0; left: 0; right: 0; margin: 0 auto;
       width: 100%; max-width: 430px; height: 100vh;
       z-index: 120;
       background-color: var(--bg-dark-1);
@@ -83,7 +84,7 @@
       transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.75s ease;
     }
     .opening-cover.opened {
-      transform: translate(-50%, -105%);
+      transform: translate3d(0, -105%, 0);
       opacity: 0;
       pointer-events: none;
     }
@@ -442,7 +443,7 @@
     .lightbox-Overlay-img { max-width: 100%; max-height: 75vh; border-radius: 8px; }
     .floating-music-btn { position: fixed; bottom: 78px; right: max(16px, calc(50% - 198px)); width: 42px; height: 42px; border-radius: 50%; background: var(--btn-charcoal); border: 1px solid var(--gold); color: var(--gold); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 95; }
     .floating-music-btn.playing { animation: spin 6s linear infinite; }
-    .bottom-touch-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; height: 60px; background: rgba(27, 27, 24, 0.96); border-top: 1px solid rgba(205, 160, 98, 0.25); display: none; grid-template-columns: repeat(5, 1fr); z-index: 90; }
+    .bottom-touch-nav { position: fixed; bottom: 0; left: 0; right: 0; margin: 0 auto; width: 100%; max-width: 430px; height: 60px; background: rgba(27, 27, 24, 0.96); border-top: 1px solid rgba(205, 160, 98, 0.25); display: none; grid-template-columns: repeat(5, 1fr); z-index: 90; }
     .bottom-touch-nav.visible { display: grid; }
     .touch-nav-link { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: var(--white-muted); font-size: 10px; }
   
@@ -465,6 +466,7 @@
     }
     @media (max-width: 480px) {
       .mobile-frame {
+      margin: 0 auto;
         width: 100% !important;
         max-width: 100% !important;
         border-left: none !important;
