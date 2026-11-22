@@ -3,6 +3,7 @@
 !*.html
 !appsscript.json
 node_modules/**
+word/**
 package.json
 package-lock.json
 README.md
