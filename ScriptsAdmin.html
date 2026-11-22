@@ -943,6 +943,13 @@
       document.getElementById('edStatus').value = w.status || 'Published';
       const activeTheme = w.invitation_theme || 'elegant_floral';
       document.getElementById('edInvitationTheme').value = activeTheme;
+      const qrSelect = document.getElementById('edQrCheckinEnabled');
+      if (qrSelect) {
+        qrSelect.value = String(w.qr_checkin_enabled !== false);
+      }
+      ADMIN_STATE.themeMediaDraft = (w.theme_media && typeof w.theme_media === 'object')
+        ? JSON.parse(JSON.stringify(w.theme_media))
+        : {};
       selectInvitationTheme(activeTheme);
       document.getElementById('edGroomName').value = w.groom_name || '';
       document.getElementById('edGroomNickname').value = w.groom_nickname || '';
@@ -1145,13 +1152,187 @@
   }
 
   const THEME_LABELS = {
-    elegant_floral: '1. Elegant Floral',
-    batak_heritage: '2. Batak Heritage',
-    modern_minimalist: '3. Modern Minimalist',
-    romantic_sunset: '4. Romantic Sunset',
-    dark_luxury: '5. Dark Luxury',
-    thelove_cinematic: '6. Thelove Cinematic (Ramses & Priska)'
+    elegant_floral: '1. Elegant Floral (6 Foto • 3D Book Flip)',
+    batak_heritage: '2. Batak Heritage (8 Foto • 3D Gorga Door)',
+    modern_minimalist: '3. Modern Minimalist (5 Foto • 3D Parallax)',
+    romantic_sunset: '4. Romantic Sunset (7 Foto • 3D Horizon)',
+    dark_luxury: '5. Dark Luxury (9 Foto • 3D Coverflow)',
+    thelove_cinematic: '6. Thelove Cinematic (12 Foto • 3D Slideshow)'
   };
+
+  const THEME_SLOT_SPECS = {
+    elegant_floral: [
+      { key: 'cover_photo', label: '1. Foto Sampul Arch Pembuka', role: 'cover' },
+      { key: 'hero_photo', label: '2. Foto Hero Katedral Utama', role: 'hero' },
+      { key: 'groom_photo', label: '3. Foto Mempelai Pria (Circle)', role: 'groom' },
+      { key: 'bride_photo', label: '4. Foto Mempelai Wanita (Circle)', role: 'bride' },
+      { key: 'gallery_1', label: '5. Foto Galeri Floral I', role: 'gallery' },
+      { key: 'gallery_2', label: '6. Foto Galeri Floral II', role: 'gallery' }
+    ],
+    batak_heritage: [
+      { key: 'cover_photo', label: '1. Foto Cover Oktagonal Gorga', role: 'cover' },
+      { key: 'hero_photo', label: '2. Foto Hero Pesta Adat Batak', role: 'hero' },
+      { key: 'groom_photo', label: '3. Foto Anak (Mempelai Pria)', role: 'groom' },
+      { key: 'bride_photo', label: '4. Foto Boru (Mempelai Wanita)', role: 'bride' },
+      { key: 'gallery_1', label: '5. Foto Momen Martumpol', role: 'gallery' },
+      { key: 'gallery_2', label: '6. Foto Pemberkatan / Akad', role: 'gallery' },
+      { key: 'gallery_3', label: '7. Foto Adat Mangulosi', role: 'gallery' },
+      { key: 'gallery_4', label: '8. Foto Keluarga & Mempelai', role: 'gallery' }
+    ],
+    modern_minimalist: [
+      { key: 'cover_photo', label: '1. Foto Cover Editorial Offset', role: 'cover' },
+      { key: 'hero_photo', label: '2. Foto Hero Minimalist Lookbook', role: 'hero' },
+      { key: 'groom_photo', label: '3. Foto Portrait Mempelai Pria', role: 'groom' },
+      { key: 'bride_photo', label: '4. Foto Portrait Mempelai Wanita', role: 'bride' },
+      { key: 'gallery_1', label: '5. Foto Duo Editorial Signature', role: 'gallery' }
+    ],
+    romantic_sunset: [
+      { key: 'cover_photo', label: '1. Foto Sampul Langit Senja', role: 'cover' },
+      { key: 'hero_photo', label: '2. Foto Hero Golden Hour', role: 'hero' },
+      { key: 'groom_photo', label: '3. Foto Mempelai Pria', role: 'groom' },
+      { key: 'bride_photo', label: '4. Foto Mempelai Wanita', role: 'bride' },
+      { key: 'gallery_1', label: '5. Foto Momen Senja I', role: 'gallery' },
+      { key: 'gallery_2', label: '6. Foto Momen Senja II', role: 'gallery' },
+      { key: 'gallery_3', label: '7. Foto Momen Senja III', role: 'gallery' }
+    ],
+    dark_luxury: [
+      { key: 'cover_photo', label: '1. Foto Cover Royal Gold Arch', role: 'cover' },
+      { key: 'hero_photo', label: '2. Foto Hero Evening Gala', role: 'hero' },
+      { key: 'groom_photo', label: '3. Foto Mempelai Pria', role: 'groom' },
+      { key: 'bride_photo', label: '4. Foto Mempelai Wanita', role: 'bride' },
+      { key: 'gallery_1', label: '5. Foto 3D Coverflow Luxury I', role: 'gallery' },
+      { key: 'gallery_2', label: '6. Foto 3D Coverflow Luxury II', role: 'gallery' },
+      { key: 'gallery_3', label: '7. Foto 3D Coverflow Luxury III', role: 'gallery' },
+      { key: 'gallery_4', label: '8. Foto 3D Coverflow Luxury IV', role: 'gallery' },
+      { key: 'gallery_5', label: '9. Foto 3D Coverflow Luxury V', role: 'gallery' }
+    ],
+    thelove_cinematic: [
+      { key: 'cover_photo', label: '1. Foto Full-Screen Opening Cover', role: 'cover' },
+      { key: 'hero_photo', label: '2. Foto 3D Hero Slideshow 1 (Opening 1)', role: 'hero' },
+      { key: 'slide_2', label: '3. Foto 3D Hero Slideshow 2 (Opening 2)', role: 'slide' },
+      { key: 'slide_3', label: '4. Foto 3D Hero Slideshow 3 (Opening 3)', role: 'slide' },
+      { key: 'groom_photo', label: '5. Foto Tall Portrait Full-Bleed Pria', role: 'groom' },
+      { key: 'bride_photo', label: '6. Foto Tall Portrait Full-Bleed Wanita', role: 'bride' },
+      { key: 'story_1', label: '7. Foto Bab 1 Our Journey (Pertemuan)', role: 'story' },
+      { key: 'story_2', label: '8. Foto Bab 2 Our Journey (Menjalin Kasih)', role: 'story' },
+      { key: 'story_3', label: '9. Foto Bab 3 Our Journey (Menuju Selamanya)', role: 'story' },
+      { key: 'gallery_1', label: '10. Foto 3D Filmstrip & Galeri I', role: 'gallery' },
+      { key: 'gallery_2', label: '11. Foto 3D Filmstrip & Galeri II', role: 'gallery' },
+      { key: 'closing_photo', label: '12. Foto Full-Screen Penutup (Thank You)', role: 'closing' }
+    ]
+  };
+
+  function ensureThemeSlotMap(themeId) {
+    if (!ADMIN_STATE.themeMediaDraft) ADMIN_STATE.themeMediaDraft = {};
+    if (!ADMIN_STATE.themeMediaDraft[themeId]) {
+      ADMIN_STATE.themeMediaDraft[themeId] = {};
+    }
+    const specs = THEME_SLOT_SPECS[themeId] || THEME_SLOT_SPECS.elegant_floral;
+    const defaultFallbacks = [
+      'https:\/\/images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=900&q=80',
+      'https:\/\/images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=900&q=80',
+      'https:\/\/images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80',
+      'https:\/\/images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
+      'https:\/\/images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=900&q=80',
+      'https:\/\/images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=900&q=80'
+    ];
+    specs.forEach((sp, idx) => {
+      if (!ADMIN_STATE.themeMediaDraft[themeId][sp.key]) {
+        ADMIN_STATE.themeMediaDraft[themeId][sp.key] = defaultFallbacks[idx % defaultFallbacks.length];
+      }
+    });
+    return ADMIN_STATE.themeMediaDraft[themeId];
+  }
+
+  function renderThemePhotoSlotsEditor(themeId) {
+    const specs = THEME_SLOT_SPECS[themeId] || THEME_SLOT_SPECS.elegant_floral;
+    const slotMap = ensureThemeSlotMap(themeId);
+
+    const titleEl = document.getElementById('themeSlotsCardTitle');
+    const badgeEl = document.getElementById('themeSlotsCountBadge');
+    const listEl = document.getElementById('themePhotoSlotsList');
+    if (titleEl) {
+      titleEl.textContent = `Slot Foto Khusus Tema: ${THEME_LABELS[themeId] || themeId}`;
+    }
+    if (badgeEl) {
+      badgeEl.textContent = `Wajib ${specs.length} Foto`;
+    }
+    if (!listEl) return;
+
+    listEl.innerHTML = specs.map((sp, idx) => {
+      const currentUrl = slotMap[sp.key] || '';
+      return `
+        <div style="background:var(--secondary); border:1px solid var(--border); border-radius:10px; padding:12px; display:flex; align-items:center; gap:10px;">
+          <img id="slotThumb_${escapeHtml(sp.key)}" src="${escapeHtml(currentUrl)}" alt="${escapeHtml(sp.label)}" style="width:56px; height:56px; object-fit:cover; border-radius:8px; border:1px solid var(--primary); flex-shrink:0;">
+          <div style="flex:1; min-width:0;">
+            <div style="font-size:11.5px; font-weight:700; color:var(--text-primary); margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${escapeHtml(sp.label)}">
+              Slot ${idx + 1}/${specs.length} • ${escapeHtml(sp.label)}
+            </div>
+            <div style="display:flex; gap:6px;">
+              <input type="url" class="form-control" style="padding:6px 9px; font-size:12px;" value="${escapeHtml(currentUrl)}" placeholder="https:\/\/..." oninput="handleThemeSlotUrlChange('${escapeHtml(themeId)}', '${escapeHtml(sp.key)}', this.value)">
+              <label class="btn btn-secondary btn-sm" style="cursor:pointer; margin:0; flex-shrink:0;">
+                <span>Upload</span>
+                <input type="file" accept="image/*" style="display:none;" onchange="handleUploadThemeSlotPhoto(this, '${escapeHtml(themeId)}', '${escapeHtml(sp.key)}')">
+              </label>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    syncThemeSlotsToMainInputs(themeId);
+  }
+
+  function syncThemeSlotsToMainInputs(themeId) {
+    const slotMap = ensureThemeSlotMap(themeId);
+    const coverEl = document.getElementById('edCoverImage');
+    const groomEl = document.getElementById('edGroomPhoto');
+    const brideEl = document.getElementById('edBridePhoto');
+    if (coverEl && slotMap.cover_photo) coverEl.value = slotMap.cover_photo;
+    if (groomEl && slotMap.groom_photo) groomEl.value = slotMap.groom_photo;
+    if (brideEl && slotMap.bride_photo) brideEl.value = slotMap.bride_photo;
+  }
+
+  function handleThemeSlotUrlChange(themeId, slotKey, newUrl) {
+    const slotMap = ensureThemeSlotMap(themeId);
+    slotMap[slotKey] = newUrl.trim();
+    const thumb = document.getElementById('slotThumb_' + slotKey);
+    if (thumb && newUrl.trim()) thumb.src = newUrl.trim();
+    syncThemeSlotsToMainInputs(themeId);
+    renderFullInteractivePhonePreview(themeId);
+  }
+
+  async function handleUploadThemeSlotPhoto(fileInputEl, themeId, slotKey) {
+    const file = fileInputEl.files && fileInputEl.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      Swal.fire('File Terlalu Besar', 'Ukuran maksimal foto adalah 5 MB.', 'warning');
+      return;
+    }
+
+    showToast('info', 'Mengunggah foto slot ke Google Drive...');
+    try {
+      const base64Data = await readFileAsBase64(file);
+      const res = await callBackend('uploadImageToDrive', {
+        base64Data,
+        fileName: `${themeId}_${slotKey}_${file.name}`,
+        mimeType: file.type
+      });
+      if (!res || !res.success) {
+        Swal.fire('Upload Gagal', res.message, 'error');
+        return;
+      }
+      const slotMap = ensureThemeSlotMap(themeId);
+      slotMap[slotKey] = res.data.imageUrl;
+      renderThemePhotoSlotsEditor(themeId);
+      renderFullInteractivePhonePreview(themeId);
+      showToast('success', 'Foto slot tema berhasil diunggah!');
+    } catch (err) {
+      Swal.fire('Error Upload', err.message, 'error');
+    } finally {
+      fileInputEl.value = '';
+    }
+  }
 
   function renderPreviewOrnamentHtml(themeId, groomNick, brideNick) {
     const gInit = String(groomNick || 'R').trim().charAt(0).toUpperCase();
@@ -1209,18 +1390,26 @@
       badge.textContent = THEME_LABELS[chosen] || '1. Elegant Floral';
     }
 
+    renderThemePhotoSlotsEditor(chosen);
     renderFullInteractivePhonePreview(chosen);
   }
 
   async function handleQuickApplyTheme() {
     const themeId = document.getElementById('edInvitationTheme').value || 'elegant_floral';
+    const qrEnabled = document.getElementById('edQrCheckinEnabled')
+      ? document.getElementById('edQrCheckinEnabled').value === 'true'
+      : true;
     try {
-      const res = await callBackend('updateWeddingSettings', { invitation_theme: themeId });
+      const res = await callBackend('updateWeddingSettings', {
+        invitation_theme: themeId,
+        qr_checkin_enabled: qrEnabled,
+        theme_media: ADMIN_STATE.themeMediaDraft
+      });
       if (!res || !res.success) {
         Swal.fire('Gagal', res.message, 'error');
         return;
       }
-      showToast('success', 'Template "' + (THEME_LABELS[themeId] || themeId) + '" berhasil diterapkan ke seluruh undangan tamu!');
+      showToast('success', 'Template "' + (THEME_LABELS[themeId] || themeId) + '" beserta slot fotonya berhasil diterapkan!');
     } catch (err) {
       Swal.fire('Error', err.message, 'error');
     }
@@ -1235,15 +1424,21 @@
     const screen = document.getElementById('previewPhoneScreen');
     if (!screen) return;
 
+    const slotMap = ensureThemeSlotMap(themeId);
+    const qrEnabled = document.getElementById('edQrCheckinEnabled')
+      ? document.getElementById('edQrCheckinEnabled').value === 'true'
+      : true;
+
     const groomName = (document.getElementById('edGroomName') && document.getElementById('edGroomName').value) || 'Romeo Montague';
     const brideName = (document.getElementById('edBrideName') && document.getElementById('edBrideName').value) || 'Juliet Capulet';
     const groomNick = (document.getElementById('edGroomNickname') && document.getElementById('edGroomNickname').value) || groomName.split(' ')[0] || 'Romeo';
     const brideNick = (document.getElementById('edBrideNickname') && document.getElementById('edBrideNickname').value) || brideName.split(' ')[0] || 'Juliet';
     const groomParents = (document.getElementById('edGroomParents') && document.getElementById('edGroomParents').value) || 'Putra dari Bpk. Montague & Ibu Montague';
     const brideParents = (document.getElementById('edBrideParents') && document.getElementById('edBrideParents').value) || 'Putri dari Bpk. Capulet & Ibu Capulet';
-    const coverImg = (document.getElementById('edCoverImage') && document.getElementById('edCoverImage').value) || 'https:\/\/images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80';
-    const groomPhoto = (document.getElementById('edGroomPhoto') && document.getElementById('edGroomPhoto').value) || 'https:\/\/images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80';
-    const bridePhoto = (document.getElementById('edBridePhoto') && document.getElementById('edBridePhoto').value) || 'https:\/\/images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80';
+    const coverImg = slotMap.cover_photo || (document.getElementById('edCoverImage') && document.getElementById('edCoverImage').value) || 'https:\/\/images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80';
+    const heroImg = slotMap.hero_photo || coverImg;
+    const groomPhoto = slotMap.groom_photo || (document.getElementById('edGroomPhoto') && document.getElementById('edGroomPhoto').value) || 'https:\/\/images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80';
+    const bridePhoto = slotMap.bride_photo || (document.getElementById('edBridePhoto') && document.getElementById('edBridePhoto').value) || 'https:\/\/images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80';
     const desc = (document.getElementById('edDescription') && document.getElementById('edDescription').value) || 'Tanpa mengurangi rasa hormat, kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri hari bahagia pernikahan kami.';
     const wDate = (document.getElementById('edWeddingDate') && document.getElementById('edWeddingDate').value) || '2026-12-12';
     const akadTitle = (document.getElementById('edAkadTitle') && document.getElementById('edAkadTitle').value) || 'Akad Nikah';
@@ -1279,11 +1474,18 @@
       ? ADMIN_STATE.storyDraft
       : [{ year: '2023', title: 'Pertemuan Pertama', story: 'Awal kisah perjalanan cinta kami.' }];
 
-    const gallery = (ADMIN_STATE.galleryDraft && ADMIN_STATE.galleryDraft.length)
-      ? ADMIN_STATE.galleryDraft
-      : [{ image_url: coverImg, caption: 'Prewedding' }];
+    const slotGalleryUrls = Object.keys(slotMap)
+      .filter((k) => k.indexOf('gallery_') === 0 || k.indexOf('slide_') === 0)
+      .map((k) => ({ image_url: slotMap[k], caption: k }))
+      .filter((x) => !!x.image_url);
 
-    /* 6. THELOVE CINEMATIC (RAMSES & PRISKA STYLE) */
+    const gallery = slotGalleryUrls.length
+      ? slotGalleryUrls
+      : ((ADMIN_STATE.galleryDraft && ADMIN_STATE.galleryDraft.length)
+          ? ADMIN_STATE.galleryDraft
+          : [{ image_url: coverImg, caption: 'Prewedding' }]);
+
+    
     if (themeId === 'thelove_cinematic') {
       screen.innerHTML = `
         <div style="background:#1B1B18; color:#FFFFFF; font-family:'Inter',sans-serif; text-align:center;">
@@ -1381,24 +1583,31 @@
               ${gallery.slice(0, 4).map((g) => `<img src="${escapeHtml(g.image_url)}" style="width:100%; height:105px; object-fit:cover; border-radius:6px;">`).join('')}
             </div>
             <div style="text-align:left; display:flex; flex-direction:column; gap:8px;">
-              ${stories.map((st) => `
-                <div style="background:#1B1B18; border:1px solid rgba(205,160,98,0.25); border-radius:8px; padding:12px;">
-                  <div style="font-family:'Abhaya Libre',serif; font-style:italic; color:#CDA062; font-size:14px;">${escapeHtml(st.year)}</div>
-                  <div style="font-family:'Playfair Display',serif; font-size:14.5px; font-weight:600; margin:2px 0 4px;">${escapeHtml(st.title)}</div>
-                  <div style="font-size:11px; color:rgba(255,255,255,0.72);">${escapeHtml(st.story)}</div>
+              ${stories.map((st, sIdx) => {
+                const stImg = slotMap['story_' + (sIdx + 1)] || '';
+                return `
+                <div style="background:#1B1B18; border:1px solid rgba(205,160,98,0.25); border-radius:8px; overflow:hidden;">
+                  ${stImg ? `<img src="${escapeHtml(stImg)}" style="width:100%; height:115px; object-fit:cover; display:block;">` : ''}
+                  <div style="padding:12px;">
+                    <div style="font-family:'Abhaya Libre',serif; font-style:italic; color:#CDA062; font-size:14px;">${escapeHtml(st.year)}</div>
+                    <div style="font-family:'Playfair Display',serif; font-size:14.5px; font-weight:600; margin:2px 0 4px;">${escapeHtml(st.title)}</div>
+                    <div style="font-size:11px; color:rgba(255,255,255,0.72);">${escapeHtml(st.story)}</div>
+                  </div>
                 </div>
-              `).join('')}
+              `;}).join('')}
             </div>
           </div>
 
           <!-- 6. RSVP & QR Pass & Thank You -->
-          <div id="prev-sec-rsvp" style="padding:26px 16px; background:#1B1B18;">
-            <div style="font-family:'Abhaya Libre',serif; font-style:italic; font-size:22px; color:#CDA062; margin-bottom:10px;">Ucapan &amp; Rsvp + QR Pass</div>
+          <div id="prev-sec-rsvp" style="padding:26px 16px; background:linear-gradient(180deg,#1B1B18 0%,rgba(27,27,24,0.88) 100%),url('${escapeHtml(slotMap.closing_photo || heroImg)}') center/cover;">
+            <div style="font-family:'Abhaya Libre',serif; font-style:italic; font-size:22px; color:#CDA062; margin-bottom:10px;">Ucapan &amp; Rsvp${qrEnabled ? ' + QR Pass' : ''}</div>
+            ${qrEnabled ? `
             <div style="background:#242424; border:1px solid rgba(205,160,98,0.25); border-radius:8px; padding:14px; margin-bottom:16px;">
-              <div style="font-size:11px; color:#CDA062; margin-bottom:4px;">PERSONAL QR PASS</div>
+              <div style="font-size:11px; color:#CDA062; margin-bottom:4px;">PERSONAL QR PASS (AKTIF)</div>
               <div style="font-family:'Playfair Display',serif; font-size:16px; margin-bottom:8px;">Naposo HKBP Tridarma</div>
               <div style="width:90px; height:90px; margin:0 auto; background:#FFF; color:#1B1B18; display:flex; align-items:center; justify-content:center; border-radius:6px; font-size:10px; font-weight:700;">[ QR CODE ]</div>
             </div>
+            ` : `<div style="padding:8px 12px; border-radius:6px; background:rgba(255,255,255,0.06); font-size:11px; color:rgba(255,255,255,0.6); margin-bottom:14px;">Fitur QR Code Check-in: NONAKTIF (Disembunyikan dari Tamu)</div>`}
             <div style="font-size:11.5px; color:rgba(255,255,255,0.75); margin-bottom:12px;">${escapeHtml(closingText)}</div>
             <div style="font-size:10px; letter-spacing:0.25em; color:#CDA062;">THANK YOU</div>
             <div style="font-family:'Great Vibes',cursive; font-size:34px; margin-top:4px;">${coupleShort}</div>
@@ -1408,7 +1617,7 @@
       return;
     }
 
-    /* 1-5. OTHER 5 DISTINCT THEMES FULL SCROLLABLE PREVIEW */
+    
     const ornamentTop = renderPreviewOrnamentHtml(themeId, groomNick, brideNick);
     const isMinimal = themeId === 'modern_minimalist';
     const alignStyle = isMinimal ? 'text-align:left;' : 'text-align:center;';
@@ -1506,12 +1715,14 @@
         <!-- 6. Form RSVP, QR Check-in Pass & Penutup -->
         <div id="prev-sec-rsvp">
           <div style="font-size:10px; letter-spacing:0.18em; color:var(--prev-primary); font-weight:600;">KEHADIRAN &amp; AKSES</div>
-          <h3 style="font-family:var(--font-heading); font-size:19px; margin:4px 0 12px;">RSVP &amp; QR Check-in Pass</h3>
+          <h3 style="font-family:var(--font-heading); font-size:19px; margin:4px 0 12px;">RSVP${qrEnabled ? ' &amp; QR Check-in Pass' : ''}</h3>
+          ${qrEnabled ? `
           <div class="prev-themed-card">
-            <div style="font-size:10.5px; color:var(--prev-primary); font-weight:700;">PERSONAL GUEST PASS</div>
+            <div style="font-size:10.5px; color:var(--prev-primary); font-weight:700;">PERSONAL GUEST PASS (AKTIF)</div>
             <div style="font-family:var(--font-heading); font-size:16px; font-weight:700; margin:4px 0 8px;">Budi Santoso</div>
             <div style="width:88px; height:88px; margin:0 auto; background:#FFF; color:#292722; border:1px solid var(--prev-border); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700;">[ QR PASS ]</div>
           </div>
+          ` : `<div class="prev-themed-card" style="font-size:11px; color:var(--prev-muted);">Fitur QR Code Check-in: NONAKTIF (Disembunyikan dari Tamu)</div>`}
           <div style="font-size:11.5px; color:var(--prev-muted); margin:12px 0;">${escapeHtml(closingText)}</div>
           <div style="font-family:var(--font-heading); font-size:21px; color:var(--prev-primary); font-weight:600;">${coupleShort}</div>
         </div>
@@ -1521,8 +1732,14 @@
 
   async function handleSaveInvitationEditor(event) {
     if (event && event.preventDefault) event.preventDefault();
+    const activeTheme = document.getElementById('edInvitationTheme').value || 'elegant_floral';
+    const qrEnabled = document.getElementById('edQrCheckinEnabled')
+      ? document.getElementById('edQrCheckinEnabled').value === 'true'
+      : true;
     const payload = {
-      invitation_theme: document.getElementById('edInvitationTheme').value || 'elegant_floral',
+      invitation_theme: activeTheme,
+      qr_checkin_enabled: qrEnabled,
+      theme_media: ADMIN_STATE.themeMediaDraft || {},
       status: document.getElementById('edStatus').value,
       groom_name: document.getElementById('edGroomName').value.trim(),
       groom_nickname: document.getElementById('edGroomNickname').value.trim(),

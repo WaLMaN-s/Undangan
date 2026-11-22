@@ -43,17 +43,42 @@ function getWeddingConfigData(bypassCache) {
     stories = [];
   }
 
+  // Merge stored per-theme media slots with default per-theme slots
+  var themeMediaMap = JSON.parse(JSON.stringify(APP_CONFIG.DEFAULT_THEME_MEDIA || {}));
+  try {
+    if (settings.theme_media_json) {
+      var parsedMedia = JSON.parse(settings.theme_media_json);
+      if (parsedMedia && typeof parsedMedia === 'object') {
+        Object.keys(parsedMedia).forEach(function (tKey) {
+          if (!themeMediaMap[tKey]) themeMediaMap[tKey] = {};
+          var slotObj = parsedMedia[tKey] || {};
+          Object.keys(slotObj).forEach(function (sKey) {
+            if (slotObj[sKey]) {
+              themeMediaMap[tKey][sKey] = slotObj[sKey];
+            }
+          });
+        });
+      }
+    }
+  } catch (eMedia) {}
+
+  var activeThemeKey = settings.invitation_theme || APP_CONFIG.DEFAULT_SETTINGS.invitation_theme || 'elegant_floral';
+  var activeSlots = themeMediaMap[activeThemeKey] || themeMediaMap.elegant_floral || {};
+
   var fullConfig = {
     wedding_id: wedding.wedding_id || 'WED-001',
-    invitation_theme: settings.invitation_theme || APP_CONFIG.DEFAULT_SETTINGS.invitation_theme || 'elegant_floral',
+    invitation_theme: activeThemeKey,
+    qr_checkin_enabled: String(settings.qr_checkin_enabled !== undefined ? settings.qr_checkin_enabled : 'true') === 'true',
+    theme_media: themeMediaMap,
+    active_theme_slots: activeSlots,
     groom_name: wedding.groom_name || APP_CONFIG.DEFAULT_WEDDING.groom_name,
     bride_name: wedding.bride_name || APP_CONFIG.DEFAULT_WEDDING.bride_name,
     groom_nickname: settings.groom_nickname || (wedding.groom_name || 'Romeo').split(' ')[0],
     bride_nickname: settings.bride_nickname || (wedding.bride_name || 'Juliet').split(' ')[0],
     groom_parents: settings.groom_parents || APP_CONFIG.DEFAULT_SETTINGS.groom_parents,
     bride_parents: settings.bride_parents || APP_CONFIG.DEFAULT_SETTINGS.bride_parents,
-    groom_photo: settings.groom_photo || APP_CONFIG.DEFAULT_SETTINGS.groom_photo,
-    bride_photo: settings.bride_photo || APP_CONFIG.DEFAULT_SETTINGS.bride_photo,
+    groom_photo: activeSlots.groom_photo || settings.groom_photo || APP_CONFIG.DEFAULT_SETTINGS.groom_photo,
+    bride_photo: activeSlots.bride_photo || settings.bride_photo || APP_CONFIG.DEFAULT_SETTINGS.bride_photo,
     wedding_date: wedding.wedding_date || APP_CONFIG.DEFAULT_WEDDING.wedding_date,
     akad_title: settings.akad_title || 'Akad Nikah',
     akad_time: wedding.akad_time || APP_CONFIG.DEFAULT_WEDDING.akad_time,
@@ -63,7 +88,9 @@ function getWeddingConfigData(bypassCache) {
     address: wedding.address || APP_CONFIG.DEFAULT_WEDDING.address,
     maps_url: wedding.maps_url || APP_CONFIG.DEFAULT_WEDDING.maps_url,
     description: wedding.description || APP_CONFIG.DEFAULT_WEDDING.description,
-    cover_image: wedding.cover_image || APP_CONFIG.DEFAULT_WEDDING.cover_image,
+    cover_image: activeSlots.cover_photo || wedding.cover_image || APP_CONFIG.DEFAULT_WEDDING.cover_image,
+    hero_image: activeSlots.hero_photo || activeSlots.cover_photo || wedding.cover_image || APP_CONFIG.DEFAULT_WEDDING.cover_image,
+    closing_image: activeSlots.closing_photo || activeSlots.hero_photo || activeSlots.cover_photo || wedding.cover_image,
     status: wedding.status || 'Published',
     quote_text: settings.quote_text !== undefined ? settings.quote_text : APP_CONFIG.DEFAULT_SETTINGS.quote_text,
     quote_source: settings.quote_source !== undefined ? settings.quote_source : APP_CONFIG.DEFAULT_SETTINGS.quote_source,
@@ -158,11 +185,29 @@ function updateWeddingSettings(sessionToken, payload) {
       });
     }
 
+    var mergedThemeMedia = current.theme_media || JSON.parse(JSON.stringify(APP_CONFIG.DEFAULT_THEME_MEDIA || {}));
+    if (payload.theme_media && typeof payload.theme_media === 'object') {
+      Object.keys(payload.theme_media).forEach(function (tKey) {
+        if (!mergedThemeMedia[tKey]) mergedThemeMedia[tKey] = {};
+        var slotMap = payload.theme_media[tKey] || {};
+        Object.keys(slotMap).forEach(function (sKey) {
+          var cleanSlotUrl = sanitizeUrl(slotMap[sKey]);
+          if (cleanSlotUrl) {
+            mergedThemeMedia[tKey][sKey] = cleanSlotUrl;
+          }
+        });
+      });
+    }
+
     var settingsUpdates = {
       invitation_theme: sanitizeTextPlain(
         payload.invitation_theme !== undefined ? payload.invitation_theme : current.invitation_theme,
         50
       ) || 'elegant_floral',
+      qr_checkin_enabled: payload.qr_checkin_enabled !== undefined
+        ? String(!!payload.qr_checkin_enabled)
+        : String(current.qr_checkin_enabled !== false),
+      theme_media_json: JSON.stringify(mergedThemeMedia),
       groom_nickname: sanitizeString(
         payload.groom_nickname !== undefined ? payload.groom_nickname : current.groom_nickname,
         60
@@ -476,6 +521,9 @@ function getInvitationByToken(rawToken) {
     },
     wedding: {
       invitation_theme: weddingConfig.invitation_theme || 'elegant_floral',
+      qr_checkin_enabled: weddingConfig.qr_checkin_enabled !== false,
+      theme_media: weddingConfig.theme_media || {},
+      active_theme_slots: weddingConfig.active_theme_slots || {},
       groom_name: weddingConfig.groom_name,
       bride_name: weddingConfig.bride_name,
       groom_nickname: weddingConfig.groom_nickname,
@@ -494,6 +542,8 @@ function getInvitationByToken(rawToken) {
       maps_url: weddingConfig.maps_url,
       description: weddingConfig.description,
       cover_image: weddingConfig.cover_image,
+      hero_image: weddingConfig.hero_image || weddingConfig.cover_image,
+      closing_image: weddingConfig.closing_image || weddingConfig.cover_image,
       quote_text: weddingConfig.quote_text,
       quote_source: weddingConfig.quote_source,
       our_story: weddingConfig.our_story,

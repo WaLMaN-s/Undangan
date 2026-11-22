@@ -1,12 +1,12 @@
 <script>
-  
-
   const GUEST_STATE = {
     token: '',
+    activeTheme: 'elegant_floral',
     guest: null,
     wedding: null,
     wishes: [],
     countdownTimer: null,
+    heroSlideTimer: null,
     musicPlaying: false
   };
 
@@ -67,6 +67,7 @@
   }
 
   function showGuestToast(icon, title) {
+    if (typeof Swal === 'undefined') return;
     Swal.fire({
       toast: true,
       position: 'top',
@@ -88,10 +89,21 @@
     return (params.get('token') || '').trim();
   }
 
-  document.addEventListener('DOMContentLoaded', async () => {
-    if (typeof lucide !== 'undefined' && lucide.createIcons) {
-      lucide.createIcons();
+  function resolveThemeOverrideFromUrl() {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      return (params.get('theme') || '').trim().toLowerCase();
+    } catch (e) {
+      return '';
     }
+  }
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      if (typeof lucide !== 'undefined' && lucide.createIcons) {
+        lucide.createIcons();
+      }
+    } catch (e) {}
 
     GUEST_STATE.token = resolveTokenFromUrl();
     if (!GUEST_STATE.token) {
@@ -118,9 +130,11 @@
       document.getElementById('guestLoadingScreen').style.display = 'none';
       document.getElementById('openingCoverPage').style.display = 'flex';
 
-      if (typeof lucide !== 'undefined' && lucide.createIcons) {
-        lucide.createIcons();
-      }
+      try {
+        if (typeof lucide !== 'undefined' && lucide.createIcons) {
+          lucide.createIcons();
+        }
+      } catch (e) {}
     } catch (err) {
       showInvalidInvitationScreen(err.message);
     }
@@ -132,9 +146,11 @@
     document.getElementById('mainInvitationPage').classList.remove('visible');
     document.getElementById('guestErrorMessage').textContent = message;
     document.getElementById('guestErrorScreen').style.display = 'flex';
-    if (typeof lucide !== 'undefined' && lucide.createIcons) {
-      lucide.createIcons();
-    }
+    try {
+      if (typeof lucide !== 'undefined' && lucide.createIcons) {
+        lucide.createIcons();
+      }
+    } catch (e) {}
   }
 
   function populateInvitationContent() {
@@ -149,15 +165,44 @@
       dark_luxury: true,
       thelove_cinematic: true
     };
-    const activeTheme = VALID_THEMES[w.invitation_theme] ? w.invitation_theme : 'elegant_floral';
+    const urlTheme = resolveThemeOverrideFromUrl();
+    const activeTheme = VALID_THEMES[urlTheme]
+      ? urlTheme
+      : (VALID_THEMES[w.invitation_theme] ? w.invitation_theme : 'elegant_floral');
+    GUEST_STATE.activeTheme = activeTheme;
+
     document.body.setAttribute('data-theme', activeTheme);
     const frameEl = document.querySelector('.mobile-frame');
     if (frameEl) frameEl.setAttribute('data-theme', activeTheme);
 
-    if (w.cover_image) {
-      const safeCssUrl = `url("${String(w.cover_image).replace(/"/g, '')}")`;
-      document.body.style.setProperty('--cover-bg-url', safeCssUrl);
-      if (frameEl) frameEl.style.setProperty('--cover-bg-url', safeCssUrl);
+    const allThemeMedia = (w.theme_media && typeof w.theme_media === 'object') ? w.theme_media : {};
+    const slots = allThemeMedia[activeTheme] || w.active_theme_slots || {};
+
+    const coverUrl = slots.cover_photo || w.cover_image || '';
+    const heroUrl = slots.hero_photo || w.hero_image || coverUrl;
+    const closingUrl = slots.closing_photo || w.closing_image || heroUrl;
+    const groomUrl = slots.groom_photo || w.groom_photo || '';
+    const brideUrl = slots.bride_photo || w.bride_photo || '';
+
+    if (coverUrl) {
+      const safeCoverCss = `url("${String(coverUrl).replace(/"/g, '')}")`;
+      document.body.style.setProperty('--cover-bg-url', safeCoverCss);
+      if (frameEl) frameEl.style.setProperty('--cover-bg-url', safeCoverCss);
+    }
+    if (heroUrl) {
+      const safeHeroCss = `url("${String(heroUrl).replace(/"/g, '')}")`;
+      document.body.style.setProperty('--hero-bg-url', safeHeroCss);
+      if (frameEl) frameEl.style.setProperty('--hero-bg-url', safeHeroCss);
+    }
+    if (closingUrl) {
+      const safeClosingCss = `url("${String(closingUrl).replace(/"/g, '')}")`;
+      document.body.style.setProperty('--closing-bg-url', safeClosingCss);
+      if (frameEl) frameEl.style.setProperty('--closing-bg-url', safeClosingCss);
+      const closingSec = document.getElementById('sec-closing');
+      if (closingSec && activeTheme === 'thelove_cinematic') {
+        closingSec.style.backgroundImage =
+          `linear-gradient(180deg, rgba(27, 27, 24, 0.35) 0%, #1B1B18 94%), ${safeClosingCss}`;
+      }
     }
 
     const gInitial = String(w.groom_nickname || w.groom_name || 'R').trim().charAt(0).toUpperCase();
@@ -198,9 +243,11 @@
     document.getElementById('openCoupleNames').textContent = coupleShort;
     document.getElementById('openGuestName').textContent = g.guest_name;
     document.getElementById('openWeddingDate').textContent = shortIndoDate;
-    if (w.cover_image) {
-      document.getElementById('openCoverPhoto').src = w.cover_image;
-      document.getElementById('mainHeroPhoto').src = w.cover_image;
+    if (coverUrl) {
+      document.getElementById('openCoverPhoto').src = coverUrl;
+    }
+    if (heroUrl) {
+      document.getElementById('mainHeroPhoto').src = heroUrl;
     }
 
     document.getElementById('mainHeroCoupleTitle').textContent = coupleShort;
@@ -208,11 +255,11 @@
 
     document.getElementById('mainGroomFullName').textContent = w.groom_name;
     document.getElementById('mainGroomParents').textContent = w.groom_parents || '';
-    if (w.groom_photo) document.getElementById('mainGroomPhoto').src = w.groom_photo;
+    if (groomUrl) document.getElementById('mainGroomPhoto').src = groomUrl;
 
     document.getElementById('mainBrideFullName').textContent = w.bride_name;
     document.getElementById('mainBrideParents').textContent = w.bride_parents || '';
-    if (w.bride_photo) document.getElementById('mainBridePhoto').src = w.bride_photo;
+    if (brideUrl) document.getElementById('mainBridePhoto').src = brideUrl;
 
     document.getElementById('mainCountdownDateText').textContent = fullIndoDate;
     startRealtimeCountdown(w.wedding_date);
@@ -242,29 +289,70 @@
     if (!stories.length) {
       document.getElementById('sec-story').style.display = 'none';
     } else {
-      storyBox.innerHTML = stories.map((st) => `
-        <div class="story-card">
-          <div class="story-year">${escapeGuestHtml(st.year)}</div>
-          <h4>${escapeGuestHtml(st.title)}</h4>
-          <p>${escapeGuestHtml(st.story)}</p>
-        </div>
-      `).join('');
+      storyBox.innerHTML = stories.map((st, idx) => {
+        const storySlotImg = slots['story_' + (idx + 1)] || '';
+        const showStoryPhoto = activeTheme === 'thelove_cinematic' && storySlotImg;
+        return `
+          <div class="story-card reveal-3d" style="${showStoryPhoto ? 'padding:0; overflow:hidden;' : ''}">
+            ${showStoryPhoto ? `<img src="${escapeGuestHtml(storySlotImg)}" alt="${escapeGuestHtml(st.title)}" loading="lazy" style="width:100%; height:220px; object-fit:cover; display:block;">` : ''}
+            <div style="${showStoryPhoto ? 'padding:16px;' : ''}">
+              <div class="story-year">${escapeGuestHtml(st.year)}</div>
+              <h4>${escapeGuestHtml(st.title)}</h4>
+              <p>${escapeGuestHtml(st.story)}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
+    const slotGalleryItems = Object.keys(slots)
+      .filter((k) => k.indexOf('gallery_') === 0 || k.indexOf('slide_') === 0)
+      .sort()
+      .map((k, idx) => ({
+        image_url: slots[k],
+        caption: `Moment ${idx + 1}`
+      }))
+      .filter((item) => !!item.image_url);
+
+    const galleryList = slotGalleryItems.length
+      ? slotGalleryItems
+      : (Array.isArray(w.gallery) ? w.gallery : []);
+
     const galleryGrid = document.getElementById('mainGalleryGrid');
-    const gallery = Array.isArray(w.gallery) ? w.gallery : [];
-    if (!gallery.length) {
+    if (!galleryList.length) {
       document.getElementById('sec-gallery').style.display = 'none';
     } else {
-      galleryGrid.innerHTML = gallery.map((img) => `
+      let filmstripHtml = '';
+      if (activeTheme === 'thelove_cinematic' || activeTheme === 'dark_luxury') {
+        const doubled = galleryList.concat(galleryList);
+        filmstripHtml = `
+          <div class="filmstrip-3d-viewport" style="grid-column: 1 / -1; overflow:hidden; margin-bottom:10px; border-radius:8px;">
+            <div class="filmstrip-3d-track">
+              ${doubled.map((img) => `
+                <img src="${escapeGuestHtml(img.image_url)}" alt="${escapeGuestHtml(img.caption)}" class="filmstrip-3d-item" onclick="openGalleryLightbox('${escapeGuestHtml(img.image_url)}', '${escapeGuestHtml(img.caption)}')">
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+      galleryGrid.innerHTML = filmstripHtml + galleryList.map((img, gIdx) => `
         <img
           src="${escapeGuestHtml(img.image_url)}"
           alt="${escapeGuestHtml(img.caption)}"
-          class="gallery-thumb"
+          class="gallery-thumb reveal-3d"
+          style="--card-idx:${gIdx};"
           loading="lazy"
           onclick="openGalleryLightbox('${escapeGuestHtml(img.image_url)}', '${escapeGuestHtml(img.caption)}')"
         >
       `).join('');
+    }
+
+    if (activeTheme === 'thelove_cinematic') {
+      startTheloveHeroSlideshow([
+        heroUrl,
+        slots.slide_2 || heroUrl,
+        slots.slide_3 || coverUrl
+      ].filter(Boolean));
     }
 
     document.getElementById('rsvpFormGuestName').value = g.guest_name;
@@ -281,38 +369,224 @@
 
     renderWishesFeed();
 
-    document.getElementById('qrPassGuestName').textContent = g.guest_name;
-    document.getElementById('qrPassCategoryBadge').innerHTML =
-      `<span style="display:inline-block; padding:4px 12px; border-radius:99px; background:var(--secondary); border:1px solid var(--primary); font-size:11.5px; font-weight:600; color:var(--primary-dark);">Kategori: ${escapeGuestHtml(g.category)}</span>`;
+    const qrEnabled = w.qr_checkin_enabled !== false;
+    const qrSec = document.getElementById('sec-qrcode');
+    const qrNavLink = document.querySelector('#bottomTouchNav a[href="#sec-qrcode"]');
+    const bottomNav = document.getElementById('bottomTouchNav');
 
-    if (g.checkin && g.checkin.checked_in) {
-      document.getElementById('qrPassCheckinStatus').innerHTML =
-        `<span style="color:var(--success); font-weight:600;">✓ Sudah Check-in di Lokasi Acara</span>`;
+    if (!qrEnabled) {
+      if (qrSec) qrSec.style.display = 'none';
+      if (qrNavLink) qrNavLink.style.display = 'none';
+      if (bottomNav) bottomNav.style.gridTemplateColumns = 'repeat(4, 1fr)';
     } else {
-      document.getElementById('qrPassCheckinStatus').textContent = 'Status: Siap dipindai saat tiba di lokasi acara';
-    }
+      if (qrSec) qrSec.style.display = '';
+      if (qrNavLink) qrNavLink.style.display = '';
+      if (bottomNav) bottomNav.style.gridTemplateColumns = 'repeat(5, 1fr)';
 
-    const qrContainer = document.getElementById('guestQrCodeContainer');
-    qrContainer.innerHTML = '';
-    if (typeof QRCode !== 'undefined') {
-      new QRCode(qrContainer, {
-        text: g.qr_token || GUEST_STATE.token,
-        width: 175,
-        height: 175,
-        colorDark: '#292722',
-        colorLight: '#FFFFFF'
-      });
+      document.getElementById('qrPassGuestName').textContent = g.guest_name;
+      document.getElementById('qrPassCategoryBadge').innerHTML =
+        `<span style="display:inline-block; padding:4px 12px; border-radius:99px; border:1px solid currentColor; font-size:11.5px; font-weight:600;">Kategori: ${escapeGuestHtml(g.category)}</span>`;
+
+      if (g.checkin && g.checkin.checked_in) {
+        document.getElementById('qrPassCheckinStatus').innerHTML =
+          `<span style="color:var(--success); font-weight:600;">✓ Sudah Check-in di Lokasi Acara</span>`;
+      } else {
+        document.getElementById('qrPassCheckinStatus').textContent = 'Status: Siap dipindai saat tiba di lokasi acara';
+      }
+
+      const qrContainer = document.getElementById('guestQrCodeContainer');
+      qrContainer.innerHTML = '';
+      if (typeof QRCode !== 'undefined') {
+        new QRCode(qrContainer, {
+          text: g.qr_token || GUEST_STATE.token,
+          width: 175,
+          height: 175,
+          colorDark: '#292722',
+          colorLight: '#FFFFFF'
+        });
+      }
     }
 
     document.getElementById('mainClosingText').textContent = w.closing_text || '';
     document.getElementById('mainClosingCouple').textContent = coupleShort;
+
+    initSmooth3DEngine(activeTheme);
   }
 
-  
+  function startTheloveHeroSlideshow(slideUrls) {
+    if (!slideUrls || slideUrls.length < 2) return;
+    if (GUEST_STATE.heroSlideTimer) clearInterval(GUEST_STATE.heroSlideTimer);
+    let idx = 0;
+    const heroSec = document.getElementById('sec-hero');
+    if (!heroSec) return;
+    GUEST_STATE.heroSlideTimer = setInterval(() => {
+      idx = (idx + 1) % slideUrls.length;
+      const nextCss = `url("${String(slideUrls[idx]).replace(/"/g, '')}")`;
+      heroSec.style.backgroundImage =
+        `linear-gradient(180deg, rgba(0, 0, 0, 0.18) 58%, #1B1B18 93%), ${nextCss}`;
+    }, 4500);
+  }
+
+  function initSmooth3DEngine(activeTheme) {
+    if (!document.getElementById('wimsSmooth3DEngineStyles')) {
+      const styleEl = document.createElement('style');
+      styleEl.id = 'wimsSmooth3DEngineStyles';
+      styleEl.textContent = `
+        .mobile-frame {
+          perspective: 1400px;
+          transform-style: preserve-3d;
+        }
+        .opening-cover {
+          will-change: transform, opacity;
+          backface-visibility: hidden;
+          transform-style: preserve-3d;
+        }
+        
+        body[data-theme="elegant_floral"] .opening-cover {
+          transform-origin: left center;
+          transition: transform 1.15s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.9s ease;
+        }
+        body[data-theme="elegant_floral"] .opening-cover.opened {
+          transform: translateX(-50%) perspective(1500px) rotateY(-110deg) translateZ(40px);
+          opacity: 0;
+        }
+        
+        body[data-theme="batak_heritage"] .opening-cover {
+          transform-origin: top center;
+          transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.85s ease;
+        }
+        body[data-theme="batak_heritage"] .opening-cover.opened {
+          transform: translateX(-50%) perspective(1400px) rotateX(78deg) scale(0.92) translateZ(80px);
+          opacity: 0;
+        }
+        
+        body[data-theme="modern_minimalist"] .opening-cover {
+          transition: transform 1.05s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
+        }
+        body[data-theme="modern_minimalist"] .opening-cover.opened {
+          transform: translate3d(-115%, 0, -140px) perspective(1400px) rotateY(26deg);
+          opacity: 0;
+        }
+        
+        body[data-theme="romantic_sunset"] .opening-cover {
+          transition: transform 1.15s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.9s ease;
+        }
+        body[data-theme="romantic_sunset"] .opening-cover.opened {
+          transform: translate3d(-50%, -104%, 90px) perspective(1300px) rotateX(-22deg);
+          opacity: 0;
+        }
+        
+        body[data-theme="dark_luxury"] .opening-cover {
+          transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.85s ease;
+        }
+        body[data-theme="dark_luxury"] .opening-cover.opened {
+          transform: translate3d(-50%, 0, 340px) perspective(1200px) scale(1.28);
+          opacity: 0;
+        }
+        
+        body[data-theme="thelove_cinematic"] .opening-cover {
+          transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.85s ease;
+        }
+        body[data-theme="thelove_cinematic"] .opening-cover.opened {
+          transform: translate3d(-50%, -102%, 0) scale(1.1);
+          opacity: 0;
+        }
+        #sec-hero {
+          transition: background-image 1.2s ease-in-out;
+        }
+
+        
+        .filmstrip-3d-track {
+          display: flex;
+          gap: 10px;
+          width: max-content;
+          animation: filmstrip3DScroll 22s linear infinite;
+          will-change: transform;
+        }
+        .filmstrip-3d-item {
+          width: 145px;
+          height: 185px;
+          object-fit: cover;
+          border-radius: 8px;
+          border: 1px solid rgba(205, 160, 98, 0.45);
+          transform: perspective(600px) rotateY(-8deg);
+          transition: transform 0.35s ease;
+          cursor: pointer;
+        }
+        .filmstrip-3d-item:hover {
+          transform: perspective(600px) rotateY(0deg) scale(1.04);
+        }
+        @keyframes filmstrip3DScroll {
+          0% { transform: translate3d(0, 0, 0); }
+          100% { transform: translate3d(-50%, 0, 0); }
+        }
+
+        
+        .reveal-3d {
+          opacity: 0;
+          will-change: transform, opacity;
+          transition:
+            transform 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+            opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        body[data-theme="elegant_floral"] .reveal-3d {
+          transform: perspective(1000px) rotateX(16deg) translate3d(0, 32px, -30px) scale(0.96);
+        }
+        body[data-theme="batak_heritage"] .reveal-3d {
+          transform: perspective(1000px) rotateY(-18deg) rotateX(12deg) translate3d(0, 30px, -40px);
+        }
+        body[data-theme="modern_minimalist"] .reveal-3d {
+          transform: perspective(1000px) rotateY(10deg) translate3d(-28px, 18px, -25px);
+        }
+        body[data-theme="romantic_sunset"] .reveal-3d {
+          transform: perspective(1000px) translate3d(0, 38px, -55px) rotateX(18deg);
+        }
+        body[data-theme="dark_luxury"] .reveal-3d {
+          transform: perspective(1000px) rotateY(16deg) scale(0.92) translate3d(0, 26px, -60px);
+        }
+        body[data-theme="thelove_cinematic"] .reveal-3d {
+          transform: perspective(1000px) translate3d(0, 26px, -85px) scale(0.88);
+        }
+        .reveal-3d.in-view-3d {
+          opacity: 1 !important;
+          transform: perspective(1000px) translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg) scale(1) !important;
+        }
+      `;
+      document.head.appendChild(styleEl);
+    }
+
+    const targets = document.querySelectorAll(
+      '.floral-card, .gorga-card, .minimal-card, .glass-sunset-card, .luxury-card, ' +
+      '.thelove-portrait-card, .thelove-event-card, .couple-card, .event-detail-card, ' +
+      '.story-card, .gallery-thumb, .cd-pill, .cd-box, .cd-minimal, .cd-sunset, .cd-lux, .cd-thelove, .countdown-box'
+    );
+    targets.forEach((el) => el.classList.add('reveal-3d'));
+
+    if ('IntersectionObserver' in window) {
+      const obs = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('in-view-3d');
+            }
+          });
+        },
+        { threshold: 0.12, rootMargin: '0px 0px -24px 0px' }
+      );
+      document.querySelectorAll('.reveal-3d').forEach((el) => obs.observe(el));
+    } else {
+      document.querySelectorAll('.reveal-3d').forEach((el) => el.classList.add('in-view-3d'));
+    }
+  }
+
   function handleOpenInvitationClick() {
     document.getElementById('openingCoverPage').classList.add('opened');
     document.getElementById('mainInvitationPage').classList.add('visible');
     document.getElementById('bottomTouchNav').classList.add('visible');
+
+    setTimeout(() => {
+      document.querySelectorAll('#sec-hero .reveal-3d').forEach((el) => el.classList.add('in-view-3d'));
+    }, 150);
 
     const w = GUEST_STATE.wedding;
     if (w && w.music_enabled && w.music_url) {
@@ -412,7 +686,9 @@
       });
 
       if (!res || !res.success) {
-        Swal.fire('Gagal Mengirim RSVP', (res && res.message) || 'Terjadi kesalahan.', 'error');
+        if (typeof Swal !== 'undefined') {
+          Swal.fire('Gagal Mengirim RSVP', (res && res.message) || 'Terjadi kesalahan.', 'error');
+        }
         return;
       }
 
@@ -427,13 +703,17 @@
         renderWishesFeed();
       }
     } catch (err) {
-      Swal.fire('Error', err.message, 'error');
+      if (typeof Swal !== 'undefined') {
+        Swal.fire('Error', err.message, 'error');
+      }
     } finally {
       btn.disabled = false;
       btn.innerHTML = '<i data-lucide="send" style="width:16px;height:16px;"></i><span>Kirim Konfirmasi &amp; Ucapan</span>';
-      if (typeof lucide !== 'undefined' && lucide.createIcons) {
-        lucide.createIcons();
-      }
+      try {
+        if (typeof lucide !== 'undefined' && lucide.createIcons) {
+          lucide.createIcons();
+        }
+      } catch (e) {}
     }
   }
 
@@ -445,7 +725,7 @@
 
     if (!list.length) {
       feed.innerHTML = `
-        <div class="wish-item" style="text-align:center; color:var(--text-secondary);">
+        <div class="wish-item" style="text-align:center; opacity:0.75;">
           Jadilah yang pertama memberikan ucapan dan doa restu untuk kedua mempelai.
         </div>`;
       return;
@@ -459,7 +739,7 @@
             <span class="wish-sender">${escapeGuestHtml(item.sender_name)}</span>
             <span class="wish-badge ${isHadir ? 'hadir' : 'absen'}">${escapeGuestHtml(item.attendance_status)}</span>
           </div>
-          <p style="font-size:13px; color:var(--text-primary); line-height:1.55;">"${escapeGuestHtml(item.wishes)}"</p>
+          <p style="font-size:13px; line-height:1.55;">"${escapeGuestHtml(item.wishes)}"</p>
         </div>
       `;
     }).join('');

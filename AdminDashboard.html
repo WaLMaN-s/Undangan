@@ -545,10 +545,36 @@
                           <span class="theme-swatch-circle" style="background:#FFFFFF;"></span>
                           <span class="theme-active-check">Aktif</span>
                         </div>
-                        <div class="theme-option-title">6. Thelove Cinematic (Ramses &amp; Priska)</div>
-                        <div class="theme-option-desc">Full-screen cover photo dengan dark fade (#1B1B18 &amp; #242424), aksen Gold #CDA062, font kaligrafi Great Vibes, kartu foto portrait penuh &amp; tanggal 3 kolom.</div>
+                        <div class="theme-option-title">6. Thelove Cinematic (12 Foto • 3D Slideshow)</div>
+                        <div class="theme-option-desc">Full-screen cover &amp; 3D hero slideshow (#1B1B18 &amp; #242424), Gold #CDA062, Great Vibes, foto per bab Story, 3D Filmstrip &amp; tanggal 3 kolom.</div>
                       </div>
                     </div>
+
+                    <!-- Bar Pengaturan QR Code Check-in (ON / OFF) -->
+                    <div style="margin-top:16px; padding:14px 16px; border-radius:10px; background:var(--secondary); border:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+                      <div>
+                        <div style="font-weight:600; font-size:13.5px; color:var(--text-primary);">Fitur QR Code Check-in pada Undangan Tamu (Opsional)</div>
+                        <div style="font-size:12px; color:var(--text-secondary);">Aktifkan jika acara menggunakan scan QR di gedung, atau nonaktifkan untuk menyembunyikan kartu QR Code dari halaman tamu.</div>
+                      </div>
+                      <select id="edQrCheckinEnabled" class="form-control" style="width:auto; font-weight:600;" onchange="updateLiveMobilePreview()">
+                        <option value="true">QR Check-in: AKTIF (ON)</option>
+                        <option value="false">QR Check-in: NONAKTIF (OFF)</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 0B. Slot Foto Dinamis Khusus Tema Ini (Berbeda Jumlah & Fungsi per Tema) -->
+                <div class="card" style="border-color:var(--primary);">
+                  <div class="card-header">
+                    <div>
+                      <div class="card-title" id="themeSlotsCardTitle">Slot Foto Khusus Tema: 1. Elegant Floral (Wajib 6 Foto)</div>
+                      <div class="card-subtitle" id="themeSlotsCardSubtitle">Setiap tema menyimpan daftar fotonya sendiri secara terpisah agar tidak bercampur saat ganti tema</div>
+                    </div>
+                    <span id="themeSlotsCountBadge" class="badge badge-gold">6 Slot Foto</span>
+                  </div>
+                  <div class="card-body">
+                    <div id="themePhotoSlotsList" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:12px;"></div>
                   </div>
                 </div>
 
