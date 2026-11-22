@@ -1147,12 +1147,18 @@
     batak_heritage: '2. Batak Heritage',
     modern_minimalist: '3. Modern Minimalist',
     romantic_sunset: '4. Romantic Sunset',
-    dark_luxury: '5. Dark Luxury'
+    dark_luxury: '5. Dark Luxury',
+    thelove_cinematic: '6. Thelove Cinematic (Ramses & Priska)'
   };
 
   function renderPreviewOrnamentHtml(themeId, groomNick, brideNick) {
     const gInit = String(groomNick || 'R').trim().charAt(0).toUpperCase();
     const bInit = String(brideNick || 'J').trim().charAt(0).toUpperCase();
+    if (themeId === 'thelove_cinematic') {
+      return `
+        <div style="font-family:'Abhaya Libre',serif; font-style:italic; font-size:13px; color:#CDA062; letter-spacing:0.12em; margin-bottom:2px;">${escapeHtml(gInit)}&amp;${escapeHtml(bInit)} WEDDING • THELOVE</div>
+      `;
+    }
     if (themeId === 'batak_heritage') {
       return `
         <div style="height:10px; background:repeating-linear-gradient(90deg,#7A1215 0 10px,#D4AF37 10px 14px,#121010 14px 22px); border-top:1px solid #D4AF37; border-bottom:1px solid #D4AF37; margin-bottom:6px;"></div>

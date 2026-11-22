@@ -8,7 +8,7 @@
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Abhaya+Libre:ital,wght@0,500;0,700;1,500&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=Great+Vibes&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Shippori+Mincho:wght@400;500;600&display=swap" rel="stylesheet">
 
   <!-- External Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -121,11 +121,14 @@
 
       <div style="position:relative; z-index:2;">
         <div class="guest-greeting-card">
-          <div class="to-label">Kepada Yth.</div>
+          <div class="to-label">Kepada Yth. Bapak/Ibu/Saudara/i</div>
           <div id="openGuestName" class="guest-name">-</div>
           <p class="invite-note">
             Tanpa mengurangi rasa hormat, kami mengundang Anda untuk menghadiri hari bahagia kami.
           </p>
+          <div class="theme-ornament ornament-thelove" style="font-size:11px; color:rgba(255,255,255,0.68); font-style:italic; margin-top:6px;">
+            *Mohon maaf apabila ada kesalahan penulisan nama/gelar
+          </div>
         </div>
 
         <button type="button" class="open-invitation-btn" onclick="handleOpenInvitationClick()">
@@ -167,19 +170,28 @@
 
       <!-- SEKSI 2: NAMA LENGKAP PASANGAN -->
       <section id="sec-couple" class="inv-section">
-        <div class="sec-eyebrow">MEMPELAI BERBAHAGIA</div>
+        <div class="sec-eyebrow">GROOM &amp; BRIDE</div>
         <h3 class="sec-title">Pasangan Mempelai</h3>
 
         <div class="couple-card">
-          <img id="mainGroomPhoto" class="couple-avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80" alt="Mempelai Pria" loading="lazy">
+          <div class="couple-photo-wrap">
+            <img id="mainGroomPhoto" class="couple-avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80" alt="Mempelai Pria" loading="lazy">
+          </div>
+          <div class="theme-ornament ornament-thelove thelove-role-tag">THE GROOM</div>
           <div id="mainGroomFullName" class="couple-fullname">Romeo Montague</div>
           <p id="mainGroomParents" class="couple-parents"></p>
         </div>
 
-        <div class="ampersand-divider">&amp;</div>
+        <div class="ampersand-divider">
+          <span class="default-amp">&amp;</span>
+          <span class="theme-ornament ornament-thelove thelove-partner-divider">ROMANTIC PARTNER</span>
+        </div>
 
         <div class="couple-card">
-          <img id="mainBridePhoto" class="couple-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80" alt="Mempelai Wanita" loading="lazy">
+          <div class="couple-photo-wrap">
+            <img id="mainBridePhoto" class="couple-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80" alt="Mempelai Wanita" loading="lazy">
+          </div>
+          <div class="theme-ornament ornament-thelove thelove-role-tag">THE BRIDE</div>
           <div id="mainBrideFullName" class="couple-fullname">Juliet Capulet</div>
           <p id="mainBrideParents" class="couple-parents"></p>
         </div>
@@ -213,11 +225,12 @@
 
       <!-- SEKSI 4: INFORMASI ACARA & KUTIPAN -->
       <section id="sec-event-info" class="inv-section">
-        <div class="sec-eyebrow">RANGKAIAN ACARA</div>
+        <div class="sec-eyebrow">WEDDING EVENT</div>
         <h3 class="sec-title">Waktu &amp; Tempat</h3>
         <div id="mainQuoteWrapper" style="background:var(--bg-card); border:1px solid var(--border); border-radius:14px; padding:18px; margin-bottom:16px;">
+          <div id="theloveQuoteMonogram" class="theme-ornament ornament-thelove" style="font-family:var(--font-heading); font-size:15px; letter-spacing:0.22em; color:#CDA062; margin-bottom:6px;">R&amp;J WEDDING</div>
+          <div id="mainQuoteSource" style="font-size:12.5px; font-weight:600; color:var(--primary); margin-bottom:8px;"></div>
           <p id="mainQuoteText" style="font-family:var(--font-decor); font-style:italic; font-size:16px; color:var(--text-primary); line-height:1.55;"></p>
-          <div id="mainQuoteSource" style="font-size:12px; font-weight:600; color:var(--primary); margin-top:8px;"></div>
         </div>
         <p class="sec-desc">
           Dengan memohon rahmat dan ridho Tuhan Yang Maha Esa, kami bermaksud menyelenggarakan acara pernikahan kami pada:
@@ -230,6 +243,15 @@
             <i data-lucide="sparkles" style="width:20px;height:20px;"></i>
           </div>
           <h4 id="mainAkadTitle" class="event-card-title">Akad Nikah</h4>
+          <!-- 3-Column Split Date (Thelove Style) -->
+          <div class="theme-ornament ornament-thelove thelove-split-date">
+            <div class="split-month" id="splitAkadMonth">Desember</div>
+            <div class="split-center">
+              <div class="split-dayname" id="splitAkadDayName">Sabtu</div>
+              <div class="split-daynum" id="splitAkadDayNum">12</div>
+            </div>
+            <div class="split-year" id="splitAkadYear">2026</div>
+          </div>
           <div id="mainAkadDate" class="event-meta-line">Sabtu, 12 Desember 2026</div>
           <div id="mainAkadTime" style="font-size:13px; color:var(--text-secondary);">Pukul 08:00 - 10:00 WIB</div>
         </div>
@@ -241,6 +263,15 @@
             <i data-lucide="wine" style="width:20px;height:20px;"></i>
           </div>
           <h4 id="mainReceptionTitle" class="event-card-title">Resepsi Pernikahan</h4>
+          <!-- 3-Column Split Date (Thelove Style) -->
+          <div class="theme-ornament ornament-thelove thelove-split-date">
+            <div class="split-month" id="splitRecMonth">Desember</div>
+            <div class="split-center">
+              <div class="split-dayname" id="splitRecDayName">Sabtu</div>
+              <div class="split-daynum" id="splitRecDayNum">12</div>
+            </div>
+            <div class="split-year" id="splitRecYear">2026</div>
+          </div>
           <div id="mainReceptionDate" class="event-meta-line">Sabtu, 12 Desember 2026</div>
           <div id="mainReceptionTime" style="font-size:13px; color:var(--text-secondary);">Pukul 11:00 - 14:00 WIB</div>
         </div>

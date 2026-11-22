@@ -146,20 +146,49 @@
       batak_heritage: true,
       modern_minimalist: true,
       romantic_sunset: true,
-      dark_luxury: true
+      dark_luxury: true,
+      thelove_cinematic: true
     };
     const activeTheme = VALID_THEMES[w.invitation_theme] ? w.invitation_theme : 'elegant_floral';
     document.body.setAttribute('data-theme', activeTheme);
     const frameEl = document.querySelector('.mobile-frame');
     if (frameEl) frameEl.setAttribute('data-theme', activeTheme);
 
+    if (w.cover_image) {
+      const safeCssUrl = `url("${String(w.cover_image).replace(/"/g, '')}")`;
+      document.body.style.setProperty('--cover-bg-url', safeCssUrl);
+      if (frameEl) frameEl.style.setProperty('--cover-bg-url', safeCssUrl);
+    }
+
     const gInitial = String(w.groom_nickname || w.groom_name || 'R').trim().charAt(0).toUpperCase();
     const bInitial = String(w.bride_nickname || w.bride_name || 'J').trim().charAt(0).toUpperCase();
     const monogramText = `${gInitial}|${bInitial}`;
     const m1 = document.getElementById('openMinimalistMonogram');
     const m2 = document.getElementById('heroMinimalistMonogram');
+    const m3 = document.getElementById('theloveQuoteMonogram');
     if (m1) m1.textContent = monogramText;
     if (m2) m2.textContent = monogramText;
+    if (m3) m3.textContent = `${gInitial}&${bInitial} WEDDING`;
+
+    try {
+      const dObj = new Date((w.wedding_date || '2026-12-12') + 'T00:00:00');
+      if (!isNaN(dObj.getTime())) {
+        const monthName = dObj.toLocaleDateString('id-ID', { month: 'long' });
+        const dayName = dObj.toLocaleDateString('id-ID', { weekday: 'long' });
+        const dayNum = String(dObj.getDate());
+        const yearNum = String(dObj.getFullYear());
+        ['Akad', 'Rec'].forEach((prefix) => {
+          const elM = document.getElementById('split' + prefix + 'Month');
+          const elDN = document.getElementById('split' + prefix + 'DayName');
+          const elD = document.getElementById('split' + prefix + 'DayNum');
+          const elY = document.getElementById('split' + prefix + 'Year');
+          if (elM) elM.textContent = monthName;
+          if (elDN) elDN.textContent = dayName;
+          if (elD) elD.textContent = dayNum;
+          if (elY) elY.textContent = yearNum;
+        });
+      }
+    } catch (e) {}
 
     const coupleShort = `${w.groom_nickname || 'Romeo'} & ${w.bride_nickname || 'Juliet'}`;
     const fullIndoDate = formatFullIndoDate(w.wedding_date);

@@ -63,7 +63,8 @@
   body[data-theme="batak_heritage"] .ornament-batak,
   body[data-theme="modern_minimalist"] .ornament-minimalist,
   body[data-theme="romantic_sunset"] .ornament-sunset,
-  body[data-theme="dark_luxury"] .ornament-darkluxury {
+  body[data-theme="dark_luxury"] .ornament-darkluxury,
+  body[data-theme="thelove_cinematic"] .ornament-thelove {
     display: block;
   }
 
@@ -1154,5 +1155,285 @@
   body[data-theme="dark_luxury"] #rsvpFormGuestName {
     background: #08140F !important;
     color: #F4EFE6 !important;
+  }
+
+  /* ==========================================================================
+     6. THELOVE CINEMATIC THEME (RAMSES & PRISKA — INV.THELOVE.ID STYLE)
+     Full-Bleed Cover & Hero Photo, #1B1B18 & #242424 Charcoal, #CDA062 Gold,
+     Great Vibes Script, Abhaya Libre Italic Gold, Tall Portrait Cards & Split Date
+     ========================================================================== */
+  body[data-theme="thelove_cinematic"] {
+    background-color: #121210;
+    --primary: #CDA062;
+    --primary-dark: #E0B578;
+    --primary-soft: rgba(205, 160, 98, 0.18);
+    --secondary: #1B1B18;
+    --bg-card: #242424;
+    --text-primary: #FFFFFF;
+    --text-secondary: rgba(255, 255, 255, 0.72);
+    --border: rgba(205, 160, 98, 0.28);
+  }
+
+  /* Full-Screen Photo Cover with Bottom Vignette Fade (#0000002E 60% -> #1B1B18 93%) */
+  body[data-theme="thelove_cinematic"] .opening-cover {
+    background-color: #1B1B18;
+    background-image:
+      linear-gradient(180deg, rgba(0, 0, 0, 0.32) 0%, rgba(0, 0, 0, 0.22) 55%, #1B1B18 92%),
+      var(--cover-bg-url, url('https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=900&q=80'));
+    background-size: cover;
+    background-position: center;
+    padding: 44px 26px 38px;
+  }
+
+  /* Sembunyikan frame foto kecil di cover karena foto sudah Full-Screen */
+  body[data-theme="thelove_cinematic"] .opening-photo-arch,
+  body[data-theme="thelove_cinematic"] .opening-ornament-line {
+    display: none !important;
+  }
+
+  body[data-theme="thelove_cinematic"] .opening-couple {
+    font-family: 'Great Vibes', cursive;
+    font-size: 42px;
+    font-weight: 400;
+    color: #FFFFFF;
+    text-shadow: 0 3px 16px rgba(0, 0, 0, 0.65);
+    margin-top: 6px;
+  }
+
+  body[data-theme="thelove_cinematic"] .guest-greeting-card {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 10px 6px;
+    margin-bottom: 14px;
+  }
+
+  body[data-theme="thelove_cinematic"] .guest-greeting-card .to-label {
+    font-family: 'Shippori Mincho', serif;
+    font-style: normal;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.88);
+  }
+
+  body[data-theme="thelove_cinematic"] .guest-greeting-card .guest-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 23px;
+    color: #FFFFFF;
+    margin: 8px 0;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+  }
+
+  body[data-theme="thelove_cinematic"] .guest-greeting-card .invite-note {
+    display: none;
+  }
+
+  body[data-theme="thelove_cinematic"] .open-invitation-btn {
+    background-color: #313131;
+    color: #FFFFFF;
+    font-family: 'Shippori Mincho', serif;
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    border-radius: 5px;
+    border: 1px solid rgba(205, 160, 98, 0.45);
+    width: auto;
+    min-width: 190px;
+    padding: 11px 24px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+  }
+
+  /* Hero Section Full-Bleed Photo + Bottom Fade to #1B1B18 */
+  body[data-theme="thelove_cinematic"] .hero-banner {
+    min-height: 520px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 42px 24px 36px;
+    background-color: #1B1B18;
+    background-image:
+      linear-gradient(180deg, rgba(0, 0, 0, 0.18) 55%, #1B1B18 94%),
+      var(--cover-bg-url, url('https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=900&q=80'));
+    background-size: cover;
+    background-position: center;
+    border-bottom: none;
+  }
+
+  body[data-theme="thelove_cinematic"] .hero-frame {
+    display: none !important;
+  }
+
+  body[data-theme="thelove_cinematic"] #mainHeroCoupleTitle {
+    font-family: 'Great Vibes', cursive !important;
+    font-size: 46px !important;
+    font-weight: 400 !important;
+    color: #FFFFFF;
+    margin: 4px 0 10px !important;
+    text-shadow: 0 3px 16px rgba(0, 0, 0, 0.6);
+  }
+
+  body[data-theme="thelove_cinematic"] .sec-eyebrow {
+    font-family: 'Abhaya Libre', Georgia, serif;
+    font-size: 17px;
+    font-style: italic;
+    letter-spacing: 0.06em;
+    text-transform: none;
+    color: #CDA062;
+  }
+
+  body[data-theme="thelove_cinematic"] .inv-section {
+    background-color: #1B1B18;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  body[data-theme="thelove_cinematic"] .inv-section.bg-white {
+    background-color: #242424;
+  }
+
+  /* Groom & Bride Tall Full-Bleed Portrait Cards (#242424 bottom fade) */
+  body[data-theme="thelove_cinematic"] .couple-card {
+    background: #242424;
+    border: 1px solid rgba(205, 160, 98, 0.22);
+    border-radius: 12px;
+    padding: 0 0 24px 0;
+    overflow: hidden;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  }
+
+  body[data-theme="thelove_cinematic"] .couple-photo-wrap {
+    position: relative;
+    width: 100%;
+    height: 330px;
+    margin-bottom: 14px;
+  }
+
+  body[data-theme="thelove_cinematic"] .couple-photo-wrap::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(36, 36, 36, 0.08) 64%, #242424 97%);
+  }
+
+  body[data-theme="thelove_cinematic"] .couple-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    border: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .thelove-role-tag {
+    font-family: 'Abhaya Libre', Georgia, serif;
+    font-style: italic;
+    font-size: 19px;
+    color: #CDA062;
+    margin-bottom: 4px;
+  }
+
+  body[data-theme="thelove_cinematic"] .couple-fullname {
+    padding: 0 18px;
+    font-size: 20px;
+    color: #FFFFFF;
+  }
+
+  body[data-theme="thelove_cinematic"] .couple-parents {
+    padding: 0 20px;
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  body[data-theme="thelove_cinematic"] .default-amp {
+    display: none;
+  }
+
+  .thelove-partner-divider {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 12px;
+    font-style: normal;
+    letter-spacing: 0.28em;
+    color: #CDA062;
+    padding: 12px 0;
+  }
+
+  /* 3-Column Split Date Layout (Mei | Sabtu 16 | 2026) */
+  .thelove-split-date {
+    display: none;
+    grid-template-columns: 1fr 1.2fr 1fr;
+    align-items: center;
+    max-width: 280px;
+    margin: 14px auto;
+    padding: 10px 0;
+    border-top: 1px solid rgba(205, 160, 98, 0.25);
+    border-bottom: 1px solid rgba(205, 160, 98, 0.25);
+  }
+
+  body[data-theme="thelove_cinematic"] .thelove-split-date {
+    display: grid;
+  }
+
+  body[data-theme="thelove_cinematic"] #mainAkadDate,
+  body[data-theme="thelove_cinematic"] #mainReceptionDate {
+    display: none;
+  }
+
+  .thelove-split-date .split-month,
+  .thelove-split-date .split-year {
+    font-family: 'Abhaya Libre', serif;
+    font-size: 16px;
+    color: #CDA062;
+    font-weight: 600;
+  }
+
+  .thelove-split-date .split-center {
+    border-left: 1px solid #CDA062;
+    border-right: 1px solid #CDA062;
+    padding: 2px 10px;
+  }
+
+  .thelove-split-date .split-dayname {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .thelove-split-date .split-daynum {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #FFFFFF;
+    line-height: 1.1;
+  }
+
+  body[data-theme="thelove_cinematic"] .event-detail-card,
+  body[data-theme="thelove_cinematic"] .rsvp-card,
+  body[data-theme="thelove_cinematic"] .story-card,
+  body[data-theme="thelove_cinematic"] .wish-item,
+  body[data-theme="thelove_cinematic"] .qr-pass-card {
+    background: #242424;
+    border: 1px solid rgba(205, 160, 98, 0.26);
+    border-radius: 10px;
+  }
+
+  body[data-theme="thelove_cinematic"] .event-card-title {
+    font-family: 'Abhaya Libre', Georgia, serif;
+    font-style: italic;
+    font-size: 24px;
+    color: #CDA062;
+  }
+
+  body[data-theme="thelove_cinematic"] .countdown-box {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(205, 160, 98, 0.4);
+    border-radius: 8px;
+  }
+
+  body[data-theme="thelove_cinematic"] .bottom-touch-nav {
+    background: rgba(27, 27, 24, 0.96);
+    border-top: 1px solid rgba(205, 160, 98, 0.3);
+  }
+
+  body[data-theme="thelove_cinematic"] #rsvpFormGuestName {
+    background: #1B1B18 !important;
+    color: #FFFFFF !important;
   }
 </style>
