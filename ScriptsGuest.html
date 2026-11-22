@@ -326,7 +326,7 @@
       if (activeTheme === 'thelove_cinematic' || activeTheme === 'dark_luxury') {
         const doubled = galleryList.concat(galleryList);
         filmstripHtml = `
-          <div class="filmstrip-3d-viewport" style="grid-column: 1 / -1; overflow:hidden; margin-bottom:10px; border-radius:8px;">
+          <div class="filmstrip-3d-viewport" style="grid-column: 1 / -1; width: 100%; max-width: 100%; min-width: 0; overflow: hidden; margin: 0 auto 10px; border-radius: 8px; box-sizing: border-box;">
             <div class="filmstrip-3d-track">
               ${doubled.map((img) => `
                 <img src="${escapeGuestHtml(img.image_url)}" alt="${escapeGuestHtml(img.caption)}" class="filmstrip-3d-item" onclick="openGalleryLightbox('${escapeGuestHtml(img.image_url)}', '${escapeGuestHtml(img.caption)}')">
@@ -433,6 +433,7 @@
       styleEl.id = 'wimsSmooth3DEngineStyles';
       styleEl.textContent = `
         html, body {
+          display: block !important;
           width: 100% !important;
           max-width: 100% !important;
           margin: 0 !important;
@@ -441,10 +442,14 @@
           overscroll-behavior-x: none;
         }
         .mobile-frame {
+          display: block !important;
           overflow-x: hidden !important;
-          width: 100%;
+          width: 100% !important;
           max-width: 430px;
           margin: 0 auto !important;
+          left: 0 !important;
+          right: 0 !important;
+          box-sizing: border-box !important;
         }
         .opening-cover, .bottom-touch-nav {
           left: 0 !important;
@@ -453,6 +458,48 @@
           margin-right: auto !important;
           width: 100% !important;
           max-width: 430px !important;
+          box-sizing: border-box !important;
+        }
+        @media (max-width: 480px) {
+          .mobile-frame, .opening-cover, .bottom-touch-nav {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 auto !important;
+            left: 0 !important;
+            right: 0 !important;
+          }
+        }
+        .gallery-grid {
+          display: grid !important;
+          grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+          width: 100% !important;
+          max-width: 100% !important;
+          min-width: 0 !important;
+          overflow: hidden !important;
+          box-sizing: border-box !important;
+        }
+        .filmstrip-3d-viewport {
+          grid-column: 1 / -1 !important;
+          width: 100% !important;
+          max-width: 100% !important;
+          min-width: 0 !important;
+          overflow: hidden !important;
+          position: relative !important;
+          box-sizing: border-box !important;
+        }
+        .split-calendar-row, .thelove-split-date {
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) minmax(0, 1fr) !important;
+          width: 100% !important;
+          max-width: 280px !important;
+          margin-left: auto !important;
+          margin-right: auto !important;
+        }
+        .countdown-grid {
+          grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+          width: 100% !important;
+          max-width: 100% !important;
+          margin-left: auto !important;
+          margin-right: auto !important;
         }
         .opening-cover:not(.opened), .bottom-touch-nav {
           transform: none !important;

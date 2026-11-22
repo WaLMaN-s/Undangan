@@ -35,18 +35,22 @@
       background-color: #10100E;
       color: var(--white);
       min-height: 100vh;
-      display: flex;
-      justify-content: center;
+      display: block;
+      margin: 0;
+      padding: 0;
       -webkit-font-smoothing: antialiased;
     }
     .mobile-frame {
-      margin: 0 auto;
-      width: 100%;
+      display: block;
+      margin: 0 auto !important;
+      width: 100% !important;
       max-width: 430px;
       min-height: 100vh;
       background-color: var(--bg-dark-1);
       position: relative;
-      overflow-x: hidden;
+      left: 0;
+      right: 0;
+      overflow-x: hidden !important;
       box-shadow: 0 0 55px rgba(0, 0, 0, 0.85);
     }
     .state-screen {
@@ -75,13 +79,22 @@
         linear-gradient(180deg, rgba(0, 0, 0, 0.28) 0%, rgba(0, 0, 0, 0.18) 55%, #1B1B18 93%),
         var(--cover-bg-url, url('https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=900&q=80'));
       background-size: cover;
-      background-position: center;
+      background-position: center center;
       display: flex;
       flex-direction: column;
+      align-items: center;
       justify-content: space-between;
-      padding: 46px 26px 42px;
+      padding: 46px 22px 42px;
       text-align: center;
+      box-sizing: border-box;
       transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.75s ease;
+    }
+    .opening-cover > div {
+      width: 100%;
+      max-width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
     }
     .opening-cover.opened {
       transform: translate3d(0, -105%, 0);
@@ -93,7 +106,12 @@
       font-size: 38px;
       font-weight: 400;
       color: #FFFFFF;
-      letter-spacing: -0.3px;
+      letter-spacing: 0;
+      text-align: center;
+      width: 100%;
+      display: block;
+      margin: 0 auto;
+      padding-right: 4px;
       text-shadow: 0 3px 16px rgba(0, 0, 0, 0.65);
     }
     .cover-bottom-box {
@@ -153,19 +171,29 @@
 
     /* 1. Full-Bleed Hero Banner with Bottom Vignette Fade to #1B1B18 */
     .thelove-hero {
+      width: 100%;
+      max-width: 100%;
       min-height: 550px;
       position: relative;
       display: flex;
       flex-direction: column;
+      align-items: center;
       justify-content: flex-end;
-      padding: 40px 24px 34px;
+      padding: 40px 20px 34px;
       text-align: center;
+      box-sizing: border-box;
       background-color: var(--bg-dark-1);
       background-image:
         linear-gradient(180deg, rgba(0, 0, 0, 0.18) 58%, #1B1B18 93%),
-        var(--cover-bg-url, url('https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=900&q=80'));
+        var(--hero-bg-url, var(--cover-bg-url, url('https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=900&q=80')));
       background-size: cover;
-      background-position: center;
+      background-position: center center;
+    }
+    .thelove-hero > div {
+      width: 100%;
+      max-width: 100%;
+      margin-left: auto;
+      margin-right: auto;
     }
     .thelove-eyebrow-italic {
       font-family: var(--font-abhaya);
@@ -173,78 +201,99 @@
       font-weight: 500;
       font-style: italic;
       color: var(--gold);
+      text-align: center;
     }
     .thelove-hero-couple {
       font-family: var(--font-script);
-      font-size: 48px;
+      font-size: 46px;
       font-weight: 400;
       color: #FFFFFF;
       line-height: 1.25;
-      margin: 4px 0;
+      margin: 4px auto;
+      width: 100%;
+      display: block;
+      text-align: center;
+      padding-right: 4px;
       text-shadow: 0 3px 16px rgba(0, 0, 0, 0.65);
     }
     .thelove-hero-date {
       font-family: var(--font-shippori);
       font-size: 13.5px;
       letter-spacing: 0.08em;
+      text-indent: 0.08em;
       color: rgba(255, 255, 255, 0.88);
       margin-bottom: 20px;
+      text-align: center;
     }
 
     /* Countdown Timer Bar */
     .countdown-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 8px;
-      margin-top: 10px;
+      width: 100%;
+      max-width: 100%;
+      margin: 10px auto 0;
     }
     .cd-thelove {
       background: rgba(255, 255, 255, 0.06);
       backdrop-filter: blur(6px);
       border: 1px solid rgba(205, 160, 98, 0.35);
       border-radius: 6px;
-      padding: 12px 4px;
+      padding: 12px 2px;
+      min-width: 0;
+      text-align: center;
     }
     .cd-num {
       font-family: var(--font-playfair);
-      font-size: 23px;
+      font-size: 22px;
       font-weight: 700;
       color: #FFFFFF;
     }
     .cd-lbl {
-      font-size: 10px;
+      font-size: 9.5px;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.05em;
       color: var(--gold);
       margin-top: 2px;
     }
 
     /* 2. Quote / Verse Block (#1B1B18) */
     .thelove-verse-sec {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
       background-color: var(--bg-dark-1);
-      padding: 36px 26px;
+      padding: 36px 22px;
       text-align: center;
     }
     .thelove-monogram-title {
       font-family: var(--font-shippori);
       font-size: 14px;
-      letter-spacing: 0.25em;
+      letter-spacing: 0.22em;
+      text-indent: 0.22em;
       color: var(--gold);
       margin-bottom: 8px;
+      text-align: center;
     }
 
     /* 3. Groom & Bride Tall Full-Bleed Portrait Cards (#242424) */
     .thelove-couple-sec {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
       background-color: var(--bg-dark-2);
-      padding: 42px 22px;
+      padding: 42px 20px;
       text-align: center;
     }
     .thelove-section-heading {
       font-family: var(--font-shippori);
       font-size: 20px;
       letter-spacing: 0.16em;
+      text-indent: 0.16em;
       color: #FFFFFF;
       margin-bottom: 24px;
+      text-align: center;
     }
     .thelove-portrait-card {
       background-color: var(--bg-dark-2);
@@ -295,23 +344,32 @@
     .thelove-partner-badge {
       font-family: var(--font-shippori);
       font-size: 11.5px;
-      letter-spacing: 0.28em;
+      letter-spacing: 0.22em;
+      text-indent: 0.22em;
       color: var(--gold);
-      margin: 22px 0;
+      margin: 22px auto;
+      text-align: center;
     }
 
     /* 4. Wedding Event Split Calendar Cards (#1B1B18) */
     .thelove-event-sec {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
       background-color: var(--bg-dark-1);
-      padding: 44px 22px;
+      padding: 44px 20px;
       text-align: center;
     }
     .thelove-event-card {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
       background-color: var(--bg-dark-2);
       border: 1px solid var(--border-gold);
       border-radius: 10px;
-      padding: 28px 20px;
-      margin-bottom: 20px;
+      padding: 26px 16px;
+      margin: 0 auto 20px;
+      text-align: center;
     }
     .thelove-event-title {
       font-family: var(--font-abhaya);
@@ -320,11 +378,13 @@
       font-weight: 500;
       color: var(--gold);
       margin-bottom: 14px;
+      text-align: center;
     }
     .split-calendar-row {
       display: grid;
-      grid-template-columns: 1fr 1.25fr 1fr;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) minmax(0, 1fr);
       align-items: center;
+      width: 100%;
       max-width: 280px;
       margin: 14px auto 16px;
       padding: 10px 0;
@@ -333,19 +393,29 @@
     }
     .split-col-side {
       font-family: var(--font-abhaya);
-      font-size: 17px;
+      font-size: 16px;
       color: var(--gold);
+      text-align: center;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      padding: 0 4px;
     }
     .split-col-center {
       border-left: 1px solid var(--gold);
       border-right: 1px solid var(--gold);
-      padding: 2px 10px;
+      padding: 2px 6px;
+      text-align: center;
+      min-width: 0;
     }
     .split-day-label {
       font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.1em;
+      text-indent: 0.1em;
       color: var(--white-muted);
+      text-align: center;
     }
     .split-day-number {
       font-family: var(--font-playfair);
@@ -353,19 +423,27 @@
       font-weight: 700;
       color: #FFFFFF;
       line-height: 1.1;
+      text-align: center;
     }
 
     /* 5. Our Gallery & Our Journey (#242424) */
     .thelove-dark2-sec {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
       background-color: var(--bg-dark-2);
-      padding: 42px 22px;
+      padding: 42px 20px;
       text-align: center;
     }
     .gallery-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
       margin-top: 18px;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      overflow: hidden;
     }
     .gallery-thumb {
       width: 100%;
@@ -449,15 +527,19 @@
   
     html, body {
       width: 100% !important;
-      max-width: 100vw !important;
+      max-width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
       overflow-x: hidden !important;
       overscroll-behavior-x: none;
       touch-action: pan-y;
       position: relative;
     }
     .mobile-frame, .main-invitation, section {
+      width: 100%;
       max-width: 100%;
       overflow-x: hidden;
+      box-sizing: border-box;
     }
     .opening-cover {
       height: 100vh;
@@ -528,7 +610,7 @@
         <div id="mainCountdownDateText" class="thelove-hero-date">Minggu, 16 Mei 2026</div>
 
         <div id="sec-countdown">
-          <div style="font-size:10px; letter-spacing:0.25em; color:var(--gold); margin-bottom:6px;">COUNTDOWN TIMER</div>
+          <div style="font-size:10px; letter-spacing:0.22em; text-indent:0.22em; color:var(--gold); margin-bottom:6px; text-align:center;">COUNTDOWN TIMER</div>
           <div class="countdown-grid">
             <div class="cd-thelove"><div id="cdDays" class="cd-num">00</div><div class="cd-lbl">Days</div></div>
             <div class="cd-thelove"><div id="cdHours" class="cd-num">00</div><div class="cd-lbl">Hours</div></div>
@@ -625,7 +707,7 @@
 
       <!-- 5. ONE STEP CLOSER / OUR GALLERY & OUR JOURNEY (#242424) -->
       <section id="sec-gallery" class="thelove-dark2-sec">
-        <div style="font-size:11px; letter-spacing:0.25em; color:var(--gold); margin-bottom:4px;">ONE STEP CLOSER</div>
+        <div style="font-size:11px; letter-spacing:0.22em; text-indent:0.22em; color:var(--gold); margin-bottom:4px; text-align:center;">ONE STEP CLOSER</div>
         <h3 class="thelove-eyebrow-italic" style="font-size:26px;">Our Gallery</h3>
         <div id="mainGalleryGrid" class="gallery-grid"></div>
       </section>
@@ -681,8 +763,8 @@
 
       <!-- 8. THANK YOU CLOSING -->
       <section id="sec-closing" class="thelove-hero" style="min-height:420px;">
-        <p id="mainClosingText" style="font-size:12.5px; color:rgba(255,255,255,0.85); line-height:1.7; margin-bottom:18px;"></p>
-        <div style="font-size:11px; letter-spacing:0.28em; color:var(--gold);">THANK YOU</div>
+        <p id="mainClosingText" style="font-size:12.5px; color:rgba(255,255,255,0.85); line-height:1.7; margin-bottom:18px; text-align:center; width:100%;"></p>
+        <div style="font-size:11px; letter-spacing:0.24em; text-indent:0.24em; color:var(--gold); text-align:center; width:100%;">THANK YOU</div>
         <h3 id="mainClosingCouple" class="thelove-hero-couple" style="font-size:42px; margin-top:4px;">Ramses &amp; Priska</h3>
       </section>
     </main>

@@ -1189,7 +1189,11 @@
      ========================================================================== */
   @media (max-width: 1120px) {
     .editor-layout {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .editor-layout > div {
+      min-width: 0;
+      max-width: 100%;
     }
     .mobile-preview-sticky {
       position: static;
@@ -1235,7 +1239,7 @@
   }
 
   html, body {
-    max-width: 100vw;
+    max-width: 100%;
     overflow-x: hidden;
   }
   .phone-mockup {

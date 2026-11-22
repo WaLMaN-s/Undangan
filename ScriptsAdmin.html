@@ -1488,11 +1488,11 @@
     
     if (themeId === 'thelove_cinematic') {
       screen.innerHTML = `
-        <div style="background:#1B1B18; color:#FFFFFF; font-family:'Inter',sans-serif; text-align:center;">
+        <div style="background:#1B1B18; color:#FFFFFF; font-family:'Inter',sans-serif; text-align:center; width:100%; max-width:100%; overflow-x:hidden; box-sizing:border-box; margin:0 auto;">
           <!-- 1. Cover Full-Bleed -->
-          <div id="prev-sec-cover" style="min-height:460px; background:linear-gradient(180deg,rgba(0,0,0,0.3) 0%,rgba(0,0,0,0.2) 55%,#1B1B18 93%),url('${escapeHtml(coverImg)}') center/cover; display:flex; flex-direction:column; justify-content:space-between; padding:28px 18px 26px;">
-            <div style="font-family:'Great Vibes',cursive; font-size:34px; color:#FFF; text-shadow:0 2px 12px rgba(0,0,0,0.7);">${coupleShort}</div>
-            <div>
+          <div id="prev-sec-cover" style="width:100%; box-sizing:border-box; min-height:460px; background:linear-gradient(180deg,rgba(0,0,0,0.3) 0%,rgba(0,0,0,0.2) 55%,#1B1B18 93%),url('${escapeHtml(coverImg)}') center center/cover; display:flex; flex-direction:column; align-items:center; justify-content:space-between; padding:28px 18px 26px; text-align:center;">
+            <div style="width:100%; font-family:'Great Vibes',cursive; font-size:34px; color:#FFF; text-shadow:0 2px 12px rgba(0,0,0,0.7); padding-right:4px;">${coupleShort}</div>
+            <div style="width:100%;">
               <div style="font-size:11.5px; color:rgba(255,255,255,0.85);">Kepada Yth. Bapak/Ibu/Saudara/i</div>
               <div style="font-family:'Playfair Display',serif; font-size:20px; font-weight:700; margin:4px 0;">Naposo HKBP Tridarma</div>
               <div style="font-size:10px; font-style:italic; color:rgba(255,255,255,0.65); margin-bottom:10px;">*Mohon maaf apabila ada kesalahan penulisan nama/gelar</div>
@@ -1501,12 +1501,12 @@
           </div>
 
           <!-- 2. Hero Full-Bleed + Countdown -->
-          <div id="prev-sec-hero" style="min-height:390px; background:linear-gradient(180deg,rgba(0,0,0,0.2) 55%,#1B1B18 94%),url('${escapeHtml(coverImg)}') center/cover; display:flex; flex-direction:column; justify-content:flex-end; padding:24px 16px;">
+          <div id="prev-sec-hero" style="width:100%; box-sizing:border-box; min-height:390px; background:linear-gradient(180deg,rgba(0,0,0,0.2) 55%,#1B1B18 94%),url('${escapeHtml(heroImg)}') center center/cover; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding:24px 16px; text-align:center;">
             <div style="font-family:'Abhaya Libre',serif; font-style:italic; font-size:16px; color:#CDA062;">The Wedding of</div>
-            <div style="font-family:'Great Vibes',cursive; font-size:40px; color:#FFF; margin:2px 0;">${coupleShort}</div>
+            <div style="width:100%; font-family:'Great Vibes',cursive; font-size:40px; color:#FFF; margin:2px auto; padding-right:4px;">${coupleShort}</div>
             <div style="font-size:12px; color:rgba(255,255,255,0.85); margin-bottom:12px;">${readableDate}</div>
-            <div style="font-size:9.5px; letter-spacing:0.22em; color:#CDA062; margin-bottom:6px;">COUNTDOWN TIMER</div>
-            <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:6px;">
+            <div style="font-size:9.5px; letter-spacing:0.2em; text-indent:0.2em; color:#CDA062; margin-bottom:6px;">COUNTDOWN TIMER</div>
+            <div style="display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; width:100%;">
               <div style="background:rgba(255,255,255,0.07); border:1px solid rgba(205,160,98,0.35); border-radius:5px; padding:8px 2px;"><div style="font-family:'Playfair Display',serif; font-size:18px; font-weight:700;">18</div><div style="font-size:9px; color:#CDA062;">DAYS</div></div>
               <div style="background:rgba(255,255,255,0.07); border:1px solid rgba(205,160,98,0.35); border-radius:5px; padding:8px 2px;"><div style="font-family:'Playfair Display',serif; font-size:18px; font-weight:700;">09</div><div style="font-size:9px; color:#CDA062;">HOURS</div></div>
               <div style="background:rgba(255,255,255,0.07); border:1px solid rgba(205,160,98,0.35); border-radius:5px; padding:8px 2px;"><div style="font-family:'Playfair Display',serif; font-size:18px; font-weight:700;">42</div><div style="font-size:9px; color:#CDA062;">MINS</div></div>
@@ -1515,26 +1515,26 @@
           </div>
 
           <!-- Verse -->
-          <div style="padding:24px 18px; background:#1B1B18;">
-            <div style="font-size:12px; letter-spacing:0.22em; color:#CDA062; margin-bottom:6px;">${gInit}&amp;${bInit} WEDDING</div>
+          <div style="width:100%; box-sizing:border-box; padding:24px 18px; background:#1B1B18; text-align:center;">
+            <div style="font-size:12px; letter-spacing:0.2em; text-indent:0.2em; color:#CDA062; margin-bottom:6px;">${gInit}&amp;${bInit} WEDDING</div>
             <div style="font-family:'Abhaya Libre',serif; font-style:italic; font-size:15px; color:#CDA062; margin-bottom:6px;">${escapeHtml(quoteSource)}</div>
             <div style="font-size:11.5px; font-style:italic; color:rgba(255,255,255,0.75); line-height:1.6;">${escapeHtml(quoteText)}</div>
           </div>
 
           <!-- 3. Groom & Bride Tall Portrait Cards (#242424) -->
-          <div id="prev-sec-couple" style="padding:28px 16px; background:#242424;">
-            <div style="font-size:16px; letter-spacing:0.16em; margin-bottom:16px;">GROOM &amp; BRIDE</div>
+          <div id="prev-sec-couple" style="width:100%; box-sizing:border-box; padding:28px 16px; background:#242424; text-align:center;">
+            <div style="font-size:16px; letter-spacing:0.16em; text-indent:0.16em; margin-bottom:16px;">GROOM &amp; BRIDE</div>
             <div style="border-radius:10px; overflow:hidden; border:1px solid rgba(255,255,255,0.08); margin-bottom:14px;">
-              <div style="height:230px; background:linear-gradient(180deg,rgba(36,36,36,0.1) 65%,#242424 97%),url('${escapeHtml(groomPhoto)}') center/cover;"></div>
+              <div style="height:230px; background:linear-gradient(180deg,rgba(36,36,36,0.1) 65%,#242424 97%),url('${escapeHtml(groomPhoto)}') center center/cover;"></div>
               <div style="padding:6px 14px 18px;">
                 <div style="font-family:'Abhaya Libre',serif; font-style:italic; color:#CDA062; font-size:16px;">THE GROOM</div>
                 <div style="font-family:'Playfair Display',serif; font-size:18px; font-weight:600; margin:4px 0;">${escapeHtml(groomName)}</div>
                 <div style="font-size:11.5px; color:rgba(255,255,255,0.72);">${escapeHtml(groomParents)}</div>
               </div>
             </div>
-            <div style="font-size:10.5px; letter-spacing:0.25em; color:#CDA062; margin:14px 0;">✦ ROMANTIC PARTNER ✦</div>
+            <div style="font-size:10.5px; letter-spacing:0.22em; text-indent:0.22em; color:#CDA062; margin:14px 0;">✦ ROMANTIC PARTNER ✦</div>
             <div style="border-radius:10px; overflow:hidden; border:1px solid rgba(255,255,255,0.08);">
-              <div style="height:230px; background:linear-gradient(180deg,rgba(36,36,36,0.1) 65%,#242424 97%),url('${escapeHtml(bridePhoto)}') center/cover;"></div>
+              <div style="height:230px; background:linear-gradient(180deg,rgba(36,36,36,0.1) 65%,#242424 97%),url('${escapeHtml(bridePhoto)}') center center/cover;"></div>
               <div style="padding:6px 14px 18px;">
                 <div style="font-family:'Abhaya Libre',serif; font-style:italic; color:#CDA062; font-size:16px;">THE BRIDE</div>
                 <div style="font-family:'Playfair Display',serif; font-size:18px; font-weight:600; margin:4px 0;">${escapeHtml(brideName)}</div>
@@ -1544,30 +1544,30 @@
           </div>
 
           <!-- 4. Wedding Event Split Calendar (#1B1B18) -->
-          <div id="prev-sec-event" style="padding:28px 16px; background:#1B1B18;">
-            <div style="font-size:16px; letter-spacing:0.16em; margin-bottom:16px;">WEDDING EVENT</div>
+          <div id="prev-sec-event" style="width:100%; box-sizing:border-box; padding:28px 16px; background:#1B1B18; text-align:center;">
+            <div style="font-size:16px; letter-spacing:0.16em; text-indent:0.16em; margin-bottom:16px;">WEDDING EVENT</div>
             <div style="background:#242424; border:1px solid rgba(205,160,98,0.28); border-radius:10px; padding:18px 14px; margin-bottom:14px;">
               <div style="font-family:'Abhaya Libre',serif; font-style:italic; font-size:21px; color:#CDA062;">${escapeHtml(akadTitle)}</div>
-              <div style="display:grid; grid-template-columns:1fr 1.2fr 1fr; align-items:center; margin:10px auto; padding:8px 0; border-top:1px solid rgba(205,160,98,0.25); border-bottom:1px solid rgba(205,160,98,0.25);">
-                <div style="color:#CDA062; font-size:13.5px;">${monthName}</div>
-                <div style="border-left:1px solid #CDA062; border-right:1px solid #CDA062; padding:2px 6px;">
+              <div style="display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) minmax(0,1fr); align-items:center; width:100%; max-width:260px; margin:10px auto; padding:8px 0; border-top:1px solid rgba(205,160,98,0.25); border-bottom:1px solid rgba(205,160,98,0.25);">
+                <div style="color:#CDA062; font-size:13.5px; text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${monthName}</div>
+                <div style="border-left:1px solid #CDA062; border-right:1px solid #CDA062; padding:2px 6px; text-align:center;">
                   <div style="font-size:10px; color:rgba(255,255,255,0.7); text-transform:uppercase;">${dayName}</div>
                   <div style="font-family:'Playfair Display',serif; font-size:22px; font-weight:700;">${dayNum}</div>
                 </div>
-                <div style="color:#CDA062; font-size:13.5px;">${yearNum}</div>
+                <div style="color:#CDA062; font-size:13.5px; text-align:center;">${yearNum}</div>
               </div>
               <div style="font-size:12px;">Pukul ${escapeHtml(akadTime)}</div>
             </div>
 
             <div style="background:#242424; border:1px solid rgba(205,160,98,0.28); border-radius:10px; padding:18px 14px; margin-bottom:14px;">
               <div style="font-family:'Abhaya Libre',serif; font-style:italic; font-size:21px; color:#CDA062;">${escapeHtml(recTitle)}</div>
-              <div style="display:grid; grid-template-columns:1fr 1.2fr 1fr; align-items:center; margin:10px auto; padding:8px 0; border-top:1px solid rgba(205,160,98,0.25); border-bottom:1px solid rgba(205,160,98,0.25);">
-                <div style="color:#CDA062; font-size:13.5px;">${monthName}</div>
-                <div style="border-left:1px solid #CDA062; border-right:1px solid #CDA062; padding:2px 6px;">
+              <div style="display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) minmax(0,1fr); align-items:center; width:100%; max-width:260px; margin:10px auto; padding:8px 0; border-top:1px solid rgba(205,160,98,0.25); border-bottom:1px solid rgba(205,160,98,0.25);">
+                <div style="color:#CDA062; font-size:13.5px; text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${monthName}</div>
+                <div style="border-left:1px solid #CDA062; border-right:1px solid #CDA062; padding:2px 6px; text-align:center;">
                   <div style="font-size:10px; color:rgba(255,255,255,0.7); text-transform:uppercase;">${dayName}</div>
                   <div style="font-family:'Playfair Display',serif; font-size:22px; font-weight:700;">${dayNum}</div>
                 </div>
-                <div style="color:#CDA062; font-size:13.5px;">${yearNum}</div>
+                <div style="color:#CDA062; font-size:13.5px; text-align:center;">${yearNum}</div>
               </div>
               <div style="font-size:12px;">Pukul ${escapeHtml(recTime)}</div>
               <div style="font-size:11.5px; color:rgba(255,255,255,0.72); margin:8px 0 12px;">Bertempat di : ${escapeHtml(venue)} — ${escapeHtml(address)}</div>
@@ -1576,10 +1576,10 @@
           </div>
 
           <!-- 5. Our Gallery & Our Journey (#242424) -->
-          <div id="prev-sec-gallery" style="padding:26px 16px; background:#242424;">
-            <div style="font-size:10px; letter-spacing:0.22em; color:#CDA062;">ONE STEP CLOSER</div>
+          <div id="prev-sec-gallery" style="width:100%; box-sizing:border-box; padding:26px 16px; background:#242424; text-align:center;">
+            <div style="font-size:10px; letter-spacing:0.2em; text-indent:0.2em; color:#CDA062;">ONE STEP CLOSER</div>
             <div style="font-family:'Abhaya Libre',serif; font-style:italic; font-size:22px; color:#CDA062; margin-bottom:12px;">Our Gallery &amp; Journey</div>
-            <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:6px; margin-bottom:16px;">
+            <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; margin-bottom:16px; width:100%;">
               ${gallery.slice(0, 4).map((g) => `<img src="${escapeHtml(g.image_url)}" style="width:100%; height:105px; object-fit:cover; border-radius:6px;">`).join('')}
             </div>
             <div style="text-align:left; display:flex; flex-direction:column; gap:8px;">
@@ -1599,7 +1599,7 @@
           </div>
 
           <!-- 6. RSVP & QR Pass & Thank You -->
-          <div id="prev-sec-rsvp" style="padding:26px 16px; background:linear-gradient(180deg,#1B1B18 0%,rgba(27,27,24,0.88) 100%),url('${escapeHtml(slotMap.closing_photo || heroImg)}') center/cover;">
+          <div id="prev-sec-rsvp" style="width:100%; box-sizing:border-box; padding:26px 16px; background:linear-gradient(180deg,#1B1B18 0%,rgba(27,27,24,0.88) 100%),url('${escapeHtml(slotMap.closing_photo || heroImg)}') center center/cover; text-align:center;">
             <div style="font-family:'Abhaya Libre',serif; font-style:italic; font-size:22px; color:#CDA062; margin-bottom:10px;">Ucapan &amp; Rsvp${qrEnabled ? ' + QR Pass' : ''}</div>
             ${qrEnabled ? `
             <div style="background:#242424; border:1px solid rgba(205,160,98,0.25); border-radius:8px; padding:14px; margin-bottom:16px;">
@@ -1609,8 +1609,8 @@
             </div>
             ` : `<div style="padding:8px 12px; border-radius:6px; background:rgba(255,255,255,0.06); font-size:11px; color:rgba(255,255,255,0.6); margin-bottom:14px;">Fitur QR Code Check-in: NONAKTIF (Disembunyikan dari Tamu)</div>`}
             <div style="font-size:11.5px; color:rgba(255,255,255,0.75); margin-bottom:12px;">${escapeHtml(closingText)}</div>
-            <div style="font-size:10px; letter-spacing:0.25em; color:#CDA062;">THANK YOU</div>
-            <div style="font-family:'Great Vibes',cursive; font-size:34px; margin-top:4px;">${coupleShort}</div>
+            <div style="font-size:10px; letter-spacing:0.22em; text-indent:0.22em; color:#CDA062;">THANK YOU</div>
+            <div style="width:100%; font-family:'Great Vibes',cursive; font-size:34px; margin-top:4px; padding-right:4px;">${coupleShort}</div>
           </div>
         </div>
       `;
