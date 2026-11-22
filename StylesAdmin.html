@@ -1233,4 +1233,26 @@
       break-inside: avoid;
     }
   }
+
+  html, body {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+  .phone-mockup {
+    max-width: 100%;
+  }
+  @media (max-width: 480px) {
+    .phone-mockup {
+      width: 100% !important;
+      border-width: 6px !important;
+      border-radius: 26px !important;
+    }
+    .content-wrapper {
+      padding: 12px !important;
+    }
+    .card-body, .card-header {
+      padding: 14px !important;
+    }
+  }
+
 </style>

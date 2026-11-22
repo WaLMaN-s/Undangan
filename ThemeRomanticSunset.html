@@ -140,6 +140,38 @@
     .bottom-touch-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; height: 62px; background: rgba(255, 246, 238, 0.95); backdrop-filter: blur(8px); border-top: 1px solid var(--border); display: none; grid-template-columns: repeat(5, 1fr); z-index: 90; }
     .bottom-touch-nav.visible { display: grid; }
     .touch-nav-link { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: var(--muted); font-size: 10.5px; }
+  
+    html, body {
+      width: 100% !important;
+      max-width: 100vw !important;
+      overflow-x: hidden !important;
+      overscroll-behavior-x: none;
+      touch-action: pan-y;
+      position: relative;
+    }
+    .mobile-frame, .main-invitation, section {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+    .opening-cover {
+      height: 100vh;
+      height: 100dvh;
+      overflow-x: hidden !important;
+    }
+    @media (max-width: 480px) {
+      .mobile-frame {
+        width: 100% !important;
+        max-width: 100% !important;
+        border-left: none !important;
+        border-right: none !important;
+        box-shadow: none !important;
+      }
+      .opening-cover, .bottom-touch-nav {
+        max-width: 100% !important;
+        width: 100% !important;
+      }
+    }
+
   </style>
 </head>
 <body>

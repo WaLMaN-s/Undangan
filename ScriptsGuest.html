@@ -432,9 +432,18 @@
       const styleEl = document.createElement('style');
       styleEl.id = 'wimsSmooth3DEngineStyles';
       styleEl.textContent = `
+        html, body {
+          width: 100% !important;
+          max-width: 100% !important;
+          overflow-x: hidden !important;
+          overscroll-behavior-x: none;
+        }
         .mobile-frame {
-          perspective: 1400px;
+          perspective: 1200px;
           transform-style: preserve-3d;
+          overflow-x: hidden !important;
+          overflow-x: clip !important;
+          width: 100%;
         }
         .opening-cover {
           will-change: transform, opacity;
@@ -530,22 +539,22 @@
             opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1);
         }
         body[data-theme="elegant_floral"] .reveal-3d {
-          transform: perspective(1000px) rotateX(16deg) translate3d(0, 32px, -30px) scale(0.96);
+          transform: perspective(900px) rotateX(15deg) translate3d(0, 28px, -25px) scale(0.96);
         }
         body[data-theme="batak_heritage"] .reveal-3d {
-          transform: perspective(1000px) rotateY(-18deg) rotateX(12deg) translate3d(0, 30px, -40px);
+          transform: perspective(900px) rotateX(18deg) translate3d(0, 28px, -35px) scale(0.95);
         }
         body[data-theme="modern_minimalist"] .reveal-3d {
-          transform: perspective(1000px) rotateY(10deg) translate3d(-28px, 18px, -25px);
+          transform: perspective(900px) rotateX(10deg) translate3d(0, 22px, -20px) scale(0.97);
         }
         body[data-theme="romantic_sunset"] .reveal-3d {
-          transform: perspective(1000px) translate3d(0, 38px, -55px) rotateX(18deg);
+          transform: perspective(900px) translate3d(0, 32px, -45px) rotateX(16deg) scale(0.95);
         }
         body[data-theme="dark_luxury"] .reveal-3d {
-          transform: perspective(1000px) rotateY(16deg) scale(0.92) translate3d(0, 26px, -60px);
+          transform: perspective(900px) rotateX(14deg) scale(0.92) translate3d(0, 24px, -50px);
         }
         body[data-theme="thelove_cinematic"] .reveal-3d {
-          transform: perspective(1000px) translate3d(0, 26px, -85px) scale(0.88);
+          transform: perspective(900px) translate3d(0, 24px, -75px) scale(0.89);
         }
         .reveal-3d.in-view-3d {
           opacity: 1 !important;
@@ -580,13 +589,20 @@
   }
 
   function handleOpenInvitationClick() {
-    document.getElementById('openingCoverPage').classList.add('opened');
+    const coverEl = document.getElementById('openingCoverPage');
+    coverEl.classList.add('opened');
     document.getElementById('mainInvitationPage').classList.add('visible');
     document.getElementById('bottomTouchNav').classList.add('visible');
 
     setTimeout(() => {
       document.querySelectorAll('#sec-hero .reveal-3d').forEach((el) => el.classList.add('in-view-3d'));
     }, 150);
+
+    setTimeout(() => {
+      if (coverEl && coverEl.classList.contains('opened')) {
+        coverEl.style.display = 'none';
+      }
+    }, 1050);
 
     const w = GUEST_STATE.wedding;
     if (w && w.music_enabled && w.music_url) {
