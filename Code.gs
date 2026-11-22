@@ -30,7 +30,27 @@ function doGet(e) {
 
   // Routing ke Guest Invitation Website jika terdapat parameter ?token=... atau ?page=invitation
   if (token || pageMode === 'invitation' || pageMode === 'guest') {
-    var guestTpl = HtmlService.createTemplateFromFile('GuestInvitation');
+    var themeFileMap = {
+      elegant_floral: 'ThemeElegantFloral',
+      batak_heritage: 'ThemeBatakHeritage',
+      modern_minimalist: 'ThemeModernMinimalist',
+      romantic_sunset: 'ThemeRomanticSunset',
+      dark_luxury: 'ThemeDarkLuxury',
+      thelove_cinematic: 'ThemeTheloveCinematic'
+    };
+
+    var selectedThemeKey = params.theme ? String(params.theme).trim().toLowerCase() : '';
+    if (!themeFileMap[selectedThemeKey]) {
+      try {
+        var weddingCfg = getWeddingConfigData(false);
+        selectedThemeKey = (weddingCfg && weddingCfg.invitation_theme) || 'elegant_floral';
+      } catch (eTheme) {
+        selectedThemeKey = 'elegant_floral';
+      }
+    }
+
+    var targetHtmlFile = themeFileMap[selectedThemeKey] || 'ThemeElegantFloral';
+    var guestTpl = HtmlService.createTemplateFromFile(targetHtmlFile);
     guestTpl.initialToken = sanitizeTextPlain(token, 120);
     guestTpl.webAppUrl = getWebAppBaseUrl();
 

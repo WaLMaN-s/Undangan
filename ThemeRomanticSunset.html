@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Undangan Pernikahan — Romantic Sunset</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    :root {
+      --peach: #FAD4B8;
+      --terracotta: #D97952;
+      --champagne: #FFF6EE;
+      --gold: #E09F5A;
+      --twilight: #3D2226;
+      --muted: #8C5E58;
+      --border: #F3D5C1;
+      --success: #3B9B72;
+      --danger: #D95C5C;
+      --font-serif: 'Playfair Display', serif;
+      --font-decor: 'Cormorant Garamond', serif;
+      --font-sans: 'Inter', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-sans);
+      background: #E2B89E;
+      color: var(--twilight);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+    }
+    .mobile-frame {
+      width: 100%; max-width: 430px; min-height: 100vh;
+      background: var(--champagne);
+      position: relative; overflow-x: hidden;
+      box-shadow: 0 0 50px rgba(61, 34, 38, 0.2);
+    }
+    .state-screen {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 36px 28px;
+      text-align: center; background: linear-gradient(180deg, #F4A27E 0%, #FFF6EE 100%);
+    }
+    .spinner-ring {
+      width: 44px; height: 44px; border: 2.5px solid var(--border);
+      border-top-color: var(--terracotta); border-radius: 50%;
+      animation: spin 0.9s linear infinite; margin-bottom: 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Langit Senja & Matahari Bersinar */
+    .opening-cover {
+      position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 430px; height: 100vh; z-index: 120;
+      background: linear-gradient(180deg, #F09872 0%, #FAD1B3 38%, #FDE8D6 72%, #FFF6EE 100%);
+      display: flex; flex-direction: column; justify-content: space-between;
+      padding: 32px 24px 28px; text-align: center;
+      transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.7s ease;
+      overflow-y: auto;
+    }
+    .opening-cover.opened { transform: translate(-50%, -105%); opacity: 0; pointer-events: none; }
+    .sun-orb-glow {
+      width: 145px; height: 145px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 250, 224, 0.96) 0%, rgba(255, 198, 138, 0.65) 50%, rgba(240, 152, 114, 0) 75%);
+      position: absolute; top: 38px; left: 50%; transform: translateX(-50%);
+      pointer-events: none; z-index: 0;
+      animation: sunPulse 4s ease-in-out infinite alternate;
+    }
+    @keyframes sunPulse {
+      0% { transform: translateX(-50%) scale(0.95); opacity: 0.85; }
+      100% { transform: translateX(-50%) scale(1.12); opacity: 1; }
+    }
+    .sunset-arch {
+      width: 205px; height: 245px; margin: 10px auto 0;
+      border-radius: 999px 999px 26px 26px;
+      padding: 6px; border: 2px solid var(--gold);
+      background: rgba(255, 255, 255, 0.85);
+      box-shadow: 0 0 38px rgba(255, 183, 120, 0.75);
+      position: relative; z-index: 2;
+    }
+    .sunset-arch img { width: 100%; height: 100%; object-fit: cover; border-radius: 999px 999px 20px 20px; }
+    .sunset-hills-svg { width: 100%; height: 54px; display: block; margin-top: -12px; position: relative; z-index: 1; }
+    .glass-sunset-card {
+      background: rgba(255, 255, 255, 0.86);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(224, 159, 90, 0.42);
+      border-radius: 22px;
+      padding: 20px 18px;
+      box-shadow: 0 10px 28px rgba(217, 121, 82, 0.14);
+      margin-top: 16px;
+    }
+    .btn-sunset {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 14px 24px;
+      border-radius: 99px;
+      background: linear-gradient(90deg, #D97952 0%, #E09F5A 100%);
+      color: #FFFFFF; border: none;
+      font-size: 12.5px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 8px 22px rgba(217, 121, 82, 0.36);
+    }
+
+    .main-invitation { display: none; padding-bottom: 90px; }
+    .main-invitation.visible { display: block; }
+    .sec-sunset { padding: 38px 22px; border-bottom: 1px solid var(--border); text-align: center; position: relative; }
+    .sec-sunset.sky { background: linear-gradient(180deg, #FAD1B4 0%, #FDE8D7 55%, #FFF6EE 100%); }
+    .eyebrow-sunset { font-size: 10.5px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--terracotta); font-weight: 700; }
+    .sec-title { font-family: var(--font-serif); font-size: 25px; color: var(--twilight); margin: 6px 0 10px; }
+    .sec-desc { font-size: 13px; color: var(--muted); line-height: 1.65; }
+    .avatar-sunset { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 2.5px solid var(--gold); box-shadow: 0 0 24px rgba(224, 159, 90, 0.45); margin-bottom: 12px; }
+    .countdown-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 18px; }
+    .cd-sunset { background: rgba(255,255,255,0.9); border: 1px solid var(--gold); border-radius: 16px; padding: 14px 6px; }
+    .cd-num { font-family: var(--font-serif); font-size: 24px; font-weight: 700; color: var(--terracotta); }
+    .cd-lbl { font-size: 10.5px; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
+    .story-timeline { display: flex; flex-direction: column; gap: 14px; margin-top: 18px; text-align: left; }
+    .story-card { background: rgba(255,255,255,0.9); border: 1px solid var(--border); border-left: 4px solid var(--terracotta); border-radius: 16px; padding: 16px; }
+    .story-year { font-size: 11px; font-weight: 700; color: var(--terracotta); text-transform: uppercase; }
+    .story-card h4 { font-family: var(--font-serif); font-size: 17px; margin: 4px 0 6px; }
+    .story-card p { font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+    .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 18px; }
+    .gallery-thumb { width: 100%; height: 165px; object-fit: cover; border-radius: 16px; border: 1px solid var(--gold); cursor: pointer; }
+    .guest-input { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; background: #FFF9F4; font-family: var(--font-sans); font-size: 13.5px; margin-bottom: 12px; }
+    .wishes-feed { max-height: 350px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-top: 16px; text-align: left; }
+    .wish-item { background: rgba(255,255,255,0.9); border: 1px solid var(--border); border-radius: 16px; padding: 14px; }
+    .wish-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+    .wish-sender { font-weight: 600; font-size: 13.5px; }
+    .wish-badge { font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: 99px; }
+    .wish-badge.hadir { background: rgba(59, 155, 114, 0.15); color: var(--success); }
+    .wish-badge.absen { background: rgba(217, 92, 92, 0.15); color: var(--danger); }
+    .lightbox-overlay { position: fixed; inset: 0; background: rgba(40, 22, 24, 0.92); z-index: 300; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+    .lightbox-overlay.open { display: flex; }
+    .lightbox-Overlay-img { max-width: 100%; max-height: 75vh; border-radius: 16px; border: 2px solid var(--gold); }
+    .floating-music-btn { position: fixed; bottom: 78px; right: max(16px, calc(50% - 198px)); width: 44px; height: 44px; border-radius: 50%; background: #FFF; border: 1.5px solid var(--terracotta); color: var(--terracotta); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 95; }
+    .floating-music-btn.playing { animation: spin 6s linear infinite; }
+    .bottom-touch-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; height: 62px; background: rgba(255, 246, 238, 0.95); backdrop-filter: blur(8px); border-top: 1px solid var(--border); display: none; grid-template-columns: repeat(5, 1fr); z-index: 90; }
+    .bottom-touch-nav.visible { display: grid; }
+    .touch-nav-link { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: var(--muted); font-size: 10.5px; }
+  </style>
+</head>
+<body>
+  <div class="mobile-frame">
+    <div id="guestLoadingScreen" class="state-screen">
+      <div class="spinner-ring"></div>
+      <div style="font-family:var(--font-serif); font-size:18px;">Memuat Undangan Senja</div>
+    </div>
+
+    <div id="guestErrorScreen" class="state-screen" style="display:none;">
+      <h1 style="font-family:var(--font-serif); font-size:23px; margin-bottom:8px;">Undangan Tidak Ditemukan</h1>
+      <p id="guestErrorMessage" class="sec-desc"></p>
+    </div>
+
+    <!-- A. OPENING COVER (ROMANTIC SUNSET) -->
+    <section id="openingCoverPage" class="opening-cover" style="display:none;">
+      <div class="sun-orb-glow"></div>
+      <div style="position:relative; z-index:2;">
+        <div class="eyebrow-sunset">GOLDEN HOUR WEDDING</div>
+        <h1 id="openCoupleNames" style="font-family:var(--font-serif); font-size:34px; margin:6px 0;">Romeo &amp; Juliet</h1>
+        <div class="sunset-arch">
+          <img id="openCoverPhoto" src="" alt="Couple">
+        </div>
+        <!-- Siluet Pemandangan Bukit & Senja -->
+        <svg class="sunset-hills-svg" viewBox="0 0 360 54" fill="none">
+          <path d="M0 44L55 22L115 38L185 14L255 36L310 20L360 40V54H0V44Z" fill="#E59A76" fill-opacity="0.45"/>
+          <path d="M0 48L75 30L145 44L225 24L295 42L360 32V54H0V48Z" fill="#D97952" fill-opacity="0.58"/>
+        </svg>
+      </div>
+
+      <div style="position:relative; z-index:2;">
+        <div class="glass-sunset-card" style="margin:6px 0 14px;">
+          <div style="font-family:var(--font-decor); font-style:italic; font-size:17px; color:var(--muted);">Kepada Yth.</div>
+          <div id="openGuestName" style="font-family:var(--font-serif); font-size:21px; font-weight:700; margin:6px 0;">-</div>
+          <p style="font-size:12px; color:var(--muted);">Di bawah hangatnya senja, kami mengundang Anda merayakan hari pernikahan kami.</p>
+        </div>
+        <button type="button" class="btn-sunset" onclick="handleOpenInvitationClick()">
+          <i data-lucide="sun" style="width:16px;height:16px;"></i>
+          <span>BUKA UNDANGAN</span>
+        </button>
+        <div id="openWeddingDate" style="font-family:var(--font-decor); font-size:16px; color:var(--muted); margin-top:10px;"></div>
+      </div>
+    </section>
+
+    <!-- B. MAIN INVITATION (ROMANTIC SUNSET) -->
+    <main id="mainInvitationPage" class="main-invitation">
+      <section id="sec-hero" class="sec-sunset sky">
+        <div class="eyebrow-sunset">THE WEDDING CELEBRATION</div>
+        <h2 id="mainHeroCoupleTitle" style="font-family:var(--font-serif); font-size:30px; margin:6px 0 14px;"></h2>
+        <div style="border-radius:160px 160px 24px 24px; padding:6px; border:2px solid var(--gold); background:#FFF; box-shadow:0 12px 30px rgba(217,121,82,0.22); margin-bottom:16px;">
+          <img id="mainHeroPhoto" src="" alt="Hero" style="width:100%; height:320px; object-fit:cover; border-radius:154px 154px 18px 18px; display:block;">
+        </div>
+        <p id="mainHeroDescription" class="sec-desc"></p>
+      </section>
+
+      <section id="sec-couple" class="sec-sunset">
+        <div class="eyebrow-sunset">PASANGAN MEMPELAI</div>
+        <h3 class="sec-title">Groom &amp; Bride</h3>
+        <div class="glass-sunset-card">
+          <img id="mainGroomPhoto" class="avatar-sunset" src="" alt="Groom" loading="lazy">
+          <div id="mainGroomFullName" style="font-family:var(--font-serif); font-size:21px; font-weight:600; margin-bottom:6px;"></div>
+          <p id="mainGroomParents" class="sec-desc"></p>
+        </div>
+        <div style="font-family:var(--font-decor); font-size:34px; font-style:italic; color:var(--terracotta); margin-top:12px;">&amp;</div>
+        <div class="glass-sunset-card">
+          <img id="mainBridePhoto" class="avatar-sunset" src="" alt="Bride" loading="lazy">
+          <div id="mainBrideFullName" style="font-family:var(--font-serif); font-size:21px; font-weight:600; margin-bottom:6px;"></div>
+          <p id="mainBrideParents" class="sec-desc"></p>
+        </div>
+      </section>
+
+      <section id="sec-countdown" class="sec-sunset sky">
+        <div class="eyebrow-sunset">MENUJU SENJA BAHAGIA</div>
+        <h3 class="sec-title">Hitung Mundur</h3>
+        <p id="mainCountdownDateText" class="sec-desc"></p>
+        <div class="countdown-grid">
+          <div class="cd-sunset"><div id="cdDays" class="cd-num">00</div><div class="cd-lbl">Hari</div></div>
+          <div class="cd-sunset"><div id="cdHours" class="cd-num">00</div><div class="cd-lbl">Jam</div></div>
+          <div class="cd-sunset"><div id="cdMinutes" class="cd-num">00</div><div class="cd-lbl">Menit</div></div>
+          <div class="cd-sunset"><div id="cdSeconds" class="cd-num">00</div><div class="cd-lbl">Detik</div></div>
+        </div>
+      </section>
+
+      <section id="sec-event-info" class="sec-sunset">
+        <div id="mainQuoteWrapper" class="glass-sunset-card" style="margin-top:0; margin-bottom:20px;">
+          <p id="mainQuoteText" style="font-family:var(--font-decor); font-style:italic; font-size:16.5px; line-height:1.6;"></p>
+          <div id="mainQuoteSource" style="font-size:12px; font-weight:700; color:var(--terracotta); margin-top:8px;"></div>
+        </div>
+        <div class="eyebrow-sunset">RANGKAIAN ACARA</div>
+        <h3 class="sec-title">Waktu &amp; Tempat</h3>
+
+        <div class="glass-sunset-card">
+          <h4 id="mainAkadTitle" style="font-family:var(--font-serif); font-size:20px; color:var(--terracotta);">Akad Nikah</h4>
+          <div id="mainAkadDate" style="font-weight:600; margin:6px 0;"></div>
+          <div id="mainAkadTime" class="sec-desc"></div>
+        </div>
+
+        <div class="glass-sunset-card">
+          <h4 id="mainReceptionTitle" style="font-family:var(--font-serif); font-size:20px; color:var(--terracotta);">Resepsi</h4>
+          <div id="mainReceptionDate" style="font-weight:600; margin:6px 0;"></div>
+          <div id="mainReceptionTime" class="sec-desc"></div>
+        </div>
+
+        <div class="glass-sunset-card" style="border-color:var(--terracotta);">
+          <h4 id="mainVenueName" style="font-family:var(--font-serif); font-size:19px;"></h4>
+          <p id="mainVenueAddress" class="sec-desc" style="margin:8px 0 16px;"></p>
+          <a id="mainGoogleMapsBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn-sunset" style="text-decoration:none;">
+            <i data-lucide="map-pin" style="width:16px;height:16px;"></i>
+            <span>Petunjuk Google Maps</span>
+          </a>
+        </div>
+      </section>
+
+      <section id="sec-story" class="sec-sunset sky">
+        <div class="eyebrow-sunset">PERJALANAN CINTA</div>
+        <h3 class="sec-title">Our Love Story</h3>
+        <div id="mainStoryList" class="story-timeline"></div>
+      </section>
+
+      <section id="sec-gallery" class="sec-sunset">
+        <div class="eyebrow-sunset">MOMEN INDAH</div>
+        <h3 class="sec-title">Galeri Foto</h3>
+        <div id="mainGalleryGrid" class="gallery-grid"></div>
+      </section>
+
+      <section id="sec-rsvp" class="sec-sunset sky">
+        <div class="eyebrow-sunset">KONFIRMASI KEHADIRAN</div>
+        <h3 class="sec-title">Formulir RSVP</h3>
+        <form id="guestRsvpForm" class="glass-sunset-card" style="text-align:left;" action="javascript:void(0);" onsubmit="handleGuestRsvpSubmit(event); return false;">
+          <label style="font-size:12px; font-weight:600;">Nama Tamu</label>
+          <input type="text" id="rsvpFormGuestName" class="guest-input" readonly>
+          <label style="font-size:12px; font-weight:600;">Kehadiran</label>
+          <select id="rsvpFormAttendance" class="guest-input" onchange="handleRsvpAttendanceChange()">
+            <option value="Hadir">Ya, Saya Akan Hadir</option>
+            <option value="Tidak Hadir">Maaf, Berhalangan Hadir</option>
+          </select>
+          <div id="rsvpGuestCountWrapper">
+            <label style="font-size:12px; font-weight:600;">Jumlah Orang</label>
+            <select id="rsvpFormGuestCount" class="guest-input">
+              <option value="1">1 Orang</option><option value="2">2 Orang</option><option value="3">3 Orang</option><option value="4">4 Orang</option><option value="5">5 Orang</option>
+            </select>
+          </div>
+          <label style="font-size:12px; font-weight:600;">Ucapan &amp; Doa</label>
+          <textarea id="rsvpFormWishes" class="guest-input" style="min-height:90px;" required placeholder="Tuliskan doa & harapan..."></textarea>
+          <button type="button" id="rsvpSubmitBtn" onclick="handleGuestRsvpSubmit(event)" class="btn-sunset">Kirim RSVP</button>
+        </form>
+      </section>
+
+      <section id="sec-wishes" class="sec-sunset">
+        <div class="eyebrow-sunset">DOA &amp; UCAPAN</div>
+        <h3 class="sec-title">Buku Ucapan</h3>
+        <p id="wishesTotalLabel" class="sec-desc"></p>
+        <div id="mainWishesFeed" class="wishes-feed"></div>
+      </section>
+
+      <section id="sec-qrcode" class="sec-sunset sky">
+        <div class="eyebrow-sunset">GUEST PASS</div>
+        <h3 class="sec-title">QR Code Check-in</h3>
+        <div class="glass-sunset-card">
+          <div id="qrPassGuestName" style="font-family:var(--font-serif); font-size:20px; font-weight:700; margin-bottom:12px;"></div>
+          <div id="guestQrCodeContainer" style="display:inline-block; padding:14px; background:#FFF; border-radius:14px;"></div>
+          <div id="qrPassCategoryBadge" style="margin-top:10px;"></div>
+          <div id="qrPassCheckinStatus" style="margin-top:6px; font-size:12px; color:var(--muted);"></div>
+        </div>
+      </section>
+
+      <section id="sec-closing" class="sec-sunset">
+        <p id="mainClosingText" class="sec-desc" style="margin-bottom:14px;"></p>
+        <div style="font-family:var(--font-decor); font-style:italic; font-size:18px; color:var(--muted);">Salam hangat penuh cinta,</div>
+        <h3 id="mainClosingCouple" style="font-family:var(--font-serif); font-size:28px; color:var(--terracotta); margin-top:6px;"></h3>
+      </section>
+    </main>
+
+    <div id="galleryLightbox" class="lightbox-overlay" onclick="closeGalleryLightbox()">
+      <img id="lightboxImgEl" class="lightbox-Overlay-img" src="" alt="Preview">
+      <div id="lightboxCaptionEl" style="color:#FFF; margin-top:10px;"></div>
+    </div>
+    <audio id="bgMusicAudio" loop preload="none"></audio>
+    <button type="button" id="floatingMusicBtn" class="floating-music-btn" onclick="toggleBackgroundMusic()"><i data-lucide="music" style="width:18px;height:18px;"></i></button>
+    <nav id="bottomTouchNav" class="bottom-touch-nav">
+      <a href="#sec-couple" class="touch-nav-link"><i data-lucide="heart" style="width:17px;height:17px;"></i><span>Mempelai</span></a>
+      <a href="#sec-event-info" class="touch-nav-link"><i data-lucide="calendar" style="width:17px;height:17px;"></i><span>Acara</span></a>
+      <a href="#sec-gallery" class="touch-nav-link"><i data-lucide="image" style="width:17px;height:17px;"></i><span>Galeri</span></a>
+      <a href="#sec-rsvp" class="touch-nav-link"><i data-lucide="mail-check" style="width:17px;height:17px;"></i><span>RSVP</span></a>
+      <a href="#sec-qrcode" class="touch-nav-link"><i data-lucide="qr-code" style="width:17px;height:17px;"></i><span>QR Pass</span></a>
+    </nav>
+  </div>
+  <script>window.__INITIAL_INVITATION_TOKEN__ = "<?= initialToken ?>";</script>
+  <?!= include('ScriptsGuest'); ?>
+</body>
+</html>

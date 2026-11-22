@@ -1300,11 +1300,16 @@
 
   async function openSampleGuestInvitation() {
     try {
+      const chosenTheme = (document.getElementById('edInvitationTheme') && document.getElementById('edInvitationTheme').value) || '';
       const res = await callBackend('getGuests', { page: 1, pageSize: 5 });
       if (res && res.success && res.data.guests && res.data.guests.length > 0) {
         const firstGuest = res.data.guests[0];
         if (firstGuest.invitation_url) {
-          window.open(firstGuest.invitation_url, '_blank', 'noopener,noreferrer');
+          const sep = firstGuest.invitation_url.indexOf('?') === -1 ? '?' : '&';
+          const previewUrl = chosenTheme
+            ? (firstGuest.invitation_url + sep + 'theme=' + encodeURIComponent(chosenTheme))
+            : firstGuest.invitation_url;
+          window.open(previewUrl, '_blank', 'noopener,noreferrer');
           return;
         }
       }

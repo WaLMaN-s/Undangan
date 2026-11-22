@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Undangan Pernikahan — Batak Heritage Modern</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,600;1,400&family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    :root {
+      --maroon: #7A1215;
+      --maroon-deep: #4A0A0C;
+      --black: #120E0E;
+      --card-dark: #1E1414;
+      --cream: #F7EFE2;
+      --gold: #D4AF37;
+      --gold-soft: rgba(212, 175, 55, 0.25);
+      --muted: #CBBBA6;
+      --success: #3B9B72;
+      --danger: #D95C5C;
+      --font-royal: 'Cinzel', 'Playfair Display', serif;
+      --font-serif: 'Playfair Display', serif;
+      --font-sans: 'Inter', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-sans);
+      background: #090707;
+      color: var(--cream);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+    }
+    .mobile-frame {
+      width: 100%; max-width: 430px; min-height: 100vh;
+      background: var(--black);
+      position: relative; overflow-x: hidden;
+      border-left: 1px solid var(--maroon);
+      border-right: 1px solid var(--maroon);
+      box-shadow: 0 0 50px rgba(122, 18, 21, 0.35);
+    }
+    .state-screen {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 36px 28px;
+      text-align: center; background: var(--black);
+    }
+    .spinner-ring {
+      width: 44px; height: 44px; border: 2.5px solid var(--maroon);
+      border-top-color: var(--gold); border-radius: 50%;
+      animation: spin 0.9s linear infinite; margin-bottom: 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Motif Tenun Ulos Ragi Hotang / Sadum */
+    .ulos-ribbon {
+      width: 100%; height: 14px;
+      background: repeating-linear-gradient(
+        90deg,
+        #7A1215 0px, #7A1215 12px,
+        #D4AF37 12px, #D4AF37 16px,
+        #120E0E 16px, #120E0E 24px,
+        #F7EFE2 24px, #F7EFE2 26px,
+        #7A1215 26px, #7A1215 36px,
+        #D4AF37 36px, #D4AF37 40px
+      );
+      border-top: 1.5px solid var(--gold);
+      border-bottom: 1.5px solid var(--gold);
+    }
+    .gorga-svg {
+      width: 100%; max-width: 330px; height: 62px;
+      margin: 8px auto 4px;
+      animation: gorgaPulse 3s ease-in-out infinite alternate;
+    }
+    @keyframes gorgaPulse {
+      0% { filter: drop-shadow(0 0 2px rgba(212, 175, 55, 0.3)); }
+      100% { filter: drop-shadow(0 0 9px rgba(212, 175, 55, 0.75)); }
+    }
+
+    /* Sampul Pembuka Batak */
+    .opening-cover {
+      position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 430px; height: 100vh; z-index: 120;
+      background: radial-gradient(circle at 50% 22%, #5E0F12 0%, #161010 72%, #0E0A0A 100%);
+      display: flex; flex-direction: column; justify-content: space-between;
+      padding: 0 0 20px; text-align: center;
+      transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.7s ease;
+      overflow-y: auto;
+    }
+    .opening-cover.opened { transform: translate(-50%, -105%); opacity: 0; pointer-events: none; }
+    .batak-octagon-frame {
+      width: 210px; height: 240px; margin: 10px auto;
+      padding: 7px; background: linear-gradient(135deg, var(--gold) 0%, var(--maroon) 50%, var(--gold) 100%);
+      clip-path: polygon(12% 0, 88% 0, 100% 12%, 100% 88%, 88% 100%, 12% 100%, 0 88%, 0 12%);
+    }
+    .batak-octagon-frame img {
+      width: 100%; height: 100%; object-fit: cover;
+      clip-path: polygon(12% 0, 88% 0, 100% 12%, 100% 88%, 88% 100%, 12% 100%, 0 88%, 0 12%);
+    }
+    .gorga-card {
+      background: linear-gradient(160deg, #271616 0%, #150E0E 100%);
+      border: 1.5px solid var(--maroon);
+      box-shadow: inset 0 0 0 1px var(--gold-soft), 0 10px 26px rgba(0,0,0,0.5);
+      border-radius: 10px;
+      padding: 20px 16px;
+      margin-top: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-batak {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 14px 24px;
+      background: linear-gradient(90deg, #7A1215 0%, #B8860B 50%, #7A1215 100%);
+      border: 1.5px solid var(--gold);
+      border-radius: 6px;
+      color: var(--cream);
+      font-family: var(--font-royal);
+      font-size: 12.5px; font-weight: 700; letter-spacing: 0.15em;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+
+    .main-invitation { display: none; padding-bottom: 90px; }
+    .main-invitation.visible { display: block; }
+    .sec-block { padding: 36px 22px; border-bottom: 1px solid #3A1517; text-align: center; }
+    .sec-block.alt { background: #181111; }
+    .eyebrow-batak { font-family: var(--font-royal); font-size: 11px; letter-spacing: 0.22em; color: var(--gold); font-weight: 600; }
+    .sec-title { font-family: var(--font-royal); font-size: 24px; color: var(--cream); margin: 6px 0 10px; }
+    .sec-desc { font-size: 13px; color: var(--muted); line-height: 1.65; }
+    .avatar-gorga {
+      width: 124px; height: 124px; object-fit: cover;
+      border: 2.5px solid var(--gold);
+      box-shadow: 0 0 0 4px var(--maroon);
+      border-radius: 14px; margin-bottom: 14px;
+    }
+    .countdown-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 18px; }
+    .cd-box { background: #221414; border: 1.5px solid var(--gold); border-radius: 8px; padding: 14px 6px; }
+    .cd-num { font-family: var(--font-royal); font-size: 24px; font-weight: 700; color: var(--gold); }
+    .cd-lbl { font-size: 10.5px; color: var(--cream); text-transform: uppercase; margin-top: 4px; }
+    .story-timeline { display: flex; flex-direction: column; gap: 14px; margin-top: 18px; text-align: left; }
+    .story-card { background: #211515; border: 1px solid var(--maroon); border-left: 4px solid var(--gold); border-radius: 8px; padding: 16px; }
+    .story-year { font-size: 11px; font-weight: 700; color: var(--gold); text-transform: uppercase; }
+    .story-card h4 { font-family: var(--font-serif); font-size: 17px; color: var(--cream); margin: 4px 0 6px; }
+    .story-card p { font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+    .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 18px; }
+    .gallery-thumb { width: 100%; height: 165px; object-fit: cover; border-radius: 8px; border: 1.5px solid var(--gold); cursor: pointer; }
+    .guest-input { width: 100%; padding: 12px 14px; border: 1px solid var(--maroon); border-radius: 8px; background: #140D0D; color: var(--cream); font-family: var(--font-sans); font-size: 13.5px; margin-bottom: 12px; }
+    .wishes-feed { max-height: 350px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-top: 16px; text-align: left; }
+    .wish-item { background: #211515; border: 1px solid var(--maroon); border-radius: 8px; padding: 14px; }
+    .wish-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+    .wish-sender { font-weight: 600; font-size: 13.5px; color: var(--gold); }
+    .wish-badge { font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: 99px; }
+    .wish-badge.hadir { background: rgba(59, 155, 114, 0.2); color: #6CD4A6; }
+    .wish-badge.absen { background: rgba(217, 92, 92, 0.2); color: #F28B8B; }
+    .lightbox-overlay { position: fixed; inset: 0; background: rgba(10, 7, 7, 0.94); z-index: 300; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+    .lightbox-overlay.open { display: flex; }
+    .lightbox-Overlay-img { max-width: 100%; max-height: 75vh; border-radius: 10px; border: 2px solid var(--gold); }
+    .floating-music-btn { position: fixed; bottom: 78px; right: max(16px, calc(50% - 198px)); width: 44px; height: 44px; border-radius: 50%; background: var(--maroon); border: 1.5px solid var(--gold); color: var(--gold); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 95; }
+    .floating-music-btn.playing { animation: spin 6s linear infinite; }
+    .bottom-touch-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; height: 62px; background: rgba(18, 14, 14, 0.96); border-top: 2px solid var(--gold); display: none; grid-template-columns: repeat(5, 1fr); z-index: 90; }
+    .bottom-touch-nav.visible { display: grid; }
+    .touch-nav-link { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: var(--muted); font-size: 10.5px; }
+  </style>
+</head>
+<body>
+  <div class="mobile-frame">
+    <div id="guestLoadingScreen" class="state-screen">
+      <div class="spinner-ring"></div>
+      <div style="font-family:var(--font-royal); color:var(--gold);">Memuat Undangan Adat &amp; Pernikahan</div>
+    </div>
+
+    <div id="guestErrorScreen" class="state-screen" style="display:none;">
+      <h1 style="font-family:var(--font-royal); font-size:22px; color:var(--gold); margin-bottom:8px;">Undangan Tidak Ditemukan</h1>
+      <p id="guestErrorMessage" class="sec-desc"></p>
+    </div>
+
+    <!-- A. OPENING COVER (BATAK HERITAGE MODERN) -->
+    <section id="openingCoverPage" class="opening-cover" style="display:none;">
+      <div>
+        <div class="ulos-ribbon"></div>
+        <div style="padding: 16px 22px 0;">
+          <!-- Siluet Rumah Bolon & Ukiran Gorga Batak -->
+          <svg class="gorga-svg" viewBox="0 0 340 60" fill="none">
+            <path d="M95 46C135 32 155 12 170 3C185 12 205 32 245 46H95Z" fill="#7A1215" stroke="#D4AF37" stroke-width="1.8"/>
+            <path d="M170 10L150 40H190L170 10Z" fill="#120E0E" stroke="#F7EFE2" stroke-width="1"/>
+            <path d="M18 48C38 20 68 20 84 42C74 50 58 44 64 34" stroke="#D4AF37" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M322 48C302 20 272 20 256 42C266 50 282 44 276 34" stroke="#D4AF37" stroke-width="2.2" stroke-linecap="round"/>
+            <line x1="14" y1="54" x2="326" y2="54" stroke="#D4AF37" stroke-width="1.4"/>
+          </svg>
+          <div class="eyebrow-batak">HORAS • THE WEDDING OF</div>
+          <h1 id="openCoupleNames" style="font-family:var(--font-royal); font-size:30px; color:var(--gold); margin:6px 0;">Romeo &amp; Juliet</h1>
+          <div class="batak-octagon-frame">
+            <img id="openCoverPhoto" src="" alt="Couple">
+          </div>
+        </div>
+      </div>
+
+      <div style="padding: 0 22px;">
+        <div class="gorga-card" style="margin: 8px 0 14px;">
+          <div style="font-size:12px; color:var(--gold); letter-spacing:0.1em; text-transform:uppercase;">Kepada Yth.</div>
+          <div id="openGuestName" style="font-family:var(--font-serif); font-size:21px; font-weight:700; color:var(--cream); margin:6px 0;">-</div>
+          <p style="font-size:12px; color:var(--muted);">Tanpa mengurangi rasa hormat, kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri pesta pernikahan kami.</p>
+        </div>
+        <button type="button" class="btn-batak" onclick="handleOpenInvitationClick()">
+          <i data-lucide="mail-open" style="width:16px;height:16px;"></i>
+          <span>BUKA UNDANGAN</span>
+        </button>
+        <div id="openWeddingDate" style="font-size:13px; color:var(--gold); margin-top:10px; letter-spacing:0.1em;"></div>
+        <div class="ulos-ribbon" style="margin-top:14px;"></div>
+      </div>
+    </section>
+
+    <!-- B. MAIN INVITATION (BATAK HERITAGE) -->
+    <main id="mainInvitationPage" class="main-invitation">
+      <div class="ulos-ribbon"></div>
+      <section id="sec-hero" class="sec-block" style="background:linear-gradient(180deg, #4A0A0C 0%, #120E0E 100%);">
+        <div class="eyebrow-batak">PESTA PERNIKAHAN</div>
+        <h2 id="mainHeroCoupleTitle" style="font-family:var(--font-royal); font-size:28px; color:var(--gold); margin:8px 0 16px;"></h2>
+        <div style="border:2px solid var(--gold); border-radius:12px; padding:6px; background:var(--maroon); margin-bottom:16px;">
+          <img id="mainHeroPhoto" src="" alt="Hero" style="width:100%; height:310px; object-fit:cover; border-radius:8px; display:block;">
+        </div>
+        <p id="mainHeroDescription" class="sec-desc"></p>
+      </section>
+
+      <section id="sec-couple" class="sec-block alt">
+        <div class="eyebrow-batak">MEMPELAI BERBAHAGIA</div>
+        <h3 class="sec-title">Anak &amp; Boru</h3>
+        <div class="gorga-card">
+          <div class="ulos-ribbon" style="margin:-20px -16px 16px; width:calc(100% + 32px);"></div>
+          <img id="mainGroomPhoto" class="avatar-gorga" src="" alt="Groom" loading="lazy">
+          <div id="mainGroomFullName" style="font-family:var(--font-serif); font-size:20px; color:var(--gold); font-weight:700; margin-bottom:6px;"></div>
+          <p id="mainGroomParents" class="sec-desc"></p>
+        </div>
+        <div style="font-family:var(--font-royal); font-size:22px; color:var(--gold); margin-top:14px;">✦ &amp; ✦</div>
+        <div class="gorga-card">
+          <div class="ulos-ribbon" style="margin:-20px -16px 16px; width:calc(100% + 32px);"></div>
+          <img id="mainBridePhoto" class="avatar-gorga" src="" alt="Bride" loading="lazy">
+          <div id="mainBrideFullName" style="font-family:var(--font-serif); font-size:20px; color:var(--gold); font-weight:700; margin-bottom:6px;"></div>
+          <p id="mainBrideParents" class="sec-desc"></p>
+        </div>
+      </section>
+
+      <section id="sec-countdown" class="sec-block">
+        <div class="eyebrow-batak">ARI NAULI</div>
+        <h3 class="sec-title">Hitung Mundur Acara</h3>
+        <p id="mainCountdownDateText" class="sec-desc"></p>
+        <div class="countdown-grid">
+          <div class="cd-box"><div id="cdDays" class="cd-num">00</div><div class="cd-lbl">Hari</div></div>
+          <div class="cd-box"><div id="cdHours" class="cd-num">00</div><div class="cd-lbl">Jam</div></div>
+          <div class="cd-box"><div id="cdMinutes" class="cd-num">00</div><div class="cd-lbl">Menit</div></div>
+          <div class="cd-box"><div id="cdSeconds" class="cd-num">00</div><div class="cd-lbl">Detik</div></div>
+        </div>
+      </section>
+
+      <section id="sec-event-info" class="sec-block alt">
+        <div id="mainQuoteWrapper" class="gorga-card" style="margin-top:0; margin-bottom:20px;">
+          <p id="mainQuoteText" style="font-style:italic; font-size:14.5px; color:var(--cream); line-height:1.6;"></p>
+          <div id="mainQuoteSource" style="font-size:12px; font-weight:700; color:var(--gold); margin-top:8px;"></div>
+        </div>
+        <div class="eyebrow-batak">RANGKAIAN ACARA</div>
+        <h3 class="sec-title">Pemberkatan &amp; Adat / Resepsi</h3>
+
+        <div class="gorga-card">
+          <div class="ulos-ribbon" style="margin:-20px -16px 14px; width:calc(100% + 32px);"></div>
+          <h4 id="mainAkadTitle" style="font-family:var(--font-royal); font-size:19px; color:var(--gold);">Pemberkatan / Akad</h4>
+          <div id="mainAkadDate" style="font-weight:600; margin:6px 0; color:var(--cream);"></div>
+          <div id="mainAkadTime" class="sec-desc"></div>
+        </div>
+
+        <div class="gorga-card">
+          <div class="ulos-ribbon" style="margin:-20px -16px 14px; width:calc(100% + 32px);"></div>
+          <h4 id="mainReceptionTitle" style="font-family:var(--font-royal); font-size:19px; color:var(--gold);">Pesta Adat &amp; Resepsi</h4>
+          <div id="mainReceptionDate" style="font-weight:600; margin:6px 0; color:var(--cream);"></div>
+          <div id="mainReceptionTime" class="sec-desc"></div>
+        </div>
+
+        <div class="gorga-card" style="border-color:var(--gold);">
+          <h4 id="mainVenueName" style="font-family:var(--font-royal); font-size:18px; color:var(--gold);"></h4>
+          <p id="mainVenueAddress" class="sec-desc" style="margin:8px 0 16px;"></p>
+          <a id="mainGoogleMapsBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn-batak" style="text-decoration:none;">
+            <i data-lucide="navigation" style="width:16px;height:16px;"></i>
+            <span>Petunjuk Lokasi Google Maps</span>
+          </a>
+        </div>
+      </section>
+
+      <section id="sec-story" class="sec-block">
+        <div class="eyebrow-batak">PERJALANAN CINTA</div>
+        <h3 class="sec-title">Our Love Story</h3>
+        <div id="mainStoryList" class="story-timeline"></div>
+      </section>
+
+      <section id="sec-gallery" class="sec-block alt">
+        <div class="eyebrow-batak">GALERI MOMEN</div>
+        <h3 class="sec-title">Galeri Foto</h3>
+        <div id="mainGalleryGrid" class="gallery-grid"></div>
+      </section>
+
+      <section id="sec-rsvp" class="sec-block">
+        <div class="eyebrow-batak">KONFIRMASI KEHADIRAN</div>
+        <h3 class="sec-title">Formulir RSVP</h3>
+        <form id="guestRsvpForm" class="gorga-card" style="text-align:left;" action="javascript:void(0);" onsubmit="handleGuestRsvpSubmit(event); return false;">
+          <label style="font-size:12px; color:var(--gold); font-weight:600;">Nama Tamu</label>
+          <input type="text" id="rsvpFormGuestName" class="guest-input" readonly>
+          <label style="font-size:12px; color:var(--gold); font-weight:600;">Kehadiran</label>
+          <select id="rsvpFormAttendance" class="guest-input" onchange="handleRsvpAttendanceChange()">
+            <option value="Hadir">Ya, Saya Akan Hadir</option>
+            <option value="Tidak Hadir">Maaf, Berhalangan Hadir</option>
+          </select>
+          <div id="rsvpGuestCountWrapper">
+            <label style="font-size:12px; color:var(--gold); font-weight:600;">Jumlah Orang</label>
+            <select id="rsvpFormGuestCount" class="guest-input">
+              <option value="1">1 Orang</option><option value="2">2 Orang</option><option value="3">3 Orang</option><option value="4">4 Orang</option><option value="5">5 Orang</option>
+            </select>
+          </div>
+          <label style="font-size:12px; color:var(--gold); font-weight:600;">Ucapan &amp; Doa</label>
+          <textarea id="rsvpFormWishes" class="guest-input" style="min-height:90px;" required placeholder="Tuliskan doa & ucapan selamat..."></textarea>
+          <button type="button" id="rsvpSubmitBtn" onclick="handleGuestRsvpSubmit(event)" class="btn-batak">Kirim RSVP &amp; Ucapan</button>
+        </form>
+      </section>
+
+      <section id="sec-wishes" class="sec-block alt">
+        <div class="eyebrow-batak">DOA &amp; UCAPAN</div>
+        <h3 class="sec-title">Buku Ucapan</h3>
+        <p id="wishesTotalLabel" class="sec-desc"></p>
+        <div id="mainWishesFeed" class="wishes-feed"></div>
+      </section>
+
+      <section id="sec-qrcode" class="sec-block">
+        <div class="eyebrow-batak">AKSES CHECK-IN</div>
+        <h3 class="sec-title">QR Code Undangan</h3>
+        <div class="gorga-card" style="border-color:var(--gold);">
+          <div id="qrPassGuestName" style="font-family:var(--font-serif); font-size:20px; color:var(--gold); font-weight:700; margin-bottom:12px;"></div>
+          <div id="guestQrCodeContainer" style="display:inline-block; padding:14px; background:#FFF; border-radius:10px;"></div>
+          <div id="qrPassCategoryBadge" style="margin-top:10px;"></div>
+          <div id="qrPassCheckinStatus" style="margin-top:6px; font-size:12px; color:var(--muted);"></div>
+        </div>
+      </section>
+
+      <section id="sec-closing" class="sec-block alt">
+        <p id="mainClosingText" class="sec-desc" style="margin-bottom:14px;"></p>
+        <div style="font-size:14px; color:var(--gold); letter-spacing:0.15em;">MAULIATE • HORAS</div>
+        <h3 id="mainClosingCouple" style="font-family:var(--font-royal); font-size:26px; color:var(--cream); margin-top:8px;"></h3>
+      </section>
+    </main>
+
+    <div id="galleryLightbox" class="lightbox-overlay" onclick="closeGalleryLightbox()">
+      <img id="lightboxImgEl" class="lightbox-Overlay-img" src="" alt="Preview">
+      <div id="lightboxCaptionEl" style="color:#FFF; margin-top:10px;"></div>
+    </div>
+    <audio id="bgMusicAudio" loop preload="none"></audio>
+    <button type="button" id="floatingMusicBtn" class="floating-music-btn" onclick="toggleBackgroundMusic()"><i data-lucide="music" style="width:18px;height:18px;"></i></button>
+    <nav id="bottomTouchNav" class="bottom-touch-nav">
+      <a href="#sec-couple" class="touch-nav-link"><i data-lucide="heart" style="width:17px;height:17px;"></i><span>Mempelai</span></a>
+      <a href="#sec-event-info" class="touch-nav-link"><i data-lucide="calendar" style="width:17px;height:17px;"></i><span>Acara</span></a>
+      <a href="#sec-gallery" class="touch-nav-link"><i data-lucide="image" style="width:17px;height:17px;"></i><span>Galeri</span></a>
+      <a href="#sec-rsvp" class="touch-nav-link"><i data-lucide="mail-check" style="width:17px;height:17px;"></i><span>RSVP</span></a>
+      <a href="#sec-qrcode" class="touch-nav-link"><i data-lucide="qr-code" style="width:17px;height:17px;"></i><span>QR Pass</span></a>
+    </nav>
+  </div>
+  <script>window.__INITIAL_INVITATION_TOKEN__ = "<?= initialToken ?>";</script>
+  <?!= include('ScriptsGuest'); ?>
+</body>
+</html>

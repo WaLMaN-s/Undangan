@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Undangan Pernikahan — Dark Luxury</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    :root {
+      --forest: #091712;
+      --forest-card: #10261D;
+      --black: #050807;
+      --ivory: #F4EFE6;
+      --gold: #D4AF37;
+      --gold-bright: #F0CD59;
+      --muted: #A6B8B0;
+      --border: rgba(212, 175, 55, 0.38);
+      --success: #3B9B72;
+      --danger: #D95C5C;
+      --font-royal: 'Cinzel', serif;
+      --font-serif: 'Playfair Display', serif;
+      --font-decor: 'Cormorant Garamond', serif;
+      --font-sans: 'Inter', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--black);
+      color: var(--ivory);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+    }
+    .mobile-frame {
+      width: 100%; max-width: 430px; min-height: 100vh;
+      background-color: var(--forest);
+      background-image:
+        radial-gradient(circle at 50% 0%, rgba(22, 64, 48, 0.65) 0%, rgba(8, 15, 12, 0.96) 75%),
+        repeating-linear-gradient(45deg, rgba(212, 175, 55, 0.03) 0px, rgba(212, 175, 55, 0.03) 1px, transparent 1px, transparent 18px);
+      position: relative; overflow-x: hidden;
+      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      box-shadow: 0 0 55px rgba(0, 0, 0, 0.8);
+    }
+    .state-screen {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 36px 28px;
+      text-align: center; background: var(--forest);
+    }
+    .spinner-ring {
+      width: 44px; height: 44px; border: 2px solid rgba(212,175,55,0.2);
+      border-top-color: var(--gold); border-radius: 50%;
+      animation: spin 0.9s linear infinite; margin-bottom: 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .opening-cover {
+      position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 430px; height: 100vh; z-index: 120;
+      background-color: var(--forest);
+      background-image:
+        radial-gradient(circle at 50% 15%, rgba(24, 72, 54, 0.72) 0%, rgba(6, 12, 9, 0.98) 78%),
+        repeating-linear-gradient(45deg, rgba(212, 175, 55, 0.03) 0px, rgba(212, 175, 55, 0.03) 1px, transparent 1px, transparent 18px);
+      display: flex; flex-direction: column; justify-content: space-between;
+      padding: 34px 24px 28px; text-align: center;
+      transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.7s ease;
+      overflow-y: auto;
+    }
+    .opening-cover.opened { transform: translate(-50%, -105%); opacity: 0; pointer-events: none; }
+    .luxury-arch-frame {
+      width: 205px; height: 245px; margin: 12px auto;
+      border-radius: 105px 105px 12px 12px;
+      padding: 6px; border: 2px solid var(--gold);
+      background: #06100C;
+      box-shadow: 0 0 0 4px var(--forest), 0 0 0 5px var(--border), 0 18px 42px rgba(0,0,0,0.7);
+    }
+    .luxury-arch-frame img { width: 100%; height: 100%; object-fit: cover; border-radius: 99px 99px 8px 8px; }
+    .luxury-card {
+      background: linear-gradient(145deg, #132E23 0%, #0A1812 100%);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 18px;
+      margin-top: 16px;
+      box-shadow: inset 0 0 18px rgba(212, 175, 55, 0.06), 0 12px 30px rgba(0,0,0,0.55);
+    }
+    .btn-luxury {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 14px 24px;
+      border-radius: 99px;
+      background: linear-gradient(90deg, #B89024 0%, #E8C756 50%, #B89024 100%);
+      color: #07120D; border: none;
+      font-family: var(--font-royal);
+      font-size: 12px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(212, 175, 55, 0.32);
+    }
+
+    .main-invitation { display: none; padding-bottom: 90px; }
+    .main-invitation.visible { display: block; }
+    .sec-lux { padding: 38px 22px; border-bottom: 1px solid rgba(212,175,55,0.18); text-align: center; }
+    .eyebrow-lux { font-family: var(--font-royal); font-size: 10.5px; letter-spacing: 0.24em; color: var(--gold); }
+    .sec-title { font-family: var(--font-serif); font-size: 25px; color: var(--ivory); margin: 6px 0 10px; text-shadow: 0 2px 14px rgba(212,175,55,0.22); }
+    .sec-desc { font-size: 13px; color: var(--muted); line-height: 1.65; }
+    .avatar-lux { width: 122px; height: 122px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); box-shadow: 0 0 0 4px var(--forest), 0 0 0 5px var(--border); margin-bottom: 12px; }
+    .countdown-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 18px; }
+    .cd-lux { background: #0C1F17; border: 1px solid var(--gold); border-radius: 12px; padding: 14px 6px; }
+    .cd-num { font-family: var(--font-serif); font-size: 24px; font-weight: 700; color: var(--gold); }
+    .cd-lbl { font-size: 10.5px; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
+    .story-timeline { display: flex; flex-direction: column; gap: 14px; margin-top: 18px; text-align: left; }
+    .story-card { background: #0E231A; border: 1px solid var(--border); border-left: 3px solid var(--gold); border-radius: 12px; padding: 16px; }
+    .story-year { font-size: 11px; font-weight: 700; color: var(--gold); text-transform: uppercase; }
+    .story-card h4 { font-family: var(--font-serif); font-size: 17px; color: var(--ivory); margin: 4px 0 6px; }
+    .story-card p { font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+    .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 18px; }
+    .gallery-thumb { width: 100%; height: 165px; object-fit: cover; border-radius: 10px; border: 1px solid var(--gold); cursor: pointer; }
+    .guest-input { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; background: #07130E; color: var(--ivory); font-family: var(--font-sans); font-size: 13.5px; margin-bottom: 12px; }
+    .wishes-feed { max-height: 350px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-top: 16px; text-align: left; }
+    .wish-item { background: #0E231A; border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+    .wish-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+    .wish-sender { font-weight: 600; font-size: 13.5px; color: var(--gold); }
+    .wish-badge { font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: 99px; }
+    .wish-badge.hadir { background: rgba(59, 155, 114, 0.2); color: #6CD4A6; }
+    .wish-badge.absen { background: rgba(217, 92, 92, 0.2); color: #F28B8B; }
+    .lightbox-overlay { position: fixed; inset: 0; background: rgba(5, 8, 7, 0.94); z-index: 300; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+    .lightbox-overlay.open { display: flex; }
+    .lightbox-Overlay-img { max-width: 100%; max-height: 75vh; border-radius: 12px; border: 1.5px solid var(--gold); }
+    .floating-music-btn { position: fixed; bottom: 78px; right: max(16px, calc(50% - 198px)); width: 44px; height: 44px; border-radius: 50%; background: var(--forest-card); border: 1.5px solid var(--gold); color: var(--gold); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 95; }
+    .floating-music-btn.playing { animation: spin 6s linear infinite; }
+    .bottom-touch-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; height: 62px; background: rgba(9, 23, 18, 0.96); border-top: 1px solid var(--border); display: none; grid-template-columns: repeat(5, 1fr); z-index: 90; }
+    .bottom-touch-nav.visible { display: grid; }
+    .touch-nav-link { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: var(--muted); font-size: 10.5px; }
+  </style>
+</head>
+<body>
+  <div class="mobile-frame">
+    <div id="guestLoadingScreen" class="state-screen">
+      <div class="spinner-ring"></div>
+      <div style="font-family:var(--font-royal); color:var(--gold); font-size:15px;">Royal Invitation</div>
+    </div>
+
+    <div id="guestErrorScreen" class="state-screen" style="display:none;">
+      <h1 style="font-family:var(--font-serif); font-size:23px; color:var(--gold); margin-bottom:8px;">Undangan Tidak Ditemukan</h1>
+      <p id="guestErrorMessage" class="sec-desc"></p>
+    </div>
+
+    <!-- A. OPENING COVER (DARK LUXURY) -->
+    <section id="openingCoverPage" class="opening-cover" style="display:none;">
+      <div>
+        <svg style="width:100%; max-width:300px; height:42px; margin:0 auto 6px;" viewBox="0 0 320 44" fill="none">
+          <path d="M10 22H118L136 8L160 34L184 8L202 22H310" stroke="#D4AF37" stroke-width="1.3"/>
+          <polygon points="160,4 168,16 160,28 152,16" fill="#091712" stroke="#D4AF37" stroke-width="1.4"/>
+          <circle cx="160" cy="16" r="3" fill="#D4AF37"/>
+        </svg>
+        <div class="eyebrow-lux">THE ROYAL WEDDING OF</div>
+        <h1 id="openCoupleNames" style="font-family:var(--font-serif); font-size:33px; color:var(--ivory); margin:6px 0;">Romeo &amp; Juliet</h1>
+        <div class="luxury-arch-frame">
+          <img id="openCoverPhoto" src="" alt="Couple">
+        </div>
+      </div>
+
+      <div>
+        <div class="luxury-card" style="margin:6px 0 14px;">
+          <div style="font-family:var(--font-decor); font-style:italic; font-size:17px; color:var(--gold);">Kepada Yth.</div>
+          <div id="openGuestName" style="font-family:var(--font-serif); font-size:21px; font-weight:700; color:var(--ivory); margin:6px 0;">-</div>
+          <p style="font-size:12px; color:var(--muted);">Merupakan kehormatan bagi kami mengundang Anda hadir dalam malam bahagia kami.</p>
+        </div>
+        <button type="button" class="btn-luxury" onclick="handleOpenInvitationClick()">
+          <i data-lucide="sparkles" style="width:16px;height:16px;"></i>
+          <span>BUKA UNDANGAN</span>
+        </button>
+        <div id="openWeddingDate" style="font-family:var(--font-decor); font-size:16px; color:var(--gold); margin-top:10px;"></div>
+      </div>
+    </section>
+
+    <!-- B. MAIN INVITATION (DARK LUXURY) -->
+    <main id="mainInvitationPage" class="main-invitation">
+      <section id="sec-hero" class="sec-lux">
+        <div class="eyebrow-lux">THE WEDDING CELEBRATION</div>
+        <h2 id="mainHeroCoupleTitle" style="font-family:var(--font-serif); font-size:30px; color:var(--ivory); margin:6px 0 16px;"></h2>
+        <div style="border:2px solid var(--gold); border-radius:140px 140px 16px 16px; padding:6px; box-shadow:0 0 0 4px var(--forest), 0 0 0 5px var(--border); margin-bottom:16px;">
+          <img id="mainHeroPhoto" src="" alt="Hero" style="width:100%; height:320px; object-fit:cover; border-radius:134px 134px 12px 12px; display:block;">
+        </div>
+        <p id="mainHeroDescription" class="sec-desc"></p>
+      </section>
+
+      <section id="sec-couple" class="sec-lux">
+        <div class="eyebrow-lux">THE BRIDE &amp; GROOM</div>
+        <h3 class="sec-title">Pasangan Mempelai</h3>
+        <div class="luxury-card">
+          <img id="mainGroomPhoto" class="avatar-lux" src="" alt="Groom" loading="lazy">
+          <div id="mainGroomFullName" style="font-family:var(--font-serif); font-size:21px; color:var(--gold); font-weight:600; margin-bottom:6px;"></div>
+          <p id="mainGroomParents" class="sec-desc"></p>
+        </div>
+        <div style="font-family:var(--font-decor); font-size:34px; font-style:italic; color:var(--gold); margin-top:12px;">&amp;</div>
+        <div class="luxury-card">
+          <img id="mainBridePhoto" class="avatar-lux" src="" alt="Bride" loading="lazy">
+          <div id="mainBrideFullName" style="font-family:var(--font-serif); font-size:21px; color:var(--gold); font-weight:600; margin-bottom:6px;"></div>
+          <p id="mainBrideParents" class="sec-desc"></p>
+        </div>
+      </section>
+
+      <section id="sec-countdown" class="sec-lux">
+        <div class="eyebrow-lux">COUNTING THE DAYS</div>
+        <h3 class="sec-title">Hitung Mundur</h3>
+        <p id="mainCountdownDateText" class="sec-desc"></p>
+        <div class="countdown-grid">
+          <div class="cd-lux"><div id="cdDays" class="cd-num">00</div><div class="cd-lbl">Hari</div></div>
+          <div class="cd-lux"><div id="cdHours" class="cd-num">00</div><div class="cd-lbl">Jam</div></div>
+          <div class="cd-lux"><div id="cdMinutes" class="cd-num">00</div><div class="cd-lbl">Menit</div></div>
+          <div class="cd-lux"><div id="cdSeconds" class="cd-num">00</div><div class="cd-lbl">Detik</div></div>
+        </div>
+      </section>
+
+      <section id="sec-event-info" class="sec-lux">
+        <div id="mainQuoteWrapper" class="luxury-card" style="margin-top:0; margin-bottom:20px;">
+          <p id="mainQuoteText" style="font-family:var(--font-decor); font-style:italic; font-size:16.5px; color:var(--ivory); line-height:1.6;"></p>
+          <div id="mainQuoteSource" style="font-size:12px; font-weight:700; color:var(--gold); margin-top:8px;"></div>
+        </div>
+        <div class="eyebrow-lux">ROYAL RECEPTION</div>
+        <h3 class="sec-title">Waktu &amp; Tempat</h3>
+
+        <div class="luxury-card">
+          <h4 id="mainAkadTitle" style="font-family:var(--font-serif); font-size:20px; color:var(--gold);">Akad Nikah</h4>
+          <div id="mainAkadDate" style="font-weight:600; margin:6px 0;"></div>
+          <div id="mainAkadTime" class="sec-desc"></div>
+        </div>
+
+        <div class="luxury-card">
+          <h4 id="mainReceptionTitle" style="font-family:var(--font-serif); font-size:20px; color:var(--gold);">Resepsi</h4>
+          <div id="mainReceptionDate" style="font-weight:600; margin:6px 0;"></div>
+          <div id="mainReceptionTime" class="sec-desc"></div>
+        </div>
+
+        <div class="luxury-card" style="border-color:var(--gold);">
+          <h4 id="mainVenueName" style="font-family:var(--font-serif); font-size:19px; color:var(--gold);"></h4>
+          <p id="mainVenueAddress" class="sec-desc" style="margin:8px 0 16px;"></p>
+          <a id="mainGoogleMapsBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn-luxury" style="text-decoration:none;">
+            <i data-lucide="navigation" style="width:16px;height:16px;"></i>
+            <span>Navigasi Google Maps</span>
+          </a>
+        </div>
+      </section>
+
+      <section id="sec-story" class="sec-lux">
+        <div class="eyebrow-lux">OUR JOURNEY</div>
+        <h3 class="sec-title">Our Love Story</h3>
+        <div id="mainStoryList" class="story-timeline"></div>
+      </section>
+
+      <section id="sec-gallery" class="sec-lux">
+        <div class="eyebrow-lux">GALLERY</div>
+        <h3 class="sec-title">Galeri Foto</h3>
+        <div id="mainGalleryGrid" class="gallery-grid"></div>
+      </section>
+
+      <section id="sec-rsvp" class="sec-lux">
+        <div class="eyebrow-lux">RSVP</div>
+        <h3 class="sec-title">Konfirmasi Kehadiran</h3>
+        <form id="guestRsvpForm" class="luxury-card" style="text-align:left;" action="javascript:void(0);" onsubmit="handleGuestRsvpSubmit(event); return false;">
+          <label style="font-size:12px; color:var(--gold); font-weight:600;">Nama Tamu</label>
+          <input type="text" id="rsvpFormGuestName" class="guest-input" readonly>
+          <label style="font-size:12px; color:var(--gold); font-weight:600;">Kehadiran</label>
+          <select id="rsvpFormAttendance" class="guest-input" onchange="handleRsvpAttendanceChange()">
+            <option value="Hadir">Ya, Saya Akan Hadir</option>
+            <option value="Tidak Hadir">Maaf, Berhalangan Hadir</option>
+          </select>
+          <div id="rsvpGuestCountWrapper">
+            <label style="font-size:12px; color:var(--gold); font-weight:600;">Jumlah Orang</label>
+            <select id="rsvpFormGuestCount" class="guest-input">
+              <option value="1">1 Orang</option><option value="2">2 Orang</option><option value="3">3 Orang</option><option value="4">4 Orang</option><option value="5">5 Orang</option>
+            </select>
+          </div>
+          <label style="font-size:12px; color:var(--gold); font-weight:600;">Ucapan &amp; Doa</label>
+          <textarea id="rsvpFormWishes" class="guest-input" style="min-height:90px;" required placeholder="Tuliskan ucapan & doa restu..."></textarea>
+          <button type="button" id="rsvpSubmitBtn" onclick="handleGuestRsvpSubmit(event)" class="btn-luxury">Kirim Konfirmasi</button>
+        </form>
+      </section>
+
+      <section id="sec-wishes" class="sec-lux">
+        <div class="eyebrow-lux">BEST WISHES</div>
+        <h3 class="sec-title">Buku Ucapan</h3>
+        <p id="wishesTotalLabel" class="sec-desc"></p>
+        <div id="mainWishesFeed" class="wishes-feed"></div>
+      </section>
+
+      <section id="sec-qrcode" class="sec-lux">
+        <div class="eyebrow-lux">VIP ACCESS PASS</div>
+        <h3 class="sec-title">QR Code Check-in</h3>
+        <div class="luxury-card" style="border-color:var(--gold);">
+          <div id="qrPassGuestName" style="font-family:var(--font-serif); font-size:20px; color:var(--gold); font-weight:700; margin-bottom:12px;"></div>
+          <div id="guestQrCodeContainer" style="display:inline-block; padding:14px; background:#FFF; border-radius:12px;"></div>
+          <div id="qrPassCategoryBadge" style="margin-top:10px;"></div>
+          <div id="qrPassCheckinStatus" style="margin-top:6px; font-size:12px; color:var(--muted);"></div>
+        </div>
+      </section>
+
+      <section id="sec-closing" class="sec-lux">
+        <p id="mainClosingText" class="sec-desc" style="margin-bottom:14px;"></p>
+        <div style="font-family:var(--font-decor); font-style:italic; font-size:18px; color:var(--gold);">With Our Deepest Gratitude,</div>
+        <h3 id="mainClosingCouple" style="font-family:var(--font-serif); font-size:28px; color:var(--ivory); margin-top:6px;"></h3>
+      </section>
+    </main>
+
+    <div id="galleryLightbox" class="lightbox-overlay" onclick="closeGalleryLightbox()">
+      <img id="lightboxImgEl" class="lightbox-Overlay-img" src="" alt="Preview">
+      <div id="lightboxCaptionEl" style="color:#FFF; margin-top:10px;"></div>
+    </div>
+    <audio id="bgMusicAudio" loop preload="none"></audio>
+    <button type="button" id="floatingMusicBtn" class="floating-music-btn" onclick="toggleBackgroundMusic()"><i data-lucide="music" style="width:18px;height:18px;"></i></button>
+    <nav id="bottomTouchNav" class="bottom-touch-nav">
+      <a href="#sec-couple" class="touch-nav-link"><i data-lucide="heart" style="width:17px;height:17px;"></i><span>Mempelai</span></a>
+      <a href="#sec-event-info" class="touch-nav-link"><i data-lucide="calendar" style="width:17px;height:17px;"></i><span>Acara</span></a>
+      <a href="#sec-gallery" class="touch-nav-link"><i data-lucide="image" style="width:17px;height:17px;"></i><span>Galeri</span></a>
+      <a href="#sec-rsvp" class="touch-nav-link"><i data-lucide="mail-check" style="width:17px;height:17px;"></i><span>RSVP</span></a>
+      <a href="#sec-qrcode" class="touch-nav-link"><i data-lucide="qr-code" style="width:17px;height:17px;"></i><span>QR Pass</span></a>
+    </nav>
+  </div>
+  <script>window.__INITIAL_INVITATION_TOKEN__ = "<?= initialToken ?>";</script>
+  <?!= include('ScriptsGuest'); ?>
+</body>
+</html>

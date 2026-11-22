@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Undangan Pernikahan — Modern Minimalist</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,400&family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    :root {
+      --beige: #EAE2D6;
+      --ivory: #F7F4EF;
+      --white: #FFFFFF;
+      --taupe: #8C7055;
+      --charcoal: #23201D;
+      --muted: #7A7167;
+      --border: #DFD7CA;
+      --success: #3B9B72;
+      --danger: #D95C5C;
+      --font-serif: 'Playfair Display', serif;
+      --font-sans: 'Inter', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-sans);
+      background: #D8CFC2;
+      color: var(--charcoal);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+    }
+    .mobile-frame {
+      width: 100%; max-width: 430px; min-height: 100vh;
+      background: var(--ivory);
+      position: relative; overflow-x: hidden;
+      box-shadow: 0 0 40px rgba(35, 32, 29, 0.1);
+    }
+    .state-screen {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 40px 30px;
+      text-align: left; background: var(--ivory);
+    }
+    .spinner-ring {
+      width: 38px; height: 38px; border: 1.5px solid var(--border);
+      border-top-color: var(--charcoal); border-radius: 50%;
+      animation: spin 0.9s linear infinite; margin-bottom: 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Monogram & Asymmetric Editorial Style */
+    .monogram-seal {
+      width: 58px; height: 58px;
+      border: 1.5px solid var(--taupe);
+      background: var(--white);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-serif); font-size: 18px; letter-spacing: 0.12em;
+      color: var(--charcoal); position: relative; margin-bottom: 18px;
+    }
+    .monogram-seal::after {
+      content: ''; position: absolute; inset: 4px; border: 1px solid var(--border);
+    }
+    .opening-cover {
+      position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 430px; height: 100vh; z-index: 120;
+      background: var(--ivory);
+      display: flex; flex-direction: column; justify-content: space-between;
+      padding: 42px 30px 34px; text-align: left;
+      transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.7s ease;
+      overflow-y: auto;
+    }
+    .opening-cover.opened { transform: translate(-50%, -105%); opacity: 0; pointer-events: none; }
+    .offset-photo-box {
+      width: 90%; height: 230px;
+      margin: 14px 0 18px auto;
+      border: 1px solid var(--taupe);
+      box-shadow: -14px 14px 0px var(--beige);
+    }
+    .offset-photo-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .minimal-guest-box {
+      background: var(--white);
+      border-left: 3px solid var(--taupe);
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+    .btn-minimal {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 15px 22px;
+      background: var(--charcoal); color: var(--ivory);
+      border: none; border-radius: 2px;
+      font-size: 11.5px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    /* Main Content Asymmetric */
+    .main-invitation { display: none; padding-bottom: 92px; }
+    .main-invitation.visible { display: block; }
+    .sec-minimal { padding: 48px 28px; border-bottom: 1px solid var(--border); text-align: left; }
+    .sec-minimal.alt { background: var(--white); }
+    .sec-index { font-size: 10.5px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--taupe); font-weight: 600; margin-bottom: 6px; }
+    .sec-heading { font-family: var(--font-serif); font-size: 26px; font-weight: 400; color: var(--charcoal); margin-bottom: 16px; }
+    .sec-text { font-size: 13px; color: var(--muted); line-height: 1.75; }
+    .minimal-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      box-shadow: 10px 10px 0px var(--beige);
+      padding: 24px 20px;
+      margin-top: 18px;
+    }
+    .countdown-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 20px; }
+    .cd-minimal { background: var(--ivory); border: 1px solid var(--border); padding: 16px 6px; text-align: center; }
+    .cd-num { font-family: var(--font-serif); font-size: 24px; color: var(--charcoal); }
+    .cd-lbl { font-size: 10px; letter-spacing: 0.12em; color: var(--taupe); text-transform: uppercase; margin-top: 4px; }
+    .story-timeline { display: flex; flex-direction: column; gap: 16px; margin-top: 18px; }
+    .story-card { border-left: 2px solid var(--taupe); padding: 4px 0 4px 16px; }
+    .story-year { font-size: 11px; letter-spacing: 0.14em; color: var(--taupe); font-weight: 600; }
+    .story-card h4 { font-family: var(--font-serif); font-size: 18px; font-weight: 500; margin: 4px 0 6px; }
+    .story-card p { font-size: 12.5px; color: var(--muted); line-height: 1.65; }
+    .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 18px; }
+    .gallery-thumb { width: 100%; height: 175px; object-fit: cover; border: 1px solid var(--border); cursor: pointer; }
+    .guest-input { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 2px; background: var(--ivory); font-family: var(--font-sans); font-size: 13px; margin-bottom: 14px; }
+    .wishes-feed { max-height: 350px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; margin-top: 18px; }
+    .wish-item { background: var(--white); border: 1px solid var(--border); padding: 16px; }
+    .wish-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+    .wish-sender { font-weight: 600; font-size: 13px; }
+    .wish-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; text-transform: uppercase; letter-spacing: 0.08em; }
+    .wish-badge.hadir { background: var(--beige); color: var(--charcoal); }
+    .wish-badge.absen { background: #F5E3E3; color: var(--danger); }
+    .lightbox-overlay { position: fixed; inset: 0; background: rgba(35, 32, 29, 0.94); z-index: 300; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+    .lightbox-overlay.open { display: flex; }
+    .lightbox-Overlay-img { max-width: 100%; max-height: 75vh; }
+    .floating-music-btn { position: fixed; bottom: 78px; right: max(16px, calc(50% - 198px)); width: 42px; height: 42px; background: var(--charcoal); color: var(--ivory); border: none; display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 95; }
+    .floating-music-btn.playing { animation: spin 6s linear infinite; }
+    .bottom-touch-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; height: 60px; background: rgba(247, 244, 239, 0.96); border-top: 1px solid var(--border); display: none; grid-template-columns: repeat(5, 1fr); z-index: 90; }
+    .bottom-touch-nav.visible { display: grid; }
+    .touch-nav-link { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: var(--muted); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; }
+  </style>
+</head>
+<body>
+  <div class="mobile-frame">
+    <div id="guestLoadingScreen" class="state-screen">
+      <div class="spinner-ring"></div>
+      <div style="font-size:12px; letter-spacing:0.2em; text-transform:uppercase;">Loading Invitation</div>
+    </div>
+
+    <div id="guestErrorScreen" class="state-screen" style="display:none;">
+      <div class="sec-index">ERROR 404</div>
+      <h1 class="sec-heading">Undangan Tidak Ditemukan</h1>
+      <p id="guestErrorMessage" class="sec-text"></p>
+    </div>
+
+    <!-- A. OPENING COVER (MODERN MINIMALIST ASYMMETRIC) -->
+    <section id="openingCoverPage" class="opening-cover" style="display:none;">
+      <div>
+        <div id="openMinimalistMonogram" class="monogram-seal">R|J</div>
+        <div class="sec-index">THE WEDDING OF</div>
+        <h1 id="openCoupleNames" style="font-family:var(--font-serif); font-size:34px; font-weight:400; line-height:1.15;">Romeo &amp; Juliet</h1>
+        <div style="width:42px; height:1.5px; background:var(--taupe); margin:12px 0;"></div>
+        <div class="offset-photo-box">
+          <img id="openCoverPhoto" src="" alt="Couple">
+        </div>
+      </div>
+
+      <div>
+        <div class="minimal-guest-box">
+          <div style="font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--taupe);">Kepada Yth.</div>
+          <div id="openGuestName" style="font-family:var(--font-serif); font-size:21px; margin:6px 0;">-</div>
+          <p style="font-size:12px; color:var(--muted);">Kami mengundang Anda untuk merayakan hari pernikahan kami.</p>
+        </div>
+        <button type="button" class="btn-minimal" onclick="handleOpenInvitationClick()">
+          <span>BUKA UNDANGAN</span>
+          <i data-lucide="arrow-right" style="width:15px;height:15px;"></i>
+        </button>
+        <div id="openWeddingDate" style="font-size:11.5px; letter-spacing:0.16em; text-transform:uppercase; color:var(--taupe); margin-top:14px;"></div>
+      </div>
+    </section>
+
+    <!-- B. MAIN INVITATION (MODERN MINIMALIST) -->
+    <main id="mainInvitationPage" class="main-invitation">
+      <section id="sec-hero" class="sec-minimal alt">
+        <div id="heroMinimalistMonogram" class="monogram-seal">R|J</div>
+        <div class="sec-index">01 / CELEBRATION</div>
+        <h2 id="mainHeroCoupleTitle" class="sec-heading" style="font-size:32px;"></h2>
+        <div style="border:1px solid var(--taupe); box-shadow:12px 12px 0px var(--beige); margin:18px 0 22px;">
+          <img id="mainHeroPhoto" src="" alt="Hero" style="width:100%; height:330px; object-fit:cover; display:block;">
+        </div>
+        <p id="mainHeroDescription" class="sec-text"></p>
+      </section>
+
+      <section id="sec-couple" class="sec-minimal">
+        <div class="sec-index">02 / THE COUPLE</div>
+        <h3 class="sec-heading">Mempelai</h3>
+        <div class="minimal-card">
+          <img id="mainGroomPhoto" src="" alt="Groom" loading="lazy" style="width:96px; height:120px; object-fit:cover; border:1px solid var(--taupe); margin-bottom:14px;">
+          <div id="mainGroomFullName" style="font-family:var(--font-serif); font-size:20px; margin-bottom:6px;"></div>
+          <p id="mainGroomParents" class="sec-text"></p>
+        </div>
+        <div style="font-family:var(--font-serif); font-size:24px; color:var(--taupe); margin:18px 0 0 8px;">&amp;</div>
+        <div class="minimal-card">
+          <img id="mainBridePhoto" src="" alt="Bride" loading="lazy" style="width:96px; height:120px; object-fit:cover; border:1px solid var(--taupe); margin-bottom:14px;">
+          <div id="mainBrideFullName" style="font-family:var(--font-serif); font-size:20px; margin-bottom:6px;"></div>
+          <p id="mainBrideParents" class="sec-text"></p>
+        </div>
+      </section>
+
+      <section id="sec-countdown" class="sec-minimal alt">
+        <div class="sec-index">03 / SAVE THE DATE</div>
+        <h3 class="sec-heading">Hitung Mundur</h3>
+        <p id="mainCountdownDateText" class="sec-text"></p>
+        <div class="countdown-grid">
+          <div class="cd-minimal"><div id="cdDays" class="cd-num">00</div><div class="cd-lbl">Hari</div></div>
+          <div class="cd-minimal"><div id="cdHours" class="cd-num">00</div><div class="cd-lbl">Jam</div></div>
+          <div class="cd-minimal"><div id="cdMinutes" class="cd-num">00</div><div class="cd-lbl">Menit</div></div>
+          <div class="cd-minimal"><div id="cdSeconds" class="cd-num">00</div><div class="cd-lbl">Detik</div></div>
+        </div>
+      </section>
+
+      <section id="sec-event-info" class="sec-minimal">
+        <div id="mainQuoteWrapper" style="border-left:2px solid var(--taupe); padding-left:16px; margin-bottom:28px;">
+          <p id="mainQuoteText" style="font-family:var(--font-serif); font-style:italic; font-size:15px; line-height:1.7;"></p>
+          <div id="mainQuoteSource" style="font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--taupe); margin-top:8px;"></div>
+        </div>
+        <div class="sec-index">04 / SCHEDULE &amp; VENUE</div>
+        <h3 class="sec-heading">Waktu &amp; Lokasi</h3>
+
+        <div class="minimal-card">
+          <div class="sec-index" id="mainAkadTitle">AKAD NIKAH</div>
+          <div id="mainAkadDate" style="font-family:var(--font-serif); font-size:18px; margin:4px 0;"></div>
+          <div id="mainAkadTime" class="sec-text"></div>
+        </div>
+
+        <div class="minimal-card">
+          <div class="sec-index" id="mainReceptionTitle">RESEPSI</div>
+          <div id="mainReceptionDate" style="font-family:var(--font-serif); font-size:18px; margin:4px 0;"></div>
+          <div id="mainReceptionTime" class="sec-text"></div>
+        </div>
+
+        <div class="minimal-card">
+          <div class="sec-index">LOCATION</div>
+          <h4 id="mainVenueName" style="font-family:var(--font-serif); font-size:20px; margin:4px 0 8px;"></h4>
+          <p id="mainVenueAddress" class="sec-text" style="margin-bottom:18px;"></p>
+          <a id="mainGoogleMapsBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn-minimal" style="text-decoration:none;">
+            <span>PETUNJUK ARAH MAPS</span>
+            <i data-lucide="arrow-up-right" style="width:15px;height:15px;"></i>
+          </a>
+        </div>
+      </section>
+
+      <section id="sec-story" class="sec-minimal alt">
+        <div class="sec-index">05 / TIMELINE</div>
+        <h3 class="sec-heading">Our Story</h3>
+        <div id="mainStoryList" class="story-timeline"></div>
+      </section>
+
+      <section id="sec-gallery" class="sec-minimal">
+        <div class="sec-index">06 / MOMENTS</div>
+        <h3 class="sec-heading">Galeri Foto</h3>
+        <div id="mainGalleryGrid" class="gallery-grid"></div>
+      </section>
+
+      <section id="sec-rsvp" class="sec-minimal alt">
+        <div class="sec-index">07 / ATTENDANCE</div>
+        <h3 class="sec-heading">Konfirmasi RSVP</h3>
+        <form id="guestRsvpForm" action="javascript:void(0);" onsubmit="handleGuestRsvpSubmit(event); return false;">
+          <label style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--taupe);">Nama Tamu</label>
+          <input type="text" id="rsvpFormGuestName" class="guest-input" readonly>
+          <label style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--taupe);">Kehadiran</label>
+          <select id="rsvpFormAttendance" class="guest-input" onchange="handleRsvpAttendanceChange()">
+            <option value="Hadir">Hadir</option>
+            <option value="Tidak Hadir">Tidak Hadir</option>
+          </select>
+          <div id="rsvpGuestCountWrapper">
+            <label style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--taupe);">Jumlah Orang</label>
+            <select id="rsvpFormGuestCount" class="guest-input">
+              <option value="1">1 Orang</option><option value="2">2 Orang</option><option value="3">3 Orang</option><option value="4">4 Orang</option><option value="5">5 Orang</option>
+            </select>
+          </div>
+          <label style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--taupe);">Ucapan &amp; Doa</label>
+          <textarea id="rsvpFormWishes" class="guest-input" style="min-height:90px;" required placeholder="Tuliskan pesan singkat..."></textarea>
+          <button type="button" id="rsvpSubmitBtn" onclick="handleGuestRsvpSubmit(event)" class="btn-minimal">KIRIM KONFIRMASI</button>
+        </form>
+      </section>
+
+      <section id="sec-wishes" class="sec-minimal">
+        <div class="sec-index">08 / WISHES</div>
+        <h3 class="sec-heading">Buku Ucapan</h3>
+        <p id="wishesTotalLabel" class="sec-text"></p>
+        <div id="mainWishesFeed" class="wishes-feed"></div>
+      </section>
+
+      <section id="sec-qrcode" class="sec-minimal alt">
+        <div class="sec-index">09 / CHECK-IN PASS</div>
+        <h3 class="sec-heading">QR Code Tamu</h3>
+        <div class="minimal-card" style="text-align:center;">
+          <div id="qrPassGuestName" style="font-family:var(--font-serif); font-size:20px; margin-bottom:14px;"></div>
+          <div id="guestQrCodeContainer" style="display:inline-block; padding:12px; background:#FFF; border:1px solid var(--border);"></div>
+          <div id="qrPassCategoryBadge" style="margin-top:12px;"></div>
+          <div id="qrPassCheckinStatus" style="margin-top:6px; font-size:12px; color:var(--muted);"></div>
+        </div>
+      </section>
+
+      <section id="sec-closing" class="sec-minimal">
+        <p id="mainClosingText" class="sec-text" style="margin-bottom:18px;"></p>
+        <div class="sec-index">WITH LOVE,</div>
+        <h3 id="mainClosingCouple" style="font-family:var(--font-serif); font-size:28px; font-weight:400;"></h3>
+      </section>
+    </main>
+
+    <div id="galleryLightbox" class="lightbox-overlay" onclick="closeGalleryLightbox()">
+      <img id="lightboxImgEl" class="lightbox-Overlay-img" src="" alt="Preview">
+      <div id="lightboxCaptionEl" style="color:#FFF; margin-top:10px;"></div>
+    </div>
+    <audio id="bgMusicAudio" loop preload="none"></audio>
+    <button type="button" id="floatingMusicBtn" class="floating-music-btn" onclick="toggleBackgroundMusic()"><i data-lucide="music" style="width:18px;height:18px;"></i></button>
+    <nav id="bottomTouchNav" class="bottom-touch-nav">
+      <a href="#sec-couple" class="touch-nav-link"><span>02/Couple</span></a>
+      <a href="#sec-event-info" class="touch-nav-link"><span>04/Event</span></a>
+      <a href="#sec-gallery" class="touch-nav-link"><span>06/Photo</span></a>
+      <a href="#sec-rsvp" class="touch-nav-link"><span>07/RSVP</span></a>
+      <a href="#sec-qrcode" class="touch-nav-link"><span>09/QR</span></a>
+    </nav>
+  </div>
+  <script>window.__INITIAL_INVITATION_TOKEN__ = "<?= initialToken ?>";</script>
+  <?!= include('ScriptsGuest'); ?>
+</body>
+</html>

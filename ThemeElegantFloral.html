@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Undangan Pernikahan — Elegant Floral</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    :root {
+      --primary: #B99A62;
+      --primary-dark: #967843;
+      --ivory: #FAF7F0;
+      --cream: #F3EDE0;
+      --white: #FFFFFF;
+      --text-main: #2C2822;
+      --text-muted: #857E73;
+      --border: #E8E0D0;
+      --success: #3B9B72;
+      --danger: #D95C5C;
+      --font-serif: 'Playfair Display', Georgia, serif;
+      --font-Romantic: 'Cormorant Garamond', Georgia, serif;
+      --font-sans: 'Inter', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-sans);
+      background: #E8E2D5;
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+    }
+    .mobile-frame {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      background: var(--ivory);
+      position: relative;
+      overflow-x: hidden;
+      box-shadow: 0 0 50px rgba(44, 40, 34, 0.14);
+    }
+    .state-screen {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 36px 28px;
+      text-align: center;
+      background: var(--ivory);
+    }
+    .spinner-ring {
+      width: 44px; height: 44px;
+      border: 2.5px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      margin-bottom: 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Animasi Kelopak Bunga Putih Jatuh */
+    .petal-sky { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 1; }
+    .petal {
+      position: absolute;
+      width: 14px; height: 18px;
+      background: radial-gradient(circle at 30% 30%, #FFFFFF 45%, #EFE6D5 100%);
+      border: 1px solid rgba(185, 154, 98, 0.35);
+      border-radius: 80% 0 80% 0;
+      opacity: 0.7;
+      animation: petalFall 10s linear infinite;
+    }
+    .petal.p1 { left: 10%; animation-duration: 9s; }
+    .petal.p2 { left: 28%; animation-duration: 12s; animation-delay: 2s; width: 11px; height: 14px; }
+    .petal.p3 { left: 54%; animation-duration: 10.5s; animation-delay: 4s; }
+    .petal.p4 { left: 76%; animation-duration: 11s; animation-delay: 1s; }
+    .petal.p5 { left: 89%; animation-duration: 9.5s; animation-delay: 3s; }
+    @keyframes petalFall {
+      0% { top: -8%; transform: translateX(0) rotate(0deg); opacity: 0; }
+      20% { opacity: 0.75; }
+      80% { opacity: 0.7; }
+      100% { top: 105%; transform: translateX(26px) rotate(220deg); opacity: 0; }
+    }
+    .floral-svg-garland {
+      width: 100%; max-width: 320px; height: 46px;
+      margin: 0 auto 6px;
+      animation: sway 4.5s ease-in-out infinite alternate;
+    }
+    @keyframes sway {
+      0% { transform: rotate(-1.2deg); }
+      100% { transform: rotate(1.2deg); }
+    }
+
+    /* Sampul Pembuka */
+    .opening-cover {
+      position: fixed;
+      top: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 430px; height: 100vh;
+      z-index: 120;
+      background: radial-gradient(circle at 50% 20%, #FFFFFF 0%, var(--ivory) 65%, var(--cream) 100%);
+      display: flex; flex-direction: column; justify-content: space-between;
+      padding: 32px 24px 28px; text-align: center;
+      transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.7s ease;
+      overflow-y: auto;
+    }
+    .opening-cover.opened { transform: translate(-50%, -105%); opacity: 0; pointer-events: none; }
+    .eyebrow-gold { font-size: 10.5px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--primary); font-weight: 600; }
+    .couple-display { font-family: var(--font-serif); font-size: 34px; font-weight: 600; color: var(--text-main); margin: 6px 0; }
+    .floral-arch-frame {
+      width: 205px; height: 245px;
+      margin: 10px auto;
+      border-radius: 120px 120px 22px 22px;
+      padding: 6px;
+      border: 1.5px solid var(--primary);
+      background: var(--white);
+      box-shadow: 0 12px 30px rgba(185, 154, 98, 0.16), 0 0 0 5px rgba(255, 255, 255, 0.75);
+    }
+    .floral-arch-frame img { width: 100%; height: 100%; object-fit: cover; border-radius: 114px 114px 16px 16px; }
+    .guest-card-floral {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 18px 16px;
+      box-shadow: 0 8px 24px rgba(185, 154, 98, 0.08);
+      margin: 8px 0 14px;
+    }
+    .btn-floral {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 14px 24px;
+      border-radius: 99px;
+      background: linear-gradient(135deg, #C6A76E 0%, #A8874E 100%);
+      color: #FFFFFF; border: none;
+      font-size: 12.5px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(185, 154, 98, 0.32);
+    }
+
+    /* Main Content */
+    .main-invitation { display: none; padding-bottom: 90px; }
+    .main-invitation.visible { display: block; animation: fadeUp 0.65s ease; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .sec-block { padding: 38px 22px; border-bottom: 1px solid var(--border); text-align: center; position: relative; }
+    .sec-block.alt { background: var(--white); }
+    .sec-title { font-family: var(--font-serif); font-size: 25px; font-weight: 600; margin: 6px 0 10px; }
+    .sec-desc { font-size: 13px; color: var(--text-muted); line-height: 1.65; }
+    .hero-arch {
+      width: 100%; height: 330px;
+      border-radius: 175px 175px 22px 22px;
+      padding: 7px; border: 1.5px solid var(--primary);
+      background: var(--white); margin: 14px 0 18px;
+      box-shadow: 0 12px 28px rgba(185, 154, 98, 0.12);
+    }
+    .hero-arch img { width: 100%; height: 100%; object-fit: cover; border-radius: 168px 168px 16px 16px; }
+    .floral-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 24px 18px;
+      margin-top: 16px;
+      box-shadow: 0 8px 24px rgba(185, 154, 98, 0.07);
+    }
+    .avatar-circle {
+      width: 120px; height: 120px; border-radius: 50%;
+      object-fit: cover; border: 2px solid var(--primary);
+      padding: 4px; background: var(--ivory); margin-bottom: 12px;
+    }
+    .countdown-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 18px; }
+    .cd-pill { background: var(--ivory); border: 1px solid var(--primary); border-radius: 16px; padding: 14px 6px; }
+    .cd-num { font-family: var(--font-serif); font-size: 24px; font-weight: 700; color: var(--primary-dark); }
+    .cd-lbl { font-size: 10.5px; color: var(--text-muted); text-transform: uppercase; margin-top: 4px; }
+    .story-timeline { display: flex; flex-direction: column; gap: 14px; margin-top: 18px; text-align: left; }
+    .story-card { background: var(--ivory); border: 1px solid var(--border); border-left: 3px solid var(--primary); border-radius: 16px; padding: 16px; }
+    .story-year { font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.1em; }
+    .story-card h4 { font-family: var(--font-serif); font-size: 17px; margin: 4px 0 6px; }
+    .story-card p { font-size: 12.5px; color: var(--text-muted); line-height: 1.6; }
+    .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 18px; }
+    .gallery-thumb { width: 100%; height: 165px; object-fit: cover; border-radius: 14px; border: 1px solid var(--border); cursor: pointer; }
+    .guest-input { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--ivory); font-family: var(--font-sans); font-size: 13.5px; margin-bottom: 12px; }
+    .wishes-feed { max-height: 350px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-top: 16px; text-align: left; }
+    .wish-item { background: var(--white); border: 1px solid var(--border); border-radius: 14px; padding: 14px; }
+    .wish-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+    .wish-sender { font-weight: 600; font-size: 13.5px; }
+    .wish-badge { font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: 99px; }
+    .wish-badge.hadir { background: rgba(59, 155, 114, 0.14); color: var(--success); }
+    .wish-badge.absen { background: rgba(217, 92, 92, 0.14); color: var(--danger); }
+    .lightbox-overlay { position: fixed; inset: 0; background: rgba(20, 19, 17, 0.92); z-index: 300; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+    .lightbox-overlay.open { display: flex; }
+    .lightbox-Overlay-img { max-width: 100%; max-height: 75vh; border-radius: 14px; border: 1px solid var(--primary); }
+    .floating-music-btn { position: fixed; bottom: 78px; right: max(16px, calc(50% - 198px)); width: 44px; height: 44px; border-radius: 50%; background: var(--white); border: 1.5px solid var(--primary); color: var(--primary); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 95; box-shadow: 0 4px 14px rgba(0,0,0,0.12); }
+    .floating-music-btn.playing { animation: spin 6s linear infinite; }
+    .bottom-touch-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; height: 62px; background: rgba(255,255,255,0.96); backdrop-filter: blur(8px); border-top: 1px solid var(--border); display: none; grid-template-columns: repeat(5, 1fr); z-index: 90; }
+    .bottom-touch-nav.visible { display: grid; }
+    .touch-nav-link { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: var(--text-muted); font-size: 10.5px; font-weight: 500; }
+  </style>
+</head>
+<body>
+  <div class="mobile-frame">
+    <div id="guestLoadingScreen" class="state-screen">
+      <div class="spinner-ring"></div>
+      <div style="font-family:var(--font-serif); font-size:18px;">Memuat Undangan</div>
+    </div>
+
+    <div id="guestErrorScreen" class="state-screen" style="display:none;">
+      <i data-lucide="mail-warning" style="width:42px;height:42px;color:var(--primary);margin-bottom:12px;"></i>
+      <h1 style="font-family:var(--font-serif); font-size:23px; margin-bottom:8px;">Undangan Tidak Ditemukan</h1>
+      <p id="guestErrorMessage" class="sec-desc"></p>
+    </div>
+
+    <!-- A. OPENING COVER (ELEGANT FLORAL) -->
+    <section id="openingCoverPage" class="opening-cover" style="display:none;">
+      <div class="petal-sky">
+        <span class="petal p1"></span><span class="petal p2"></span><span class="petal p3"></span><span class="petal p4"></span><span class="petal p5"></span>
+      </div>
+      <div style="position:relative; z-index:2;">
+        <svg class="floral-svg-garland" viewBox="0 0 320 48" fill="none">
+          <path d="M20 38C75 12 120 26 160 16C200 26 245 12 300 38" stroke="#B99A62" stroke-width="1.2"/>
+          <path d="M115 22C102 12 88 15 82 24C94 28 106 26 115 22Z" fill="#DCE3D6" stroke="#B99A62" stroke-width="0.9"/>
+          <path d="M205 22C218 12 232 15 238 24C226 28 214 26 205 22Z" fill="#DCE3D6" stroke="#B99A62" stroke-width="0.9"/>
+          <circle cx="160" cy="18" r="11" fill="#FFFFFF" stroke="#B99A62" stroke-width="1.2"/>
+          <circle cx="160" cy="18" r="4" fill="#B99A62"/>
+          <circle cx="134" cy="21" r="7" fill="#FFFFFF" stroke="#B99A62" stroke-width="1"/>
+          <circle cx="186" cy="21" r="7" fill="#FFFFFF" stroke="#B99A62" stroke-width="1"/>
+        </svg>
+        <div class="eyebrow-gold">THE WEDDING OF</div>
+        <h1 id="openCoupleNames" class="couple-display">Romeo &amp; Juliet</h1>
+        <div class="floral-arch-frame">
+          <img id="openCoverPhoto" src="" alt="Couple">
+        </div>
+      </div>
+
+      <div style="position:relative; z-index:2;">
+        <div class="guest-card-floral">
+          <div style="font-family:var(--font-Romantic); font-style:italic; font-size:17px; color:var(--text-muted);">Kepada Yth.</div>
+          <div id="openGuestName" style="font-family:var(--font-serif); font-size:21px; font-weight:700; margin:6px 0;">-</div>
+          <p style="font-size:12px; color:var(--text-muted);">Tanpa mengurangi rasa hormat, kami mengundang Anda untuk menghadiri hari bahagia kami.</p>
+        </div>
+        <button type="button" class="btn-floral" onclick="handleOpenInvitationClick()">
+          <i data-lucide="mail-open" style="width:16px;height:16px;"></i>
+          <span>BUKA UNDANGAN</span>
+        </button>
+        <div id="openWeddingDate" style="font-family:var(--font-Romantic); font-size:16px; color:var(--text-muted); margin-top:10px;"></div>
+      </div>
+    </section>
+
+    <!-- B. MAIN INVITATION (ELEGANT FLORAL) -->
+    <main id="mainInvitationPage" class="main-invitation">
+      <section id="sec-hero" class="sec-block alt">
+        <div class="eyebrow-gold">THE WEDDING CELEBRATION</div>
+        <h2 id="mainHeroCoupleTitle" class="couple-display" style="font-size:30px;">Romeo &amp; Juliet</h2>
+        <div class="hero-arch"><img id="mainHeroPhoto" src="" alt="Hero"></div>
+        <p id="mainHeroDescription" class="sec-desc"></p>
+      </section>
+
+      <section id="sec-couple" class="sec-block">
+        <div class="eyebrow-gold">MEMPELAI BERBAHAGIA</div>
+        <h3 class="sec-title">Pasangan Mempelai</h3>
+        <div class="floral-card">
+          <img id="mainGroomPhoto" class="avatar-circle" src="" alt="Groom" loading="lazy">
+          <div id="mainGroomFullName" style="font-family:var(--font-serif); font-size:21px; font-weight:600; margin-bottom:6px;"></div>
+          <p id="mainGroomParents" class="sec-desc"></p>
+        </div>
+        <div style="font-family:var(--font-Romantic); font-size:34px; font-style:italic; color:var(--primary); margin-top:12px;">&amp;</div>
+        <div class="floral-card">
+          <img id="mainBridePhoto" class="avatar-circle" src="" alt="Bride" loading="lazy">
+          <div id="mainBrideFullName" style="font-family:var(--font-serif); font-size:21px; font-weight:600; margin-bottom:6px;"></div>
+          <p id="mainBrideParents" class="sec-desc"></p>
+        </div>
+      </section>
+
+      <section id="sec-countdown" class="sec-block alt">
+        <div class="eyebrow-gold">MENUJU HARI BAHAGIA</div>
+        <h3 class="sec-title">Hitung Mundur Acara</h3>
+        <p id="mainCountdownDateText" class="sec-desc"></p>
+        <div class="countdown-grid">
+          <div class="cd-pill"><div id="cdDays" class="cd-num">00</div><div class="cd-lbl">Hari</div></div>
+          <div class="cd-pill"><div id="cdHours" class="cd-num">00</div><div class="cd-lbl">Jam</div></div>
+          <div class="cd-pill"><div id="cdMinutes" class="cd-num">00</div><div class="cd-lbl">Menit</div></div>
+          <div class="cd-pill"><div id="cdSeconds" class="cd-num">00</div><div class="cd-lbl">Detik</div></div>
+        </div>
+      </section>
+
+      <section id="sec-event-info" class="sec-block">
+        <div id="mainQuoteWrapper" class="floral-card" style="margin-top:0; margin-bottom:20px;">
+          <p id="mainQuoteText" style="font-family:var(--font-Romantic); font-style:italic; font-size:16.5px; line-height:1.6;"></p>
+          <div id="mainQuoteSource" style="font-size:12px; font-weight:600; color:var(--primary); margin-top:8px;"></div>
+        </div>
+        <div class="eyebrow-gold">RANGKAIAN ACARA</div>
+        <h3 class="sec-title">Waktu &amp; Tempat</h3>
+
+        <div class="floral-card">
+          <h4 id="mainAkadTitle" style="font-family:var(--font-serif); font-size:20px; color:var(--primary-dark);">Akad Nikah</h4>
+          <div id="mainAkadDate" style="font-weight:600; margin:6px 0;"></div>
+          <div id="mainAkadTime" class="sec-desc"></div>
+        </div>
+
+        <div class="floral-card">
+          <h4 id="mainReceptionTitle" style="font-family:var(--font-serif); font-size:20px; color:var(--primary-dark);">Resepsi</h4>
+          <div id="mainReceptionDate" style="font-weight:600; margin:6px 0;"></div>
+          <div id="mainReceptionTime" class="sec-desc"></div>
+        </div>
+
+        <div class="floral-card" style="border-color:var(--primary);">
+          <h4 id="mainVenueName" style="font-family:var(--font-serif); font-size:19px;"></h4>
+          <p id="mainVenueAddress" class="sec-desc" style="margin:8px 0 16px;"></p>
+          <a id="mainGoogleMapsBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn-floral" style="text-decoration:none;">
+            <i data-lucide="map-pin" style="width:16px;height:16px;"></i>
+            <span>Buka Google Maps</span>
+          </a>
+        </div>
+      </section>
+
+      <section id="sec-story" class="sec-block alt">
+        <div class="eyebrow-gold">PERJALANAN CINTA</div>
+        <h3 class="sec-title">Our Love Story</h3>
+        <div id="mainStoryList" class="story-timeline"></div>
+      </section>
+
+      <section id="sec-gallery" class="sec-block">
+        <div class="eyebrow-gold">MOMEN BAHAGIA</div>
+        <h3 class="sec-title">Galeri Foto</h3>
+        <div id="mainGalleryGrid" class="gallery-grid"></div>
+      </section>
+
+      <section id="sec-rsvp" class="sec-block alt">
+        <div class="eyebrow-gold">KONFIRMASI KEHADIRAN</div>
+        <h3 class="sec-title">Formulir RSVP</h3>
+        <form id="guestRsvpForm" class="floral-card" style="text-align:left;" action="javascript:void(0);" onsubmit="handleGuestRsvpSubmit(event); return false;">
+          <label style="font-size:12px; font-weight:600;">Nama Tamu</label>
+          <input type="text" id="rsvpFormGuestName" class="guest-input" readonly>
+          <label style="font-size:12px; font-weight:600;">Konfirmasi Kehadiran</label>
+          <select id="rsvpFormAttendance" class="guest-input" onchange="handleRsvpAttendanceChange()">
+            <option value="Hadir">Ya, Saya Akan Hadir</option>
+            <option value="Tidak Hadir">Maaf, Berhalangan Hadir</option>
+          </select>
+          <div id="rsvpGuestCountWrapper">
+            <label style="font-size:12px; font-weight:600;">Jumlah Orang</label>
+            <select id="rsvpFormGuestCount" class="guest-input">
+              <option value="1">1 Orang</option><option value="2">2 Orang</option><option value="3">3 Orang</option><option value="4">4 Orang</option><option value="5">5 Orang</option>
+            </select>
+          </div>
+          <label style="font-size:12px; font-weight:600;">Ucapan &amp; Doa</label>
+          <textarea id="rsvpFormWishes" class="guest-input" style="min-height:90px;" required placeholder="Tuliskan ucapan & doa restu..."></textarea>
+          <button type="button" id="rsvpSubmitBtn" onclick="handleGuestRsvpSubmit(event)" class="btn-floral">Kirim Konfirmasi</button>
+        </form>
+      </section>
+
+      <section id="sec-wishes" class="sec-block">
+        <div class="eyebrow-gold">DOA &amp; HARAPAN</div>
+        <h3 class="sec-title">Buku Ucapan</h3>
+        <p id="wishesTotalLabel" class="sec-desc"></p>
+        <div id="mainWishesFeed" class="wishes-feed"></div>
+      </section>
+
+      <section id="sec-qrcode" class="sec-block alt">
+        <div class="eyebrow-gold">GUEST PASS</div>
+        <h3 class="sec-title">QR Code Check-in</h3>
+        <div class="floral-card" style="border-color:var(--primary);">
+          <div id="qrPassGuestName" style="font-family:var(--font-serif); font-size:20px; font-weight:700; margin-bottom:12px;"></div>
+          <div id="guestQrCodeContainer" style="display:inline-block; padding:14px; background:#FFF; border:1px solid var(--border); border-radius:14px;"></div>
+          <div id="qrPassCategoryBadge" style="margin-top:10px;"></div>
+          <div id="qrPassCheckinStatus" style="margin-top:6px; font-size:12px; color:var(--text-muted);"></div>
+        </div>
+      </section>
+
+      <section id="sec-closing" class="sec-block">
+        <p id="mainClosingText" class="sec-desc" style="margin-bottom:14px;"></p>
+        <div style="font-family:var(--font-Romantic); font-style:italic; font-size:18px; color:var(--text-muted);">Kami yang berbahagia,</div>
+        <h3 id="mainClosingCouple" class="couple-display" style="font-size:28px; color:var(--primary-dark);"></h3>
+      </section>
+    </main>
+
+    <div id="galleryLightbox" class="lightbox-overlay" onclick="closeGalleryLightbox()">
+      <img id="lightboxImgEl" class="lightbox-Overlay-img" src="" alt="Preview">
+      <div id="lightboxCaptionEl" style="color:#FFF; margin-top:10px;"></div>
+    </div>
+    <audio id="bgMusicAudio" loop preload="none"></audio>
+    <button type="button" id="floatingMusicBtn" class="floating-music-btn" onclick="toggleBackgroundMusic()"><i data-lucide="music" style="width:18px;height:18px;"></i></button>
+    <nav id="bottomTouchNav" class="bottom-touch-nav">
+      <a href="#sec-couple" class="touch-nav-link"><i data-lucide="heart" style="width:17px;height:17px;"></i><span>Mempelai</span></a>
+      <a href="#sec-event-info" class="touch-nav-link"><i data-lucide="calendar" style="width:17px;height:17px;"></i><span>Acara</span></a>
+      <a href="#sec-gallery" class="touch-nav-link"><i data-lucide="image" style="width:17px;height:17px;"></i><span>Galeri</span></a>
+      <a href="#sec-rsvp" class="touch-nav-link"><i data-lucide="mail-check" style="width:17px;height:17px;"></i><span>RSVP</span></a>
+      <a href="#sec-qrcode" class="touch-nav-link"><i data-lucide="qr-code" style="width:17px;height:17px;"></i><span>QR Pass</span></a>
+    </nav>
+  </div>
+  <script>window.__INITIAL_INVITATION_TOKEN__ = "<?= initialToken ?>";</script>
+  <?!= include('ScriptsGuest'); ?>
+</body>
+</html>

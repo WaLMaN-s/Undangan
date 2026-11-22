@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>The Wedding Invitation — Thelove Cinematic Edition</title>
+  <!-- Exact Google Fonts from inv.thelove.id/ramses-priska: Great Vibes, Abhaya Libre, Shippori Mincho, Playfair Display, Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Abhaya+Libre:ital,wght@0,500;0,700;1,500&family=Great+Vibes&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=Poppins:wght@300;400;500;600&family=Shippori+Mincho:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    :root {
+      --bg-dark-1: #1B1B18;
+      --bg-dark-2: #242424;
+      --btn-charcoal: #313131;
+      --gold: #CDA062;
+      --white: #FFFFFF;
+      --white-muted: rgba(255, 255, 255, 0.72);
+      --border-gold: rgba(205, 160, 98, 0.28);
+      --success: #3B9B72;
+      --danger: #D95C5C;
+      --font-script: 'Great Vibes', cursive;
+      --font-abhaya: 'Abhaya Libre', Georgia, serif;
+      --font-shippori: 'Shippori Mincho', Georgia, serif;
+      --font-playfair: 'Playfair Display', Georgia, serif;
+      --font-poppins: 'Poppins', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-poppins);
+      background-color: #10100E;
+      color: var(--white);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      -webkit-font-smoothing: antialiased;
+    }
+    .mobile-frame {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      background-color: var(--bg-dark-1);
+      position: relative;
+      overflow-x: hidden;
+      box-shadow: 0 0 55px rgba(0, 0, 0, 0.85);
+    }
+    .state-screen {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 36px 28px;
+      text-align: center; background: var(--bg-dark-1);
+    }
+    .spinner-ring {
+      width: 44px; height: 44px; border: 2px solid rgba(255,255,255,0.15);
+      border-top-color: var(--gold); border-radius: 50%;
+      animation: spin 0.9s linear infinite; margin-bottom: 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ========================================================================
+       A. OPENING COVER (100vh FULL-BLEED PHOTO + #0000002E -> #1B1B18 FADE)
+       Persis inv.thelove.id/ramses-priska
+       ======================================================================== */
+    .opening-cover {
+      position: fixed;
+      top: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 430px; height: 100vh;
+      z-index: 120;
+      background-color: var(--bg-dark-1);
+      background-image:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.28) 0%, rgba(0, 0, 0, 0.18) 55%, #1B1B18 93%),
+        var(--cover-bg-url, url('https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=900&q=80'));
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 46px 26px 42px;
+      text-align: center;
+      transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.75s ease;
+    }
+    .opening-cover.opened {
+      transform: translate(-50%, -105%);
+      opacity: 0;
+      pointer-events: none;
+    }
+    .cover-script-couple {
+      font-family: var(--font-script);
+      font-size: 38px;
+      font-weight: 400;
+      color: #FFFFFF;
+      letter-spacing: -0.3px;
+      text-shadow: 0 3px 16px rgba(0, 0, 0, 0.65);
+    }
+    .cover-bottom-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .cover-yth {
+      font-family: var(--font-shippori);
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.88);
+    }
+    .cover-guest-name {
+      font-family: var(--font-playfair);
+      font-size: 24px;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin: 4px 0;
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+    }
+    .cover-apology {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.65);
+      font-style: italic;
+      margin-bottom: 12px;
+    }
+    .thelove-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background-color: var(--btn-charcoal);
+      color: #FFFFFF;
+      font-family: var(--font-shippori);
+      font-size: 12.5px;
+      font-weight: 500;
+      border-radius: 5px;
+      border: 1px solid rgba(205, 160, 98, 0.35);
+      padding: 10px 22px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.25s ease;
+    }
+    .thelove-btn:active {
+      transform: scale(0.97);
+      background-color: var(--gold);
+      color: #1B1B18;
+    }
+
+    /* ========================================================================
+       B. MAIN INVITATION SECTIONS (THELOVE RAMSES & PRISKA ANATOMY)
+       ======================================================================== */
+    .main-invitation { display: none; padding-bottom: 90px; }
+    .main-invitation.visible { display: block; animation: fadeIn 0.7s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* 1. Full-Bleed Hero Banner with Bottom Vignette Fade to #1B1B18 */
+    .thelove-hero {
+      min-height: 550px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 40px 24px 34px;
+      text-align: center;
+      background-color: var(--bg-dark-1);
+      background-image:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.18) 58%, #1B1B18 93%),
+        var(--cover-bg-url, url('https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=900&q=80'));
+      background-size: cover;
+      background-position: center;
+    }
+    .thelove-eyebrow-italic {
+      font-family: var(--font-abhaya);
+      font-size: 19px;
+      font-weight: 500;
+      font-style: italic;
+      color: var(--gold);
+    }
+    .thelove-hero-couple {
+      font-family: var(--font-script);
+      font-size: 48px;
+      font-weight: 400;
+      color: #FFFFFF;
+      line-height: 1.25;
+      margin: 4px 0;
+      text-shadow: 0 3px 16px rgba(0, 0, 0, 0.65);
+    }
+    .thelove-hero-date {
+      font-family: var(--font-shippori);
+      font-size: 13.5px;
+      letter-spacing: 0.08em;
+      color: rgba(255, 255, 255, 0.88);
+      margin-bottom: 20px;
+    }
+
+    /* Countdown Timer Bar */
+    .countdown-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .cd-thelove {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(205, 160, 98, 0.35);
+      border-radius: 6px;
+      padding: 12px 4px;
+    }
+    .cd-num {
+      font-family: var(--font-playfair);
+      font-size: 23px;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+    .cd-lbl {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+      margin-top: 2px;
+    }
+
+    /* 2. Quote / Verse Block (#1B1B18) */
+    .thelove-verse-sec {
+      background-color: var(--bg-dark-1);
+      padding: 36px 26px;
+      text-align: center;
+    }
+    .thelove-monogram-title {
+      font-family: var(--font-shippori);
+      font-size: 14px;
+      letter-spacing: 0.25em;
+      color: var(--gold);
+      margin-bottom: 8px;
+    }
+
+    /* 3. Groom & Bride Tall Full-Bleed Portrait Cards (#242424) */
+    .thelove-couple-sec {
+      background-color: var(--bg-dark-2);
+      padding: 42px 22px;
+      text-align: center;
+    }
+    .thelove-section-heading {
+      font-family: var(--font-shippori);
+      font-size: 20px;
+      letter-spacing: 0.16em;
+      color: #FFFFFF;
+      margin-bottom: 24px;
+    }
+    .thelove-portrait-card {
+      background-color: var(--bg-dark-2);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+    .thelove-portrait-img-wrap {
+      position: relative;
+      width: 100%;
+      height: 360px;
+    }
+    .thelove-portrait-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .thelove-portrait-img-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(180deg, #24242421 68%, #242424 96%);
+    }
+    .thelove-portrait-body {
+      padding: 8px 18px 26px;
+    }
+    .thelove-role-italic {
+      font-family: var(--font-abhaya);
+      font-size: 19px;
+      font-style: italic;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+    .thelove-person-name {
+      font-family: var(--font-playfair);
+      font-size: 21px;
+      font-weight: 600;
+      color: #FFFFFF;
+      margin-bottom: 8px;
+    }
+    .thelove-person-parents {
+      font-size: 12.5px;
+      color: var(--white-muted);
+      line-height: 1.6;
+    }
+    .thelove-partner-badge {
+      font-family: var(--font-shippori);
+      font-size: 11.5px;
+      letter-spacing: 0.28em;
+      color: var(--gold);
+      margin: 22px 0;
+    }
+
+    /* 4. Wedding Event Split Calendar Cards (#1B1B18) */
+    .thelove-event-sec {
+      background-color: var(--bg-dark-1);
+      padding: 44px 22px;
+      text-align: center;
+    }
+    .thelove-event-card {
+      background-color: var(--bg-dark-2);
+      border: 1px solid var(--border-gold);
+      border-radius: 10px;
+      padding: 28px 20px;
+      margin-bottom: 20px;
+    }
+    .thelove-event-title {
+      font-family: var(--font-abhaya);
+      font-size: 26px;
+      font-style: italic;
+      font-weight: 500;
+      color: var(--gold);
+      margin-bottom: 14px;
+    }
+    .split-calendar-row {
+      display: grid;
+      grid-template-columns: 1fr 1.25fr 1fr;
+      align-items: center;
+      max-width: 280px;
+      margin: 14px auto 16px;
+      padding: 10px 0;
+      border-top: 1px solid rgba(205, 160, 98, 0.25);
+      border-bottom: 1px solid rgba(205, 160, 98, 0.25);
+    }
+    .split-col-side {
+      font-family: var(--font-abhaya);
+      font-size: 17px;
+      color: var(--gold);
+    }
+    .split-col-center {
+      border-left: 1px solid var(--gold);
+      border-right: 1px solid var(--gold);
+      padding: 2px 10px;
+    }
+    .split-day-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--white-muted);
+    }
+    .split-day-number {
+      font-family: var(--font-playfair);
+      font-size: 30px;
+      font-weight: 700;
+      color: #FFFFFF;
+      line-height: 1.1;
+    }
+
+    /* 5. Our Gallery & Our Journey (#242424) */
+    .thelove-dark2-sec {
+      background-color: var(--bg-dark-2);
+      padding: 42px 22px;
+      text-align: center;
+    }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .gallery-thumb {
+      width: 100%;
+      height: 170px;
+      object-fit: cover;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .story-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 18px;
+      text-align: left;
+    }
+    .story-card {
+      background: var(--bg-dark-1);
+      border: 1px solid rgba(205, 160, 98, 0.25);
+      border-radius: 8px;
+      padding: 18px;
+    }
+    .story-year {
+      font-family: var(--font-abhaya);
+      font-style: italic;
+      font-size: 17px;
+      color: var(--gold);
+    }
+    .story-card h4 {
+      font-family: var(--font-playfair);
+      font-size: 18px;
+      color: #FFFFFF;
+      margin: 4px 0 8px;
+    }
+    .story-card p {
+      font-size: 12.5px;
+      color: var(--white-muted);
+      line-height: 1.65;
+    }
+
+    /* 6. RSVP & Wishes (#1B1B18) */
+    .guest-input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid rgba(205, 160, 98, 0.3);
+      border-radius: 5px;
+      background: #141412;
+      color: #FFFFFF;
+      font-family: var(--font-poppins);
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+    .wishes-feed {
+      max-height: 360px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 16px;
+      text-align: left;
+    }
+    .wish-item {
+      background: var(--bg-dark-2);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      padding: 14px;
+    }
+    .wish-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+    .wish-sender { font-weight: 600; font-size: 13px; color: var(--gold); }
+    .wish-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+    .wish-badge.hadir { background: rgba(59, 155, 114, 0.22); color: #6CD4A6; }
+    .wish-badge.absen { background: rgba(217, 92, 92, 0.22); color: #F28B8B; }
+
+    .lightbox-overlay { position: fixed; inset: 0; background: rgba(12, 12, 10, 0.95); z-index: 300; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+    .lightbox-overlay.open { display: flex; }
+    .lightbox-Overlay-img { max-width: 100%; max-height: 75vh; border-radius: 8px; }
+    .floating-music-btn { position: fixed; bottom: 78px; right: max(16px, calc(50% - 198px)); width: 42px; height: 42px; border-radius: 50%; background: var(--btn-charcoal); border: 1px solid var(--gold); color: var(--gold); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 95; }
+    .floating-music-btn.playing { animation: spin 6s linear infinite; }
+    .bottom-touch-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; height: 60px; background: rgba(27, 27, 24, 0.96); border-top: 1px solid rgba(205, 160, 98, 0.25); display: none; grid-template-columns: repeat(5, 1fr); z-index: 90; }
+    .bottom-touch-nav.visible { display: grid; }
+    .touch-nav-link { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: var(--white-muted); font-size: 10px; }
+  </style>
+</head>
+<body>
+  <div class="mobile-frame">
+    <div id="guestLoadingScreen" class="state-screen">
+      <div class="spinner-ring"></div>
+      <div style="font-family:var(--font-script); font-size:28px; color:var(--gold);">The Wedding Invitation</div>
+    </div>
+
+    <div id="guestErrorScreen" class="state-screen" style="display:none;">
+      <h1 style="font-family:var(--font-playfair); font-size:22px; color:var(--gold); margin-bottom:8px;">Undangan Tidak Ditemukan</h1>
+      <p id="guestErrorMessage" style="font-size:13px; color:var(--white-muted);"></p>
+    </div>
+
+    <!-- ======================================================================
+         A. OPENING COVER (FULL-SCREEN PHOTO + GREAT VIBES + DARK FADE)
+         ====================================================================== -->
+    <section id="openingCoverPage" class="opening-cover" style="display:none;">
+      <div>
+        <h1 id="openCoupleNames" class="cover-script-couple">Ramses &amp; Priska</h1>
+        <img id="openCoverPhoto" src="" alt="" style="display:none;">
+      </div>
+
+      <div class="cover-bottom-box">
+        <div class="cover-yth">Kepada Yth. Bapak/Ibu/Saudara/i</div>
+        <div id="openGuestName" class="cover-guest-name">-</div>
+        <div class="cover-apology">Mohon maaf apabila ada kesalahan penulisan nama/gelar</div>
+
+        <button type="button" class="thelove-btn" onclick="handleOpenInvitationClick()">
+          <i data-lucide="mail-open" style="width:15px;height:15px;"></i>
+          <span>Open Invitation</span>
+        </button>
+        <div id="openWeddingDate" style="display:none;"></div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         B. MAIN INVITATION PAGE (RAMSES & PRISKA — THELOVE.ID STRUCTURE)
+         ====================================================================== -->
+    <main id="mainInvitationPage" class="main-invitation">
+
+      <!-- 1. FULL-BLEED HERO + COUNTDOWN TIMER -->
+      <section id="sec-hero" class="thelove-hero">
+        <img id="mainHeroPhoto" src="" alt="" style="display:none;">
+        <div class="thelove-eyebrow-italic">The Wedding of</div>
+        <h2 id="mainHeroCoupleTitle" class="thelove-hero-couple">Ramses &amp; Priska</h2>
+        <div id="mainCountdownDateText" class="thelove-hero-date">Minggu, 16 Mei 2026</div>
+
+        <div id="sec-countdown">
+          <div style="font-size:10px; letter-spacing:0.25em; color:var(--gold); margin-bottom:6px;">COUNTDOWN TIMER</div>
+          <div class="countdown-grid">
+            <div class="cd-thelove"><div id="cdDays" class="cd-num">00</div><div class="cd-lbl">Days</div></div>
+            <div class="cd-thelove"><div id="cdHours" class="cd-num">00</div><div class="cd-lbl">Hours</div></div>
+            <div class="cd-thelove"><div id="cdMinutes" class="cd-num">00</div><div class="cd-lbl">Minutes</div></div>
+            <div class="cd-thelove"><div id="cdSeconds" class="cd-num">00</div><div class="cd-lbl">Seconds</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. MONOGRAM & BIBLE VERSE / QUOTE (#1B1B18) -->
+      <section class="thelove-verse-sec">
+        <div id="theloveQuoteMonogram" class="thelove-monogram-title">R&amp;P WEDDING</div>
+        <div id="mainQuoteWrapper">
+          <div id="mainQuoteSource" class="thelove-eyebrow-italic" style="margin-bottom:8px;">- Kolose 3:14 -</div>
+          <p id="mainQuoteText" style="font-size:13px; font-style:italic; color:var(--white-muted); line-height:1.75;"></p>
+        </div>
+        <p id="mainHeroDescription" style="font-size:12.5px; color:var(--white-muted); margin-top:14px; line-height:1.65;"></p>
+      </section>
+
+      <!-- 3. GROOM & BRIDE TALL FULL-BLEED PORTRAIT CARDS (#242424) -->
+      <section id="sec-couple" class="thelove-couple-sec">
+        <h3 class="thelove-section-heading">GROOM &amp; BRIDE</h3>
+
+        <div class="thelove-portrait-card">
+          <div class="thelove-portrait-img-wrap">
+            <img id="mainGroomPhoto" src="" alt="The Groom" loading="lazy">
+          </div>
+          <div class="thelove-portrait-body">
+            <div class="thelove-role-italic">THE GROOM</div>
+            <div id="mainGroomFullName" class="thelove-person-name"></div>
+            <p id="mainGroomParents" class="thelove-person-parents"></p>
+          </div>
+        </div>
+
+        <div class="thelove-partner-badge">✦ ROMANTIC PARTNER ✦</div>
+
+        <div class="thelove-portrait-card">
+          <div class="thelove-portrait-img-wrap">
+            <img id="mainBridePhoto" src="" alt="The Bride" loading="lazy">
+          </div>
+          <div class="thelove-portrait-body">
+            <div class="thelove-role-italic">THE BRIDE</div>
+            <div id="mainBrideFullName" class="thelove-person-name"></div>
+            <p id="mainBrideParents" class="thelove-person-parents"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. WEDDING EVENT WITH 3-COLUMN SPLIT DATE (#1B1B18) -->
+      <section id="sec-event-info" class="thelove-event-sec">
+        <h3 class="thelove-section-heading">WEDDING EVENT</h3>
+
+        <!-- Pemberkatan / Akad Card -->
+        <div class="thelove-event-card">
+          <h4 id="mainAkadTitle" class="thelove-event-title">Pemberkatan</h4>
+          <div class="split-calendar-row">
+            <div id="splitAkadMonth" class="split-col-side">Mei</div>
+            <div class="split-col-center">
+              <div id="splitAkadDayName" class="split-day-label">Sabtu</div>
+              <div id="splitAkadDayNum" class="split-day-number">16</div>
+            </div>
+            <div id="splitAkadYear" class="split-col-side">2026</div>
+          </div>
+          <div id="mainAkadDate" style="display:none;"></div>
+          <div id="mainAkadTime" style="font-size:13px; color:#FFFFFF; font-weight:500; margin-bottom:8px;"></div>
+        </div>
+
+        <!-- Resepsi Card -->
+        <div class="thelove-event-card">
+          <h4 id="mainReceptionTitle" class="thelove-event-title">Resepsi</h4>
+          <div class="split-calendar-row">
+            <div id="splitRecMonth" class="split-col-side">Mei</div>
+            <div class="split-col-center">
+              <div id="splitRecDayName" class="split-day-label">Sabtu</div>
+              <div id="splitRecDayNum" class="split-day-number">16</div>
+            </div>
+            <div id="splitRecYear" class="split-col-side">2026</div>
+          </div>
+          <div id="mainReceptionDate" style="display:none;"></div>
+          <div id="mainReceptionTime" style="font-size:13px; color:#FFFFFF; font-weight:500; margin-bottom:8px;"></div>
+        </div>
+
+        <!-- Lokasi & Google Maps -->
+        <div class="thelove-event-card">
+          <div class="thelove-eyebrow-italic" style="margin-bottom:6px;">Bertempat di :</div>
+          <h4 id="mainVenueName" style="font-family:var(--font-playfair); font-size:19px; color:#FFFFFF; margin-bottom:8px;"></h4>
+          <p id="mainVenueAddress" style="font-size:12.5px; color:var(--white-muted); line-height:1.65; margin-bottom:18px;"></p>
+          <a id="mainGoogleMapsBtn" href="#" target="_blank" rel="noopener noreferrer" class="thelove-btn">
+            <i data-lucide="map-pin" style="width:15px;height:15px;"></i>
+            <span>Google Maps Lokasi</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- 5. ONE STEP CLOSER / OUR GALLERY & OUR JOURNEY (#242424) -->
+      <section id="sec-gallery" class="thelove-dark2-sec">
+        <div style="font-size:11px; letter-spacing:0.25em; color:var(--gold); margin-bottom:4px;">ONE STEP CLOSER</div>
+        <h3 class="thelove-eyebrow-italic" style="font-size:26px;">Our Gallery</h3>
+        <div id="mainGalleryGrid" class="gallery-grid"></div>
+      </section>
+
+      <section id="sec-story" class="thelove-dark2-sec" style="border-top:1px solid rgba(255,255,255,0.06);">
+        <h3 class="thelove-eyebrow-italic" style="font-size:26px;">Our Journey</h3>
+        <div id="mainStoryList" class="story-timeline"></div>
+      </section>
+
+      <!-- 6. UCAPAN & RSVP (#1B1B18) -->
+      <section id="sec-rsvp" class="thelove-event-sec">
+        <h3 class="thelove-eyebrow-italic" style="font-size:26px; margin-bottom:6px;">Ucapan &amp; Rsvp</h3>
+        <p style="font-size:12px; color:var(--white-muted); margin-bottom:18px;">Konfirmasi kehadiran &amp; berikan doa terbaik Anda</p>
+
+        <form id="guestRsvpForm" class="thelove-event-card" style="text-align:left;" action="javascript:void(0);" onsubmit="handleGuestRsvpSubmit(event); return false;">
+          <label style="font-size:11.5px; color:var(--gold);">Nama Tamu Undangan</label>
+          <input type="text" id="rsvpFormGuestName" class="guest-input" readonly>
+          <label style="font-size:11.5px; color:var(--gold);">Konfirmasi Kehadiran</label>
+          <select id="rsvpFormAttendance" class="guest-input" onchange="handleRsvpAttendanceChange()">
+            <option value="Hadir">Datang / Hadir</option>
+            <option value="Tidak Hadir">Absen / Berhalangan</option>
+          </select>
+          <div id="rsvpGuestCountWrapper">
+            <label style="font-size:11.5px; color:var(--gold);">Jumlah Orang</label>
+            <select id="rsvpFormGuestCount" class="guest-input">
+              <option value="1">1 Orang</option><option value="2">2 Orang</option><option value="3">3 Orang</option><option value="4">4 Orang</option><option value="5">5 Orang</option>
+            </select>
+          </div>
+          <label style="font-size:11.5px; color:var(--gold);">Ucapan &amp; Doa</label>
+          <textarea id="rsvpFormWishes" class="guest-input" style="min-height:90px;" required placeholder="Berikan ucapan & doa untuk kedua mempelai..."></textarea>
+          <button type="button" id="rsvpSubmitBtn" onclick="handleGuestRsvpSubmit(event)" class="thelove-btn" style="width:100%; padding:12px;">
+            <i data-lucide="send" style="width:15px;height:15px;"></i>
+            <span>Kirim Konfirmasi &amp; Ucapan</span>
+          </button>
+        </form>
+
+        <div id="sec-wishes" style="margin-top:24px;">
+          <div id="wishesTotalLabel" style="font-size:12px; color:var(--gold); margin-bottom:10px;"></div>
+          <div id="mainWishesFeed" class="wishes-feed"></div>
+        </div>
+      </section>
+
+      <!-- 7. QR CODE CHECK-IN PASS (#242424) -->
+      <section id="sec-qrcode" class="thelove-dark2-sec">
+        <div class="thelove-eyebrow-italic" style="font-size:24px; margin-bottom:8px;">Personal Guest Pass</div>
+        <div class="thelove-event-card" style="background:var(--bg-dark-1);">
+          <div id="qrPassGuestName" style="font-family:var(--font-playfair); font-size:20px; color:#FFFFFF; margin-bottom:12px;"></div>
+          <div id="guestQrCodeContainer" style="display:inline-block; padding:14px; background:#FFFFFF; border-radius:8px;"></div>
+          <div id="qrPassCategoryBadge" style="margin-top:12px;"></div>
+          <div id="qrPassCheckinStatus" style="margin-top:6px; font-size:12px; color:var(--white-muted);"></div>
+        </div>
+      </section>
+
+      <!-- 8. THANK YOU CLOSING -->
+      <section id="sec-closing" class="thelove-hero" style="min-height:420px;">
+        <p id="mainClosingText" style="font-size:12.5px; color:rgba(255,255,255,0.85); line-height:1.7; margin-bottom:18px;"></p>
+        <div style="font-size:11px; letter-spacing:0.28em; color:var(--gold);">THANK YOU</div>
+        <h3 id="mainClosingCouple" class="thelove-hero-couple" style="font-size:42px; margin-top:4px;">Ramses &amp; Priska</h3>
+      </section>
+    </main>
+
+    <div id="galleryLightbox" class="lightbox-overlay" onclick="closeGalleryLightbox()">
+      <img id="lightboxImgEl" class="lightbox-Overlay-img" src="" alt="Preview">
+      <div id="lightboxCaptionEl" style="color:#FFF; margin-top:10px;"></div>
+    </div>
+    <audio id="bgMusicAudio" loop preload="none"></audio>
+    <button type="button" id="floatingMusicBtn" class="floating-music-btn" onclick="toggleBackgroundMusic()"><i data-lucide="music" style="width:18px;height:18px;"></i></button>
+    <nav id="bottomTouchNav" class="bottom-touch-nav">
+      <a href="#sec-couple" class="touch-nav-link"><i data-lucide="heart" style="width:16px;height:16px;"></i><span>Mempelai</span></a>
+      <a href="#sec-event-info" class="touch-nav-link"><i data-lucide="calendar" style="width:16px;height:16px;"></i><span>Event</span></a>
+      <a href="#sec-gallery" class="touch-nav-link"><i data-lucide="image" style="width:16px;height:16px;"></i><span>Gallery</span></a>
+      <a href="#sec-rsvp" class="touch-nav-link"><i data-lucide="mail-check" style="width:16px;height:16px;"></i><span>RSVP</span></a>
+      <a href="#sec-qrcode" class="touch-nav-link"><i data-lucide="qr-code" style="width:16px;height:16px;"></i><span>QR Pass</span></a>
+    </nav>
+  </div>
+  <script>window.__INITIAL_INVITATION_TOKEN__ = "<?= initialToken ?>";</script>
+  <?!= include('ScriptsGuest'); ?>
+</body>
+</html>
