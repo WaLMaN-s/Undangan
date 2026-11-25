@@ -92,6 +92,8 @@
   function resolveThemeOverrideFromUrl() {
     try {
       const params = new URLSearchParams(window.location.search);
+      const isPreview = params.get('preview') === '1' || params.get('preview') === 'true';
+      if (!isPreview) return '';
       return (params.get('theme') || '').trim().toLowerCase();
     } catch (e) {
       return '';

@@ -291,7 +291,9 @@ function recordManualWhatsAppSend(sessionToken, payload) {
       return errorResponse('Tamu tidak ditemukan.', 'WA_GUEST_NOT_FOUND');
     }
 
-    var wedding = getWeddingConfigData(false);
+    var guestWeddingId = (targetGuest.wedding_id && String(targetGuest.wedding_id).trim()) || '';
+    var wedding = getWeddingConfigData(false, guestWeddingId);
+    var effectiveLockedTheme = (targetGuest.locked_theme && String(targetGuest.locked_theme).trim()) || wedding.invitation_theme || 'elegant_floral';
     var template = payload.template || wedding.wa_message_template || APP_CONFIG.DEFAULT_SETTINGS.wa_message_template;
     var rawToken = extractRawTokenFromGuest(targetGuest);
     var invUrl = targetGuest.invitation_url || (getWebAppBaseUrl() + '?token=' + encodeURIComponent(rawToken));
@@ -321,6 +323,8 @@ function recordManualWhatsAppSend(sessionToken, payload) {
 
     updateRecordById(APP_CONFIG.SHEETS.GUESTS.name, 'guest_id', guestId, {
       delivery_status: APP_CONFIG.DELIVERY_STATUS.SENT,
+      locked_theme: effectiveLockedTheme,
+      wedding_id: targetGuest.wedding_id || wedding.wedding_id || 'WED-001',
       updated_at: ts
     });
 
@@ -351,7 +355,9 @@ function createMessageQueue(sessionToken, queuePayload) {
 
   return withScriptLock(function () {
     var guests = getSheetRecords(APP_CONFIG.SHEETS.GUESTS.name);
-    var wedding = getWeddingConfigData(false);
+    var guestWeddingId = (targetGuest.wedding_id && String(targetGuest.wedding_id).trim()) || '';
+    var wedding = getWeddingConfigData(false, guestWeddingId);
+    var effectiveLockedTheme = (targetGuest.locked_theme && String(targetGuest.locked_theme).trim()) || wedding.invitation_theme || 'elegant_floral';
     var template = sanitizeTextPlain(
       queuePayload.template || wedding.wa_message_template || APP_CONFIG.DEFAULT_SETTINGS.wa_message_template,
       2500

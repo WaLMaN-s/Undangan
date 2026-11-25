@@ -47,9 +47,15 @@ function getGuests(sessionToken, filters) {
   var rsvps = getSheetRecords(APP_CONFIG.SHEETS.RSVP.name);
   var checkins = getSheetRecords(APP_CONFIG.SHEETS.CHECKIN.name);
   var settings = getSettingsMap();
-  var weddings = getSheetRecords(APP_CONFIG.SHEETS.WEDDINGS.name);
-  var wedding = weddings[0] || APP_CONFIG.DEFAULT_WEDDING;
-  var waTemplate = settings.wa_message_template || APP_CONFIG.DEFAULT_SETTINGS.wa_message_template;
+  var wedding = getWeddingConfigData(false);
+  var activeWeddingId = wedding.wedding_id || 'WED-001';
+  var waTemplate = wedding.wa_message_template || settings.wa_message_template || APP_CONFIG.DEFAULT_SETTINGS.wa_message_template;
+
+  // Filter tamu khusus milik klien/wedding aktif (tamu lama tanpa wedding_id dianggap milik WED-001)
+  var clientGuests = guests.filter(function (g) {
+    var gWid = (g.wedding_id && String(g.wedding_id).trim()) || 'WED-001';
+    return gWid === activeWeddingId;
+  });
 
   // Buat map RSVP per guest_id
   var rsvpByGuest = {};
@@ -66,7 +72,7 @@ function getGuests(sessionToken, filters) {
   var baseUrl = getWebAppBaseUrl();
 
   // Gabungkan data
-  var enriched = guests.map(function (g) {
+  var enriched = clientGuests.map(function (g) {
     var gid = String(g.guest_id);
     var rsvp = rsvpByGuest[gid] || null;
     var checkin = checkinByGuest[gid] || null;
@@ -108,6 +114,8 @@ function getGuests(sessionToken, filters) {
       checkin_time: checkin ? checkin.checkin_time : '',
       wa_me_url: waMeUrl,
       rendered_message: renderedMsg,
+      wedding_id: (g.wedding_id && String(g.wedding_id).trim()) || activeWeddingId,
+      locked_theme: (g.locked_theme && String(g.locked_theme).trim()) || '',
       created_at: g.created_at || '',
       updated_at: g.updated_at || g.created_at || ''
     };
@@ -195,10 +203,15 @@ function addGuest(sessionToken, guestData) {
   }
 
   return withScriptLock(function () {
+    var activeWedding = getWeddingConfigData(false);
+    var activeWeddingId = activeWedding.wedding_id || 'WED-001';
+    var activeTheme = activeWedding.invitation_theme || 'elegant_floral';
     var existingGuests = getSheetRecords(APP_CONFIG.SHEETS.GUESTS.name);
 
-    // Deteksi nomor telepon duplikat
+    // Deteksi nomor telepon duplikat pada klien yang sama
     for (var i = 0; i < existingGuests.length; i++) {
+      var gWid = (existingGuests[i].wedding_id && String(existingGuests[i].wedding_id).trim()) || 'WED-001';
+      if (gWid !== activeWeddingId) continue;
       var existingPhone = normalizeIndonesianPhone(existingGuests[i].whatsapp_number);
       if (existingPhone === normalizedPhone) {
         return errorResponse(
@@ -220,7 +233,9 @@ function addGuest(sessionToken, guestData) {
       delivery_status: APP_CONFIG.DELIVERY_STATUS.UNSENT,
       created_at: ts,
       updated_at: ts,
-      invitation_token: tokenBundle.invitation_token
+      invitation_token: tokenBundle.invitation_token,
+      wedding_id: activeWeddingId,
+      locked_theme: activeTheme
     };
 
     appendRecord(APP_CONFIG.SHEETS.GUESTS.name, newGuest);
@@ -439,9 +454,14 @@ function importGuests(sessionToken, payload) {
   }
 
   return withScriptLock(function () {
+    var activeWedding = getWeddingConfigData(false);
+    var activeWeddingId = activeWedding.wedding_id || 'WED-001';
+    var activeTheme = activeWedding.invitation_theme || 'elegant_floral';
     var existingGuests = getSheetRecords(APP_CONFIG.SHEETS.GUESTS.name);
     var phoneSet = {};
     existingGuests.forEach(function (g) {
+      var gWid = (g.wedding_id && String(g.wedding_id).trim()) || 'WED-001';
+      if (gWid !== activeWeddingId) return;
       var p = normalizeIndonesianPhone(g.whatsapp_number);
       if (p) phoneSet[p] = g.guest_name;
     });
@@ -548,7 +568,9 @@ function importGuests(sessionToken, payload) {
         delivery_status: APP_CONFIG.DELIVERY_STATUS.UNSENT,
         created_at: ts,
         updated_at: ts,
-        invitation_token: tokenObj.invitation_token
+        invitation_token: tokenObj.invitation_token,
+        wedding_id: activeWeddingId,
+        locked_theme: activeTheme
       });
     }
 

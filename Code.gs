@@ -43,11 +43,30 @@ function doGet(e) {
       traditional_java: 'ThemeTraditionalJava'
     };
 
-    var selectedThemeKey = params.theme ? String(params.theme).trim().toLowerCase() : '';
-    if (!themeFileMap[selectedThemeKey]) {
+    var selectedThemeKey = '';
+    var isAdminPreview = params.preview === '1' || params.preview === 'true';
+    var matchedGuest = token ? findGuestByRawToken(token) : null;
+    var guestWeddingId = (matchedGuest && matchedGuest.wedding_id) ? String(matchedGuest.wedding_id).trim() : '';
+
+    if (matchedGuest && matchedGuest.locked_theme && themeFileMap[String(matchedGuest.locked_theme).trim().toLowerCase()]) {
+      selectedThemeKey = String(matchedGuest.locked_theme).trim().toLowerCase();
+      if (isAdminPreview && params.theme && themeFileMap[String(params.theme).trim().toLowerCase()]) {
+        selectedThemeKey = String(params.theme).trim().toLowerCase();
+      }
+    } else if (isAdminPreview && params.theme && themeFileMap[String(params.theme).trim().toLowerCase()]) {
+      selectedThemeKey = String(params.theme).trim().toLowerCase();
+    } else {
       try {
-        var weddingCfg = getWeddingConfigData(false);
+        var weddingCfg = getWeddingConfigData(false, guestWeddingId);
         selectedThemeKey = (weddingCfg && weddingCfg.invitation_theme) || 'elegant_floral';
+        if (matchedGuest && !matchedGuest.locked_theme && !isAdminPreview) {
+          try {
+            updateRecordById(APP_CONFIG.SHEETS.GUESTS.name, 'guest_id', matchedGuest.guest_id, {
+              locked_theme: selectedThemeKey,
+              wedding_id: weddingCfg.wedding_id || guestWeddingId || 'WED-001'
+            });
+          } catch (eLock) {}
+        }
       } catch (eTheme) {
         selectedThemeKey = 'elegant_floral';
       }
@@ -131,9 +150,17 @@ function apiDispatcher(action, payload, sessionToken) {
       case 'refreshAllGuestInvitationUrls':
         return refreshAllGuestInvitationUrls(sessionToken);
 
-      // --- Invitation Editor & Settings ---
+      // --- Invitation Editor & Settings & Multi-Client ---
       case 'getWeddingSettingsAdmin':
         return getWeddingSettingsAdmin(sessionToken);
+      case 'listWeddingsAdmin':
+        return listWeddingsAdmin(sessionToken);
+      case 'createWeddingClient':
+        return createWeddingClient(sessionToken, payload);
+      case 'switchActiveWedding':
+        return switchActiveWedding(sessionToken, payload && payload.wedding_id);
+      case 'deleteWeddingClient':
+        return deleteWeddingClient(sessionToken, payload && payload.wedding_id);
       case 'updateWeddingSettings':
         return updateWeddingSettings(sessionToken, payload);
       case 'uploadImageToDrive':

@@ -7,14 +7,46 @@
  */
 
 /**
- * Mengambil konfigurasi pernikahan lengkap (Weddings + Settings + Gallery)
- * menggunakan CacheService untuk mempercepat waktu muat halaman tamu.
+ * Mengambil ID klien/wedding aktif saat ini dari Settings (default: WED-001)
  */
-function getWeddingConfigData(bypassCache) {
+function getActiveWeddingId() {
+  var settings = getSettingsMap();
+  return (settings.active_wedding_id && String(settings.active_wedding_id).trim()) || 'WED-001';
+}
+
+/**
+ * Mengambil ringkasan seluruh klien/wedding untuk dropdown switcher Admin
+ */
+function listAllWeddingsSummary() {
+  var weddings = getSheetRecords(APP_CONFIG.SHEETS.WEDDINGS.name);
+  var globalSettings = getSettingsMap();
+  return weddings.map(function (w) {
+    var wSet = {};
+    try {
+      if (w.settings_json) wSet = JSON.parse(w.settings_json);
+    } catch (e) {}
+    return {
+      wedding_id: w.wedding_id,
+      groom_name: w.groom_name || '',
+      bride_name: w.bride_name || '',
+      wedding_date: w.wedding_date || '',
+      invitation_theme: wSet.invitation_theme || globalSettings.invitation_theme || 'elegant_floral',
+      status: w.status || 'Published'
+    };
+  });
+}
+
+/**
+ * Mengambil konfigurasi pernikahan lengkap (Weddings + Settings + Gallery)
+ * mendukung Multi-Klien (targetWeddingId) dan CacheService.
+ */
+function getWeddingConfigData(bypassCache, targetWeddingId) {
+  var activeId = (targetWeddingId && String(targetWeddingId).trim()) || getActiveWeddingId();
+  var cacheKey = APP_CONFIG.WEDDING_CACHE_KEY + '_' + activeId;
   var cache = CacheService.getScriptCache();
   if (!bypassCache) {
     try {
-      var cachedStr = cache.get(APP_CONFIG.WEDDING_CACHE_KEY);
+      var cachedStr = cache.get(cacheKey);
       if (cachedStr) {
         return JSON.parse(cachedStr);
       }
@@ -27,9 +59,43 @@ function getWeddingConfigData(bypassCache) {
     weddings = getSheetRecords(APP_CONFIG.SHEETS.WEDDINGS.name);
   }
 
-  var wedding = weddings[0] || APP_CONFIG.DEFAULT_WEDDING;
-  var settings = getSettingsMap();
-  var gallery = getSheetRecords(APP_CONFIG.SHEETS.GALLERY.name);
+  var wedding = null;
+  for (var wi = 0; wi < weddings.length; wi++) {
+    if (String(weddings[wi].wedding_id).trim() === activeId) {
+      wedding = weddings[wi];
+      break;
+    }
+  }
+  if (!wedding) {
+    wedding = weddings[0] || APP_CONFIG.DEFAULT_WEDDING;
+  }
+
+  var globalSettings = getSettingsMap();
+  var clientSettings = {};
+  try {
+    if (wedding.settings_json && String(wedding.settings_json).trim()) {
+      clientSettings = JSON.parse(wedding.settings_json);
+    }
+  } catch (eParse) {}
+
+  // Gabungkan: default -> global Settings (khusus WED-001) -> clientSettings (per klien)
+  var settings = {};
+  if (String(wedding.wedding_id) === 'WED-001' || !wedding.settings_json) {
+    Object.keys(globalSettings).forEach(function (k) {
+      settings[k] = globalSettings[k];
+    });
+  }
+  Object.keys(clientSettings).forEach(function (k) {
+    if (clientSettings[k] !== undefined) {
+      settings[k] = clientSettings[k];
+    }
+  });
+
+  var allGallery = getSheetRecords(APP_CONFIG.SHEETS.GALLERY.name);
+  var gallery = allGallery.filter(function (g) {
+    var gWid = (g.wedding_id && String(g.wedding_id).trim()) || 'WED-001';
+    return gWid === String(wedding.wedding_id);
+  });
 
   gallery.sort(function (a, b) {
     return (parseInt(a.display_order, 10) || 0) - (parseInt(b.display_order, 10) || 0);
@@ -111,7 +177,7 @@ function getWeddingConfigData(bypassCache) {
   };
 
   try {
-    cache.put(APP_CONFIG.WEDDING_CACHE_KEY, JSON.stringify(fullConfig), APP_CONFIG.WEDDING_CACHE_TTL);
+    cache.put(cacheKey, JSON.stringify(fullConfig), APP_CONFIG.WEDDING_CACHE_TTL);
   } catch (e3) {}
 
   return fullConfig;
@@ -137,7 +203,116 @@ function getWeddingSettingsAdmin(sessionToken) {
   };
   return okResponse({
     wedding: config,
+    clients: listAllWeddingsSummary(),
+    activeWeddingId: config.wedding_id,
     system: systemProps
+  });
+}
+
+function listWeddingsAdmin(sessionToken) {
+  requireAdmin(sessionToken);
+  return okResponse({
+    clients: listAllWeddingsSummary(),
+    activeWeddingId: getActiveWeddingId()
+  });
+}
+
+function createWeddingClient(sessionToken, payload) {
+  requireAdmin(sessionToken);
+  if (!payload) return errorResponse('Data klien baru tidak boleh kosong.', 'CLIENT_EMPTY');
+
+  return withScriptLock(function () {
+    var groomName = sanitizeString(payload.groom_name || 'Mempelai Pria', 120);
+    var brideName = sanitizeString(payload.bride_name || 'Mempelai Wanita', 120);
+    var weddingDate = sanitizeTextPlain(payload.wedding_date || '2026-12-12', 30);
+    var chosenTheme = sanitizeTextPlain(payload.invitation_theme || 'elegant_floral', 50);
+    var newWeddingId = 'WED-' + Utilities.formatDate(new Date(), 'Asia/Jakarta', 'yyMMddHHmmss');
+
+    var clientSettings = {
+      invitation_theme: chosenTheme,
+      qr_checkin_enabled: 'true',
+      theme_media_json: JSON.stringify(APP_CONFIG.DEFAULT_THEME_MEDIA || {}),
+      groom_nickname: groomName.split(' ')[0] || 'Pria',
+      bride_nickname: brideName.split(' ')[0] || 'Wanita',
+      groom_parents: sanitizeString(payload.groom_parents || 'Putra dari Bpk. ... & Ibu ...', 220),
+      bride_parents: sanitizeString(payload.bride_parents || 'Putri dari Bpk. ... & Ibu ...', 220),
+      groom_photo: APP_CONFIG.DEFAULT_SETTINGS.groom_photo,
+      bride_photo: APP_CONFIG.DEFAULT_SETTINGS.bride_photo,
+      akad_title: 'Akad Nikah',
+      reception_title: 'Resepsi Pernikahan',
+      quote_text: APP_CONFIG.DEFAULT_SETTINGS.quote_text,
+      quote_source: APP_CONFIG.DEFAULT_SETTINGS.quote_source,
+      our_story_json: APP_CONFIG.DEFAULT_SETTINGS.our_story_json,
+      music_url: APP_CONFIG.DEFAULT_SETTINGS.music_url,
+      music_enabled: 'true',
+      closing_text: APP_CONFIG.DEFAULT_SETTINGS.closing_text,
+      wa_message_template: APP_CONFIG.DEFAULT_SETTINGS.wa_message_template
+    };
+
+    var newRow = {
+      wedding_id: newWeddingId,
+      groom_name: groomName,
+      bride_name: brideName,
+      wedding_date: weddingDate,
+      akad_time: sanitizeString(payload.akad_time || '08:00 - 10:00 WIB', 80),
+      reception_time: sanitizeString(payload.reception_time || '11:00 - 14:00 WIB', 80),
+      venue: sanitizeString(payload.venue || 'The Grand Ballroom', 160),
+      address: sanitizeString(payload.address || 'Jakarta, Indonesia', 350),
+      maps_url: sanitizeUrl(payload.maps_url || APP_CONFIG.DEFAULT_WEDDING.maps_url),
+      description: APP_CONFIG.DEFAULT_WEDDING.description,
+      cover_image: APP_CONFIG.DEFAULT_WEDDING.cover_image,
+      status: 'Published',
+      settings_json: JSON.stringify(clientSettings)
+    };
+
+    appendRecord(APP_CONFIG.SHEETS.WEDDINGS.name, newRow);
+    saveSettingsMap({ active_wedding_id: newWeddingId });
+    clearWeddingCache();
+
+    var refreshed = getWeddingConfigData(true, newWeddingId);
+    return okResponse({
+      wedding: refreshed,
+      clients: listAllWeddingsSummary(),
+      activeWeddingId: newWeddingId
+    }, 'Klien baru "' + groomName + ' & ' + brideName + '" berhasil ditambahkan!');
+  });
+}
+
+function switchActiveWedding(sessionToken, weddingId) {
+  requireAdmin(sessionToken);
+  var targetId = String(weddingId || '').trim();
+  if (!targetId) return errorResponse('ID Klien wajib dipilih.', 'CLIENT_MISSING_ID');
+
+  return withScriptLock(function () {
+    saveSettingsMap({ active_wedding_id: targetId });
+    clearWeddingCache();
+    var refreshed = getWeddingConfigData(true, targetId);
+    return okResponse({
+      wedding: refreshed,
+      clients: listAllWeddingsSummary(),
+      activeWeddingId: targetId
+    }, 'Berhasil beralih ke klien: ' + refreshed.groom_name + ' & ' + refreshed.bride_name);
+  });
+}
+
+function deleteWeddingClient(sessionToken, weddingId) {
+  requireAdmin(sessionToken);
+  var targetId = String(weddingId || '').trim();
+  return withScriptLock(function () {
+    var weddings = getSheetRecords(APP_CONFIG.SHEETS.WEDDINGS.name);
+    if (weddings.length <= 1) {
+      return errorResponse('Minimal harus ada 1 klien undangan yang tersisa.', 'CLIENT_MIN_ONE');
+    }
+    deleteRecordsByIds(APP_CONFIG.SHEETS.WEDDINGS.name, 'wedding_id', [targetId]);
+    var remaining = getSheetRecords(APP_CONFIG.SHEETS.WEDDINGS.name);
+    var nextId = remaining[0].wedding_id;
+    saveSettingsMap({ active_wedding_id: nextId });
+    clearWeddingCache();
+    return okResponse({
+      wedding: getWeddingConfigData(true, nextId),
+      clients: listAllWeddingsSummary(),
+      activeWeddingId: nextId
+    }, 'Klien berhasil dihapus.');
   });
 }
 
@@ -151,8 +326,9 @@ function updateWeddingSettings(sessionToken, payload) {
   }
 
   return withScriptLock(function () {
-    var current = getWeddingConfigData(true);
-    var weddingId = current.wedding_id || 'WED-001';
+    var targetWid = (payload.wedding_id && String(payload.wedding_id).trim()) || getActiveWeddingId();
+    var current = getWeddingConfigData(true, targetWid);
+    var weddingId = current.wedding_id || targetWid;
 
     var updatedWeddingRow = {
       wedding_id: weddingId,
@@ -259,12 +435,26 @@ function updateWeddingSettings(sessionToken, payload) {
 
     if (payload.wa_message_template !== undefined) {
       settingsUpdates.wa_message_template = sanitizeTextPlain(payload.wa_message_template, 2000);
+    } else if (current.wa_message_template) {
+      settingsUpdates.wa_message_template = current.wa_message_template;
     }
 
-    saveSettingsMap(settingsUpdates);
+    updatedWeddingRow.settings_json = JSON.stringify(settingsUpdates);
+    var updatedOk = updateRecordById(APP_CONFIG.SHEETS.WEDDINGS.name, 'wedding_id', weddingId, updatedWeddingRow);
+    if (!updatedOk) {
+      appendRecord(APP_CONFIG.SHEETS.WEDDINGS.name, updatedWeddingRow);
+    }
 
-    // Update Galeri jika disertakan
+    if (weddingId === getActiveWeddingId()) {
+      saveSettingsMap(settingsUpdates);
+    }
+
+    // Update Galeri khusus klien ini jika disertakan
     if (Array.isArray(payload.gallery)) {
+      var otherGallery = getSheetRecords(APP_CONFIG.SHEETS.GALLERY.name).filter(function (g) {
+        var gWid = (g.wedding_id && String(g.wedding_id).trim()) || 'WED-001';
+        return gWid !== weddingId;
+      });
       var cleanGallery = payload.gallery
         .map(function (g, idx) {
           var imgUrl = sanitizeUrl(g.image_url);
@@ -278,13 +468,17 @@ function updateWeddingSettings(sessionToken, payload) {
           };
         })
         .filter(Boolean);
-      replaceSheetRecords(APP_CONFIG.SHEETS.GALLERY.name, cleanGallery);
+      replaceSheetRecords(APP_CONFIG.SHEETS.GALLERY.name, otherGallery.concat(cleanGallery));
     }
 
     clearWeddingCache();
-    var refreshed = getWeddingConfigData(true);
+    var refreshed = getWeddingConfigData(true, weddingId);
 
-    return okResponse({ wedding: refreshed }, 'Pengaturan undangan pernikahan berhasil disimpan.');
+    return okResponse({
+      wedding: refreshed,
+      clients: listAllWeddingsSummary(),
+      activeWeddingId: weddingId
+    }, 'Pengaturan undangan klien berhasil disimpan.');
   });
 }
 
@@ -451,7 +645,8 @@ function getInvitationByToken(rawToken) {
     );
   }
 
-  var weddingConfig = getWeddingConfigData(false);
+  var guestWeddingId = (matchedGuest.wedding_id && String(matchedGuest.wedding_id).trim()) || 'WED-001';
+  var weddingConfig = getWeddingConfigData(false, guestWeddingId);
   if (String(weddingConfig.status).toLowerCase() === 'draft') {
     return errorResponse(
       'Undangan saat ini sedang dalam tahap persiapan dan belum dipublikasikan.',
@@ -459,14 +654,34 @@ function getInvitationByToken(rawToken) {
     );
   }
 
-  // Ambil RSVP milik tamu ini & daftar buku ucapan publik (tanpa nomor WA / token)
+  // Kunci tema permanen per link tamu jika belum terkunci
+  var lockedTheme = (matchedGuest.locked_theme && String(matchedGuest.locked_theme).trim()) || '';
+  var effectiveTheme = lockedTheme || weddingConfig.invitation_theme || 'elegant_floral';
+  if (!lockedTheme) {
+    try {
+      updateRecordById(APP_CONFIG.SHEETS.GUESTS.name, 'guest_id', matchedGuest.guest_id, {
+        locked_theme: effectiveTheme,
+        wedding_id: weddingConfig.wedding_id || guestWeddingId
+      });
+    } catch (eLock) {}
+  }
+  var effectiveSlots = (weddingConfig.theme_media && weddingConfig.theme_media[effectiveTheme])
+    ? weddingConfig.theme_media[effectiveTheme]
+    : (weddingConfig.active_theme_slots || {});
+
+  // Ambil RSVP milik tamu ini & daftar buku ucapan publik (khusus klien/wedding yang sama)
   var allRsvps = getSheetRecords(APP_CONFIG.SHEETS.RSVP.name);
   var allGuests = getSheetRecords(APP_CONFIG.SHEETS.GUESTS.name);
   var checkins = getSheetRecords(APP_CONFIG.SHEETS.CHECKIN.name);
 
   var guestNameMap = {};
+  var sameClientGuestMap = {};
   allGuests.forEach(function (g) {
-    guestNameMap[String(g.guest_id)] = g.guest_name || 'Tamu Undangan';
+    var gWid = (g.wedding_id && String(g.wedding_id).trim()) || 'WED-001';
+    if (gWid === String(weddingConfig.wedding_id || guestWeddingId)) {
+      guestNameMap[String(g.guest_id)] = g.guest_name || 'Tamu Undangan';
+      sameClientGuestMap[String(g.guest_id)] = true;
+    }
   });
 
   var myRsvp = null;
@@ -483,7 +698,7 @@ function getInvitationByToken(rawToken) {
       };
     }
 
-    if (r.wishes && String(r.wishes).trim() !== '') {
+    if (sameClientGuestMap[String(r.guest_id)] && r.wishes && String(r.wishes).trim() !== '') {
       publicWishes.push({
         sender_name: guestNameMap[String(r.guest_id)] || 'Sahabat & Keluarga',
         attendance_status: r.attendance_status || APP_CONFIG.RSVP_STATUS.ATTENDING,
@@ -520,10 +735,10 @@ function getInvitationByToken(rawToken) {
       checkin: myCheckin
     },
     wedding: {
-      invitation_theme: weddingConfig.invitation_theme || 'elegant_floral',
+      invitation_theme: effectiveTheme,
       qr_checkin_enabled: weddingConfig.qr_checkin_enabled !== false,
       theme_media: weddingConfig.theme_media || {},
-      active_theme_slots: weddingConfig.active_theme_slots || {},
+      active_theme_slots: effectiveSlots,
       groom_name: weddingConfig.groom_name,
       bride_name: weddingConfig.bride_name,
       groom_nickname: weddingConfig.groom_nickname,

@@ -558,11 +558,12 @@
             <span class="badge badge-gold">${escapeHtml(g.category)}</span>
           </td>
           <td>
-            <div style="display:flex; align-items:center; gap:6px;">
+            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
               <button type="button" class="btn btn-outline btn-sm" onclick="copyTextToClipboard('${escapeHtml(g.invitation_url)}', 'Link undangan ${escapeHtml(g.guest_name)} disalin!')" title="Salin Link Undangan">
                 <i data-lucide="copy" style="width:13px;height:13px;"></i>
                 <span>Salin Link</span>
               </button>
+              ${g.locked_theme ? `<span class="badge badge-neutral" style="font-size:10px;" title="Tema terkunci permanen untuk link ini">🔒 ${escapeHtml(g.locked_theme)}</span>` : ''}
               <button type="button" class="btn btn-secondary btn-sm" onclick="openQrPreviewModal('${escapeHtml(g.guest_id)}')" title="Lihat QR Code & Link">
                 <i data-lucide="qr-code" style="width:13px;height:13px;"></i>
               </button>
@@ -939,6 +940,7 @@
       const sys = res.data.system;
       ADMIN_STATE.weddingConfig = w;
       ADMIN_STATE.systemConfig = sys;
+      renderClientSwitcherBar(res.data.clients || [], res.data.activeWeddingId || w.wedding_id);
 
       document.getElementById('edStatus').value = w.status || 'Published';
       const activeTheme = w.invitation_theme || 'elegant_floral';
@@ -1654,6 +1656,7 @@
       : true;
     try {
       const res = await callBackend('updateWeddingSettings', {
+        wedding_id: (ADMIN_STATE.weddingConfig && ADMIN_STATE.weddingConfig.wedding_id) || '',
         invitation_theme: themeId,
         qr_checkin_enabled: qrEnabled,
         theme_media: ADMIN_STATE.themeMediaDraft
@@ -2064,6 +2067,112 @@
     `;
   }
 
+  function renderClientSwitcherBar(clients, activeId) {
+    const sel = document.getElementById('activeClientSelector');
+    if (!sel) return;
+    if (!Array.isArray(clients) || !clients.length) return;
+    sel.innerHTML = clients.map((c) => {
+      const label = `${c.groom_name || 'Pria'} & ${c.bride_name || 'Wanita'} (${c.wedding_date || '-'})`;
+      const selected = String(c.wedding_id) === String(activeId) ? 'selected' : '';
+      return `<option value="${escapeHtml(c.wedding_id)}" ${selected}>${escapeHtml(label)}</option>`;
+    }).join('');
+  }
+
+  async function handleSwitchClient(weddingId) {
+    if (!weddingId) return;
+    showToast('info', 'Mengganti klien aktif...');
+    try {
+      const res = await callBackend('switchActiveWedding', { wedding_id: weddingId });
+      if (!res || !res.success) {
+        Swal.fire('Gagal', (res && res.message) || 'Tidak dapat mengganti klien.', 'error');
+        return;
+      }
+      await Promise.all([
+        loadOverviewDashboard(),
+        loadInvitationEditorAndSettings()
+      ]);
+      if (ADMIN_STATE.currentView === 'guests') loadGuestsTable(1);
+      if (ADMIN_STATE.currentView === 'whatsapp') loadMessageHistory();
+      if (ADMIN_STATE.currentView === 'rsvp') loadRSVPManagement();
+      if (ADMIN_STATE.currentView === 'checkin') loadCheckinView();
+      showToast('success', res.message);
+    } catch (err) {
+      Swal.fire('Error', err.message, 'error');
+    }
+  }
+
+  async function openNewClientModal() {
+    const { value: formValues } = await Swal.fire({
+      title: 'Tambah Klien / Proyek Undangan Baru',
+      html: `
+        <div style="text-align:left; display:flex; flex-direction:column; gap:10px; margin-top:8px;">
+          <div>
+            <label style="font-size:12px; font-weight:600;">Nama Mempelai Pria</label>
+            <input id="ncGroomName" class="swal2-input" style="margin:4px 0 0; width:100%;" placeholder="Contoh: Andi Pratama">
+          </div>
+          <div>
+            <label style="font-size:12px; font-weight:600;">Nama Mempelai Wanita</label>
+            <input id="ncBrideName" class="swal2-input" style="margin:4px 0 0; width:100%;" placeholder="Contoh: Sari Wijaya">
+          </div>
+          <div>
+            <label style="font-size:12px; font-weight:600;">Tanggal Acara</label>
+            <input id="ncWeddingDate" type="date" class="swal2-input" style="margin:4px 0 0; width:100%;" value="2026-12-20">
+          </div>
+          <div>
+            <label style="font-size:12px; font-weight:600;">Pilih Tema Awal</label>
+            <select id="ncTheme" class="swal2-input" style="margin:4px 0 0; width:100%;">
+              <option value="elegant_floral">1. Elegant Floral</option>
+              <option value="batak_heritage">2. Batak Heritage</option>
+              <option value="modern_minimalist">3. Modern Minimalist</option>
+              <option value="romantic_sunset">4. Romantic Sunset</option>
+              <option value="dark_luxury">5. Dark Luxury</option>
+              <option value="thelove_cinematic">6. Thelove Cinematic</option>
+              <option value="dark_boho">7. Dark Boho</option>
+              <option value="cypress_linen">8. Cypress &amp; Linen</option>
+              <option value="first_class_vows">9. First Class Vows</option>
+              <option value="traditional_java">10. Traditional Java</option>
+            </select>
+          </div>
+        </div>
+      `,
+      focusConfirm: false,
+      showCancelButton: true,
+      confirmButtonColor: '#B99A62',
+      confirmButtonText: 'Buat Klien Baru',
+      cancelButtonText: 'Batal',
+      preConfirm: () => {
+        const g = document.getElementById('ncGroomName').value.trim();
+        const b = document.getElementById('ncBrideName').value.trim();
+        const d = document.getElementById('ncWeddingDate').value;
+        const t = document.getElementById('ncTheme').value;
+        if (!g || !b) {
+          Swal.showValidationMessage('Nama mempelai pria & wanita wajib diisi.');
+          return false;
+        }
+        return { groom_name: g, bride_name: b, wedding_date: d, invitation_theme: t };
+      }
+    });
+    if (!formValues) return;
+
+    showToast('info', 'Membuat ruang proyek klien baru...');
+    try {
+      const res = await callBackend('createWeddingClient', formValues);
+      if (!res || !res.success) {
+        Swal.fire('Gagal', (res && res.message) || 'Gagal membuat klien baru.', 'error');
+        return;
+      }
+      await Promise.all([
+        loadOverviewDashboard(),
+        loadInvitationEditorAndSettings()
+      ]);
+      switchAdminView('editor');
+      setEditorStep(1);
+      showToast('success', res.message);
+    } catch (err) {
+      Swal.fire('Error', err.message, 'error');
+    }
+  }
+
   async function handleSaveInvitationEditor(event) {
     if (event && event.preventDefault) event.preventDefault();
     const activeTheme = document.getElementById('edInvitationTheme').value || 'elegant_floral';
@@ -2071,6 +2180,7 @@
       ? document.getElementById('edQrCheckinEnabled').value === 'true'
       : true;
     const payload = {
+      wedding_id: (ADMIN_STATE.weddingConfig && ADMIN_STATE.weddingConfig.wedding_id) || '',
       invitation_theme: activeTheme,
       qr_checkin_enabled: qrEnabled,
       theme_media: ADMIN_STATE.themeMediaDraft || {},
@@ -2126,7 +2236,7 @@
         if (firstGuest.invitation_url) {
           const sep = firstGuest.invitation_url.indexOf('?') === -1 ? '?' : '&';
           const previewUrl = chosenTheme
-            ? (firstGuest.invitation_url + sep + 'theme=' + encodeURIComponent(chosenTheme))
+            ? (firstGuest.invitation_url + sep + 'preview=1&theme=' + encodeURIComponent(chosenTheme))
             : firstGuest.invitation_url;
           window.open(previewUrl, '_blank', 'noopener,noreferrer');
           return;

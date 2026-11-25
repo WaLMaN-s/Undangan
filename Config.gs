@@ -69,7 +69,8 @@ var APP_CONFIG = {
         'maps_url',
         'description',
         'cover_image',
-        'status'
+        'status',
+        'settings_json'
       ]
     },
     GUESTS: {
@@ -84,7 +85,9 @@ var APP_CONFIG = {
         'delivery_status',
         'created_at',
         'updated_at',
-        'invitation_token'
+        'invitation_token',
+        'wedding_id',
+        'locked_theme'
       ]
     },
     MESSAGES: {
