@@ -460,12 +460,12 @@
               <form id="invitationEditorForm" action="javascript:void(0);" onsubmit="handleSaveInvitationEditor(event); return false;">
                 <input type="hidden" id="edInvitationTheme" value="elegant_floral">
 
-                <!-- 0. Pilihan Template Desain Undangan (5 Desain Berbeda) -->
+                <!-- 0. Katalog Desain Undangan Digital (Gaya our-wedding.link/design) -->
                 <div class="card" style="border-color:var(--primary);">
                   <div class="card-header">
                     <div>
-                      <div class="card-title">Pilih Template Desain Undangan Digital (5 Desain Berbeda)</div>
-                      <div class="card-subtitle">Setiap template memiliki layout, ornamen visual, animasi, dan karakter desain yang berbeda</div>
+                      <div class="card-title">Katalog Desain Undangan Digital (6 Tema 3D)</div>
+                      <div class="card-subtitle">Pilih desain sesuai gaya &amp; warna favoritmu, filter berdasarkan kategori, atau klik Coba Langsung</div>
                     </div>
                     <button type="button" class="btn btn-primary btn-sm" onclick="handleQuickApplyTheme()">
                       <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
@@ -473,80 +473,178 @@
                     </button>
                   </div>
                   <div class="card-body">
-                    <div class="theme-selector-grid">
-                      <!-- 1. Elegant Floral -->
-                      <div class="theme-option-card active" data-theme-card="elegant_floral" onclick="selectInvitationTheme('elegant_floral')">
-                        <div class="theme-swatch-row">
-                          <span class="theme-swatch-circle" style="background:#FAF7F0;"></span>
-                          <span class="theme-swatch-circle" style="background:#FFFFFF;"></span>
-                          <span class="theme-swatch-circle" style="background:#B99A62;"></span>
-                          <span class="theme-active-check">Aktif</span>
+                    <!-- Featured Hero Showcase (our-wedding.link/design style) -->
+                    <div id="owlFeaturedShowcase" class="owl-showcase-banner">
+                      <div class="owl-showcase-info">
+                        <div class="owl-showcase-eyebrow">
+                          <span class="owl-badge-luxury" id="owlHeroBadge">Desain Pilihan</span>
+                          <span class="owl-hero-tags" id="owlHeroTags">Animasi 3D · Floral · Elegan</span>
                         </div>
-                        <div class="theme-option-title">1. Elegant Floral</div>
-                        <div class="theme-option-desc">Ivory, Cream, Putih &amp; Gold. Dihiasi garland bunga putih, daun natural, animasi kelopak bunga jatuh &amp; tipografi serif romantis.</div>
+                        <div class="owl-hero-title" id="owlHeroTitle">Elegant <span class="owl-script">Floral</span></div>
+                        <p class="owl-hero-desc" id="owlHeroDesc">Taman bunga ivory &amp; gold dengan lengkung katedral, kelopak bunga jatuh, dan efek 3D Book Page Flip.</p>
+                        <div class="owl-hero-actions">
+                          <button type="button" class="btn btn-primary btn-sm" onclick="handleQuickApplyTheme()">
+                            <i data-lucide="check-circle" style="width:14px;height:14px;"></i>
+                            <span>Terapkan Tema Ini</span>
+                          </button>
+                          <button type="button" class="btn btn-outline btn-sm" onclick="openSampleGuestInvitation()">
+                            <i data-lucide="external-link" style="width:14px;height:14px;"></i>
+                            <span>Coba Langsung</span>
+                          </button>
+                        </div>
+                      </div>
+                      <div class="owl-showcase-phones" id="owlHeroPhones" aria-hidden="true"></div>
+                    </div>
+
+                    <!-- Category Filter Pills -->
+                    <div class="owl-filter-bar" id="owlCategoryFilterBar">
+                      <button type="button" class="owl-filter-pill active" data-filter="all" onclick="filterThemeCatalog('all')">Semua (6)</button>
+                      <button type="button" class="owl-filter-pill" data-filter="floral" onclick="filterThemeCatalog('floral')">Floral &amp; Elegan</button>
+                      <button type="button" class="owl-filter-pill" data-filter="adat" onclick="filterThemeCatalog('adat')">Adat &amp; Budaya</button>
+                      <button type="button" class="owl-filter-pill" data-filter="minimalis" onclick="filterThemeCatalog('minimalis')">Minimalis</button>
+                      <button type="button" class="owl-filter-pill" data-filter="3d" onclick="filterThemeCatalog('3d')">Animasi 3D</button>
+                      <button type="button" class="owl-filter-pill" data-filter="dark" onclick="filterThemeCatalog('dark')">Dark &amp; Moody</button>
+                    </div>
+
+                    <div class="owl-catalog-grid">
+                      <!-- 1. Elegant Floral -->
+                      <div class="owl-theme-card active" data-theme-card="elegant_floral" data-tags="all floral 3d" onclick="selectInvitationTheme('elegant_floral')">
+                        <div class="owl-card-stage" style="background:linear-gradient(145deg,#FAF7F0,#EFE6D5);">
+                          <span class="owl-card-slot-pill">6 Foto</span>
+                          <span class="theme-active-check">Aktif</span>
+                          <div class="owl-mini-phone" style="background:radial-gradient(circle at 50% 20%,#FFF,#FAF7F0); color:#2C2822; border-color:#D8C9AE;">
+                            <div class="owl-mini-eyebrow" style="color:#B99A62;">THE WEDDING OF</div>
+                            <div class="owl-mini-couple" style="font-family:'Cormorant Garamond',serif;">Romeo &amp; Juliet</div>
+                            <div class="owl-mini-arch" style="border-color:#B99A62; border-radius:42px 42px 8px 8px; background:url('https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=400&q=70') center/cover;"></div>
+                            <div class="owl-mini-btn" style="background:#B99A62; color:#FFF;">Buka Undangan</div>
+                          </div>
+                        </div>
+                        <div class="owl-card-body">
+                          <div class="owl-card-tags">Animasi 3D · Floral · Elegan</div>
+                          <div class="owl-card-title">Elegant <span class="owl-script">Floral</span></div>
+                          <div class="owl-card-desc">Nuansa Ivory, Putih &amp; Gold dengan lengkung floral, kelopak bunga jatuh &amp; 3D Book Flip.</div>
+                          <div class="owl-card-actions">
+                            <button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="event.stopPropagation(); selectInvitationTheme('elegant_floral')">Pilih Tema</button>
+                            <button type="button" class="btn btn-outline btn-sm" onclick="event.stopPropagation(); previewSpecificThemeTab('elegant_floral')">Coba</button>
+                          </div>
+                        </div>
                       </div>
 
                       <!-- 2. Batak Heritage -->
-                      <div class="theme-option-card" data-theme-card="batak_heritage" onclick="selectInvitationTheme('batak_heritage')">
-                        <div class="theme-swatch-row">
-                          <span class="theme-swatch-circle" style="background:#7A1215;"></span>
-                          <span class="theme-swatch-circle" style="background:#141010;"></span>
-                          <span class="theme-swatch-circle" style="background:#F7EFE2;"></span>
-                          <span class="theme-swatch-circle" style="background:#D4AF37;"></span>
+                      <div class="owl-theme-card" data-theme-card="batak_heritage" data-tags="all adat 3d dark" onclick="selectInvitationTheme('batak_heritage')">
+                        <div class="owl-card-stage" style="background:linear-gradient(145deg,#2B090B,#140B0B);">
+                          <span class="owl-card-slot-pill">8 Foto</span>
                           <span class="theme-active-check">Aktif</span>
+                          <div class="owl-mini-phone" style="background:radial-gradient(circle at 50% 20%,rgba(122,18,21,0.7),#140E0E); color:#F7EFE2; border-color:#D4AF37;">
+                            <div style="height:5px; width:100%; background:repeating-linear-gradient(90deg,#7A1215 0 6px,#D4AF37 6px 8px,#121010 8px 13px); margin-bottom:4px;"></div>
+                            <div class="owl-mini-eyebrow" style="color:#D4AF37;">HORAS • ADAT BATAK</div>
+                            <div class="owl-mini-couple" style="font-family:'Playfair Display',serif;">Romeo &amp; Juliet</div>
+                            <div class="owl-mini-arch" style="border-color:#D4AF37; border-radius:10px; background:url('https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=400&q=70') center/cover;"></div>
+                            <div class="owl-mini-btn" style="background:#7A1215; color:#D4AF37; border:1px solid #D4AF37;">Buka Undangan</div>
+                          </div>
                         </div>
-                        <div class="theme-option-title">2. Batak Heritage</div>
-                        <div class="theme-option-desc">Merah Marun, Hitam, Cream &amp; Gold. Dilengkapi ukiran Gorga Batak, pita tenun Motif Ulos, siluet Rumah Bolon &amp; bingkai oktagonal.</div>
+                        <div class="owl-card-body">
+                          <div class="owl-card-tags">Adat Batak · Animasi 3D · Ulos</div>
+                          <div class="owl-card-title">Batak <span class="owl-script">Heritage</span></div>
+                          <div class="owl-card-desc">Ukiran Gorga Batak, pita tenun Ulos, siluet Rumah Bolon &amp; gerbang 3D Gorga Fold.</div>
+                          <div class="owl-card-actions">
+                            <button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="event.stopPropagation(); selectInvitationTheme('batak_heritage')">Pilih Tema</button>
+                            <button type="button" class="btn btn-outline btn-sm" onclick="event.stopPropagation(); previewSpecificThemeTab('batak_heritage')">Coba</button>
+                          </div>
+                        </div>
                       </div>
 
                       <!-- 3. Modern Minimalist -->
-                      <div class="theme-option-card" data-theme-card="modern_minimalist" onclick="selectInvitationTheme('modern_minimalist')">
-                        <div class="theme-swatch-row">
-                          <span class="theme-swatch-circle" style="background:#EAE2D6;"></span>
-                          <span class="theme-swatch-circle" style="background:#FFFFFF;"></span>
-                          <span class="theme-swatch-circle" style="background:#8C7055;"></span>
+                      <div class="owl-theme-card" data-theme-card="modern_minimalist" data-tags="all minimalis 3d" onclick="selectInvitationTheme('modern_minimalist')">
+                        <div class="owl-card-stage" style="background:linear-gradient(145deg,#F3EFE8,#E5DDD0);">
+                          <span class="owl-card-slot-pill">5 Foto</span>
                           <span class="theme-active-check">Aktif</span>
+                          <div class="owl-mini-phone" style="background:#FAF8F5; color:#23201D; border-color:#C7B8A3; text-align:left; align-items:flex-start;">
+                            <div style="border:1px solid #8C7055; padding:1px 5px; font-size:8px; font-weight:700; margin-bottom:4px;">R|J</div>
+                            <div class="owl-mini-couple" style="font-family:'Playfair Display',serif; font-size:12px;">Romeo &amp; Juliet</div>
+                            <div class="owl-mini-arch" style="border-color:#8C7055; border-radius:2px; width:100%; box-shadow:4px 4px 0 #E2DBD0; background:url('https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=400&q=70') center/cover;"></div>
+                            <div class="owl-mini-btn" style="background:#23201D; color:#FFF; border-radius:2px; width:100%;">Buka Undangan</div>
+                          </div>
                         </div>
-                        <div class="theme-option-title">3. Modern Minimalist</div>
-                        <div class="theme-option-desc">Beige, Putih, Ivory &amp; Cokelat Muda. Layout editorial asimetris rata kiri, Monogram Pasangan (R|J), whitespace luas &amp; garis arsitektural.</div>
+                        <div class="owl-card-body">
+                          <div class="owl-card-tags">Minimalis · Editorial · 3D Parallax</div>
+                          <div class="owl-card-title">Modern <span class="owl-script">Minimalist</span></div>
+                          <div class="owl-card-desc">Layout editorial asimetris bersih, Monogram R|J, whitespace luas &amp; 3D Isometric Slide.</div>
+                          <div class="owl-card-actions">
+                            <button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="event.stopPropagation(); selectInvitationTheme('modern_minimalist')">Pilih Tema</button>
+                            <button type="button" class="btn btn-outline btn-sm" onclick="event.stopPropagation(); previewSpecificThemeTab('modern_minimalist')">Coba</button>
+                          </div>
+                        </div>
                       </div>
 
                       <!-- 4. Romantic Sunset -->
-                      <div class="theme-option-card" data-theme-card="romantic_sunset" onclick="selectInvitationTheme('romantic_sunset')">
-                        <div class="theme-swatch-row">
-                          <span class="theme-swatch-circle" style="background:#F4A27E;"></span>
-                          <span class="theme-swatch-circle" style="background:#FAD6BE;"></span>
-                          <span class="theme-swatch-circle" style="background:#D97952;"></span>
+                      <div class="owl-theme-card" data-theme-card="romantic_sunset" data-tags="all floral 3d" onclick="selectInvitationTheme('romantic_sunset')">
+                        <div class="owl-card-stage" style="background:linear-gradient(145deg,#FAD4B8,#F4A27E);">
+                          <span class="owl-card-slot-pill">7 Foto</span>
                           <span class="theme-active-check">Aktif</span>
+                          <div class="owl-mini-phone" style="background:linear-gradient(180deg,#F4A27E,#FAD4B8 45%,#FFF6EE); color:#3D2226; border-color:#D97952;">
+                            <div class="owl-mini-eyebrow" style="color:#FFF;">GOLDEN HOUR</div>
+                            <div class="owl-mini-couple" style="font-family:'Cormorant Garamond',serif;">Romeo &amp; Juliet</div>
+                            <div class="owl-mini-arch" style="border-color:#D97952; border-radius:46px 46px 10px 10px; background:url('https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=400&q=70') center/cover;"></div>
+                            <div class="owl-mini-btn" style="background:#D97952; color:#FFF;">Buka Undangan</div>
+                          </div>
                         </div>
-                        <div class="theme-option-title">4. Romantic Sunset</div>
-                        <div class="theme-option-desc">Peach, Soft Orange, Champagne &amp; Gold. Visual gradasi langit senja, cahaya matahari hangat &amp; siluet pemandangan bukit romantis.</div>
+                        <div class="owl-card-body">
+                          <div class="owl-card-tags">Romantis · Senja · 3D Horizon</div>
+                          <div class="owl-card-title">Romantic <span class="owl-script">Sunset</span></div>
+                          <div class="owl-card-desc">Gradasi langit senja peach &amp; champagne dengan siluet bukit dan animasi 3D Horizon Lift.</div>
+                          <div class="owl-card-actions">
+                            <button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="event.stopPropagation(); selectInvitationTheme('romantic_sunset')">Pilih Tema</button>
+                            <button type="button" class="btn btn-outline btn-sm" onclick="event.stopPropagation(); previewSpecificThemeTab('romantic_sunset')">Coba</button>
+                          </div>
+                        </div>
                       </div>
 
                       <!-- 5. Dark Luxury -->
-                      <div class="theme-option-card" data-theme-card="dark_luxury" onclick="selectInvitationTheme('dark_luxury')">
-                        <div class="theme-swatch-row">
-                          <span class="theme-swatch-circle" style="background:#0A1913;"></span>
-                          <span class="theme-swatch-circle" style="background:#050807;"></span>
-                          <span class="theme-swatch-circle" style="background:#F4EFE6;"></span>
-                          <span class="theme-swatch-circle" style="background:#D4AF37;"></span>
+                      <div class="owl-theme-card" data-theme-card="dark_luxury" data-tags="all dark 3d floral" onclick="selectInvitationTheme('dark_luxury')">
+                        <div class="owl-card-stage" style="background:linear-gradient(145deg,#14382B,#07120D);">
+                          <span class="owl-card-slot-pill">9 Foto</span>
                           <span class="theme-active-check">Aktif</span>
+                          <div class="owl-mini-phone" style="background:radial-gradient(circle at 50% 0%,#14382B,#091712); color:#F4EFE6; border-color:#D4AF37;">
+                            <div class="owl-mini-eyebrow" style="color:#D4AF37;">ROYAL LUXURY</div>
+                            <div class="owl-mini-couple" style="font-family:'Playfair Display',serif;">Romeo &amp; Juliet</div>
+                            <div class="owl-mini-arch" style="border-color:#D4AF37; border-radius:42px 42px 6px 6px; background:url('https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=400&q=70') center/cover;"></div>
+                            <div class="owl-mini-btn" style="background:linear-gradient(90deg,#B89024,#E8C756); color:#07120D;">Buka Undangan</div>
+                          </div>
                         </div>
-                        <div class="theme-option-title">5. Dark Luxury</div>
-                        <div class="theme-option-desc">Forest Green, Hitam, Ivory &amp; Gold. Layout dramatis bertekstur damask emas, ornamen garis emas &amp; kontras malam eksklusif.</div>
+                        <div class="owl-card-body">
+                          <div class="owl-card-tags">Luxury · Emerald Gold · 3D Portal</div>
+                          <div class="owl-card-title">Dark <span class="owl-script">Luxury</span></div>
+                          <div class="owl-card-desc">Forest green &amp; damask emas eksklusif dengan 3D Gold Portal Zoom &amp; 3D Filmstrip Galeri.</div>
+                          <div class="owl-card-actions">
+                            <button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="event.stopPropagation(); selectInvitationTheme('dark_luxury')">Pilih Tema</button>
+                            <button type="button" class="btn btn-outline btn-sm" onclick="event.stopPropagation(); previewSpecificThemeTab('dark_luxury')">Coba</button>
+                          </div>
+                        </div>
                       </div>
 
-                      <!-- 6. Thelove Cinematic (Ramses & Priska HKBP Style) -->
-                      <div class="theme-option-card" data-theme-card="thelove_cinematic" onclick="selectInvitationTheme('thelove_cinematic')">
-                        <div class="theme-swatch-row">
-                          <span class="theme-swatch-circle" style="background:#1B1B18;"></span>
-                          <span class="theme-swatch-circle" style="background:#242424;"></span>
-                          <span class="theme-swatch-circle" style="background:#CDA062;"></span>
-                          <span class="theme-swatch-circle" style="background:#FFFFFF;"></span>
+                      <!-- 6. Thelove Cinematic -->
+                      <div class="owl-theme-card" data-theme-card="thelove_cinematic" data-tags="all dark 3d" onclick="selectInvitationTheme('thelove_cinematic')">
+                        <div class="owl-card-stage" style="background:linear-gradient(145deg,#2B2B28,#141412);">
+                          <span class="owl-card-slot-pill">12 Foto</span>
                           <span class="theme-active-check">Aktif</span>
+                          <div class="owl-mini-phone" style="background:linear-gradient(180deg,rgba(0,0,0,0.35),#1B1B18 85%),url('https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=400&q=70') center/cover; color:#FFF; border-color:#CDA062; justify-content:space-between;">
+                            <div class="owl-mini-couple" style="font-family:'Great Vibes',cursive; font-size:15px; margin-top:4px;">Romeo &amp; Juliet</div>
+                            <div style="width:100%;">
+                              <div style="font-size:7px; color:#CDA062; margin-bottom:4px;">Full-Bleed Cinematic</div>
+                              <div class="owl-mini-btn" style="background:#313131; color:#FFF; border:1px solid #CDA062; border-radius:4px;">Open Invitation</div>
+                            </div>
+                          </div>
                         </div>
-                        <div class="theme-option-title">6. Thelove Cinematic (12 Foto • 3D Slideshow)</div>
-                        <div class="theme-option-desc">Full-screen cover &amp; 3D hero slideshow (#1B1B18 &amp; #242424), Gold #CDA062, Great Vibes, foto per bab Story, 3D Filmstrip &amp; tanggal 3 kolom.</div>
+                        <div class="owl-card-body">
+                          <div class="owl-card-tags">Dark &amp; Moody · Cinematic · 3D Slideshow</div>
+                          <div class="owl-card-title">Thelove <span class="owl-script">Cinematic</span></div>
+                          <div class="owl-card-desc">Full-screen cover, 3D Hero Slideshow, foto per bab Our Journey, 3D Filmstrip &amp; tanggal 3 kolom.</div>
+                          <div class="owl-card-actions">
+                            <button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="event.stopPropagation(); selectInvitationTheme('thelove_cinematic')">Pilih Tema</button>
+                            <button type="button" class="btn btn-outline btn-sm" onclick="event.stopPropagation(); previewSpecificThemeTab('thelove_cinematic')">Coba</button>
+                          </div>
+                        </div>
                       </div>
                     </div>
 

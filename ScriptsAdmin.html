@@ -1371,6 +1371,131 @@
     }
   }
 
+  const THEME_SHOWCASE_META = {
+    elegant_floral: {
+      badge: 'Desain Floral',
+      tags: 'Animasi 3D · Floral · Elegan',
+      titleHtml: 'Elegant <span class="owl-script">Floral</span>',
+      desc: 'Taman bunga ivory & gold dengan lengkung katedral, kelopak bunga jatuh, dan efek 3D Book Page Flip.',
+      bg: 'radial-gradient(circle at 50% 20%,#FFFFFF,#FAF7F0)',
+      accent: '#B99A62',
+      text: '#2C2822',
+      btnBg: '#B99A62',
+      btnText: '#FFFFFF'
+    },
+    batak_heritage: {
+      badge: 'Desain Adat',
+      tags: 'Adat Batak · Animasi 3D · Ulos',
+      titleHtml: 'Batak <span class="owl-script">Heritage</span>',
+      desc: 'Ukiran Gorga Batak, pita tenun Motif Ulos, siluet Rumah Bolon & animasi pembuka 3D Gorga Gate Fold.',
+      bg: 'radial-gradient(circle at 50% 20%,rgba(122,18,21,0.75),#140E0E)',
+      accent: '#D4AF37',
+      text: '#F7EFE2',
+      btnBg: '#7A1215',
+      btnText: '#D4AF37'
+    },
+    modern_minimalist: {
+      badge: 'Desain Minimalis',
+      tags: 'Minimalis · Editorial · 3D Parallax',
+      titleHtml: 'Modern <span class="owl-script">Minimalist</span>',
+      desc: 'Layout editorial asimetris bersih, Monogram Pasangan R|J, whitespace luas & transisi 3D Isometric Slide.',
+      bg: '#FAF8F5',
+      accent: '#8C7055',
+      text: '#23201D',
+      btnBg: '#23201D',
+      btnText: '#FFFFFF'
+    },
+    romantic_sunset: {
+      badge: 'Desain Romantis',
+      tags: 'Romantis · Senja · 3D Horizon',
+      titleHtml: 'Romantic <span class="owl-script">Sunset</span>',
+      desc: 'Gradasi langit senja peach & champagne dengan siluet bukit dan animasi 3D Horizon Lift.',
+      bg: 'linear-gradient(180deg,#F4A27E,#FAD4B8 45%,#FFF6EE)',
+      accent: '#D97952',
+      text: '#3D2226',
+      btnBg: '#D97952',
+      btnText: '#FFFFFF'
+    },
+    dark_luxury: {
+      badge: 'Desain Luxury',
+      tags: 'Luxury · Emerald Gold · 3D Portal',
+      titleHtml: 'Dark <span class="owl-script">Luxury</span>',
+      desc: 'Forest green & damask emas eksklusif dengan 3D Gold Portal Zoom & 3D Filmstrip Galeri.',
+      bg: 'radial-gradient(circle at 50% 0%,#14382B,#091712)',
+      accent: '#D4AF37',
+      text: '#F4EFE6',
+      btnBg: '#D4AF37',
+      btnText: '#07120D'
+    },
+    thelove_cinematic: {
+      badge: 'Desain Cinematic',
+      tags: 'Dark & Moody · Cinematic · 3D Slideshow',
+      titleHtml: 'Thelove <span class="owl-script">Cinematic</span>',
+      desc: 'Full-screen cover, 3D Hero Slideshow, foto per bab Our Journey, 3D Filmstrip & tanggal 3 kolom.',
+      bg: '#1B1B18',
+      accent: '#CDA062',
+      text: '#FFFFFF',
+      btnBg: '#313131',
+      btnText: '#FFFFFF'
+    }
+  };
+
+  function filterThemeCatalog(tag) {
+    document.querySelectorAll('#owlCategoryFilterBar .owl-filter-pill').forEach((btn) => {
+      btn.classList.toggle('active', btn.getAttribute('data-filter') === tag);
+    });
+    document.querySelectorAll('.owl-theme-card').forEach((card) => {
+      const tags = (card.getAttribute('data-tags') || '').split(' ');
+      card.style.display = (tag === 'all' || tags.indexOf(tag) !== -1) ? 'flex' : 'none';
+    });
+  }
+
+  function updateOwlShowcaseBanner(themeId) {
+    const meta = THEME_SHOWCASE_META[themeId] || THEME_SHOWCASE_META.elegant_floral;
+    const slotMap = ensureThemeSlotMap(themeId);
+    const coverUrl = slotMap.cover_photo || 'https:\/\/images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=400&q=70';
+    const heroUrl = slotMap.hero_photo || coverUrl;
+
+    const badgeEl = document.getElementById('owlHeroBadge');
+    const tagsEl = document.getElementById('owlHeroTags');
+    const titleEl = document.getElementById('owlHeroTitle');
+    const descEl = document.getElementById('owlHeroDesc');
+    const phonesEl = document.getElementById('owlHeroPhones');
+
+    if (badgeEl) badgeEl.textContent = meta.badge;
+    if (tagsEl) tagsEl.textContent = meta.tags;
+    if (titleEl) titleEl.innerHTML = meta.titleHtml;
+    if (descEl) descEl.textContent = meta.desc;
+    if (phonesEl) {
+      phonesEl.innerHTML = `
+        <div class="owl-stack-phone side-left" style="background:${meta.bg}; color:${meta.text}; border-color:${meta.accent};">
+          <div style="font-size:6.5px; letter-spacing:0.12em; color:${meta.accent}; margin-bottom:4px;">COUNTDOWN</div>
+          <div style="width:100%; height:64px; border-radius:6px; background:url('${escapeHtml(heroUrl)}') center/cover; margin-bottom:5px;"></div>
+          <div style="font-size:7.5px; font-weight:700;">Save The Date</div>
+        </div>
+        <div class="owl-stack-phone center" style="background:${meta.bg}; color:${meta.text}; border-color:${meta.accent};">
+          <div style="font-size:6px; letter-spacing:0.14em; color:${meta.accent};">THE WEDDING</div>
+          <div style="font-family:var(--font-heading); font-size:11px; font-weight:700; margin:3px 0;">Romeo &amp; Juliet</div>
+          <div style="width:52px; height:64px; border-radius:26px 26px 6px 6px; border:1.5px solid ${meta.accent}; background:url('${escapeHtml(coverUrl)}') center/cover; margin:3px 0;"></div>
+          <div style="font-size:7px; font-weight:700; padding:3px 8px; border-radius:99px; background:${meta.btnBg}; color:${meta.btnText}; margin-top:4px;">Buka Undangan</div>
+        </div>
+        <div class="owl-stack-phone side-right" style="background:${meta.bg}; color:${meta.text}; border-color:${meta.accent};">
+          <div style="font-size:6.5px; letter-spacing:0.12em; color:${meta.accent}; margin-bottom:4px;">GALLERY</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:3px; width:100%;">
+            <div style="height:40px; border-radius:4px; background:url('${escapeHtml(coverUrl)}') center/cover;"></div>
+            <div style="height:40px; border-radius:4px; background:url('${escapeHtml(heroUrl)}') center/cover;"></div>
+          </div>
+          <div style="font-size:7.5px; font-weight:700; margin-top:6px;">Our Story</div>
+        </div>
+      `;
+    }
+  }
+
+  async function previewSpecificThemeTab(themeId) {
+    selectInvitationTheme(themeId);
+    await openSampleGuestInvitation();
+  }
+
   function selectInvitationTheme(themeId) {
     const chosen = THEME_LABELS[themeId] ? themeId : 'elegant_floral';
     const hiddenInput = document.getElementById('edInvitationTheme');
@@ -1390,6 +1515,7 @@
       badge.textContent = THEME_LABELS[chosen] || '1. Elegant Floral';
     }
 
+    updateOwlShowcaseBanner(chosen);
     renderThemePhotoSlotsEditor(chosen);
     renderFullInteractivePhonePreview(chosen);
   }
