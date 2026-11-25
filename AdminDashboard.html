@@ -825,12 +825,129 @@
                     </div>
                   </div>
 
+                  <!-- Pengaturan & Informasi Khusus Tema Terpilih (Berbeda Setiap Tema!) -->
+                  <div id="themeSpecificConfigCard" class="card" style="border-color:var(--primary);">
+                    <div class="card-header">
+                      <div>
+                        <div class="card-title" id="themeSpecificTitle">Pengaturan Khusus Tema Terpilih</div>
+                        <div class="card-subtitle" id="themeSpecificSubtitle">Field, opsi cover, section toggle, dan info tampilan yang menyesuaikan tema pilihan Anda</div>
+                      </div>
+                      <span id="themeSpecificBadge" class="badge badge-gold">Tema Spesifik</span>
+                    </div>
+                    <div class="card-body">
+                      <div id="otherThemeSpecificBanner" style="display:none; background:var(--secondary); border:1px solid var(--border); border-radius:10px; padding:12px 14px; font-size:12.5px; color:var(--text-secondary); margin-bottom:12px;"></div>
+
+                      <!-- Detail Tambahan Profil & Galeri (Bermanfaat untuk Dark Boho & Tema Lain) -->
+                      <div id="coupleExtendedMetaGroup">
+                        <div class="grid-2">
+                          <div class="form-group">
+                            <label class="form-label">Kota Asal Mempelai Pria</label>
+                            <input type="text" id="edGroomOrigin" class="form-control" placeholder="Contoh: Jakarta Selatan" oninput="updateLiveMobilePreview()">
+                          </div>
+                          <div class="form-group">
+                            <label class="form-label">Kota Asal Mempelai Wanita</label>
+                            <input type="text" id="edBrideOrigin" class="form-control" placeholder="Contoh: Bandung" oninput="updateLiveMobilePreview()">
+                          </div>
+                        </div>
+                        <div class="grid-2">
+                          <div class="form-group">
+                            <label class="form-label">Instagram Pria (Opsional)</label>
+                            <input type="text" id="edGroomIg" class="form-control" placeholder="@romeo.montague" oninput="updateLiveMobilePreview()">
+                          </div>
+                          <div class="form-group">
+                            <label class="form-label">Instagram Wanita (Opsional)</label>
+                            <input type="text" id="edBrideIg" class="form-control" placeholder="@juliet.capulet" oninput="updateLiveMobilePreview()">
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Panel Eksklusif Tema DARK BOHO -->
+                      <div id="darkBohoSpecificPanel" style="display:none; background:rgba(181,101,29,0.06); border:1px solid rgba(181,101,29,0.35); border-radius:12px; padding:14px;">
+                        <div style="font-weight:700; font-size:13px; color:#8C4810; margin-bottom:10px;">✦ Pengaturan Cover, Layout &amp; Toggle Section Dark Boho</div>
+                        <div class="grid-3">
+                          <div class="form-group">
+                            <label class="form-label">Gaya Tata Letak Cover</label>
+                            <select id="edCoverStyle" class="form-control" onchange="updateLiveMobilePreview()">
+                              <option value="space-between">Space Between (Atas-Bawah)</option>
+                              <option value="default">Default (Tengah Penuh)</option>
+                              <option value="top-cover">Top Cover (Merapat ke Atas)</option>
+                            </select>
+                          </div>
+                          <div class="form-group">
+                            <label class="form-label">Pakai Foto Background Cover</label>
+                            <select id="edCoverUsePhoto" class="form-control" onchange="updateLiveMobilePreview()">
+                              <option value="true">Ya (Tampilkan Foto Cover)</option>
+                              <option value="false">Tidak (Gradasi Charcoal Solid)</option>
+                            </select>
+                          </div>
+                          <div class="form-group">
+                            <label class="form-label">Tampilkan Nama Tamu di Cover</label>
+                            <select id="edCoverShowGuest" class="form-control" onchange="updateLiveMobilePreview()">
+                              <option value="true">Tampilkan "Kepada Yth."</option>
+                              <option value="false">Sembunyikan Nama Tamu</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="grid-3">
+                          <div class="form-group">
+                            <label class="form-label">Warna Overlay Cover</label>
+                            <input type="color" id="edCoverOverlayColor" class="form-control" value="#1d1d1b" style="height:40px; padding:4px;" oninput="updateLiveMobilePreview()">
+                          </div>
+                          <div class="form-group">
+                            <label class="form-label">Opacity Overlay (0.1 - 0.95)</label>
+                            <input type="number" id="edCoverOverlayOpacity" class="form-control" min="0.1" max="0.95" step="0.05" value="0.68" oninput="updateLiveMobilePreview()">
+                          </div>
+                          <div class="form-group">
+                            <label class="form-label">Warna Teks Cover</label>
+                            <input type="color" id="edCoverTextColor" class="form-control" value="#efe6d8" style="height:40px; padding:4px;" oninput="updateLiveMobilePreview()">
+                          </div>
+                        </div>
+                        <div class="grid-2">
+                          <div class="form-group">
+                            <label class="form-label">Posisi Section Peta &amp; RSVP</label>
+                            <select id="edBohoRsvpMapPosition" class="form-control" onchange="updateLiveMobilePreview()">
+                              <option value="separate_sections">Section Terpisah (Setelah Video &amp; Galeri)</option>
+                              <option value="below_event">Tepat di Bawah Jadwal Acara</option>
+                            </select>
+                          </div>
+                          <div class="form-group">
+                            <label class="form-label">Kutipan Galeri "Precious Moment"</label>
+                            <input type="text" id="edGalleryQuote" class="form-control" placeholder="Every moment with you feels like home..." oninput="updateLiveMobilePreview()">
+                          </div>
+                        </div>
+                        <div class="grid-3" style="margin-top:4px;">
+                          <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label">Section Video Prewedding</label>
+                            <select id="edSectionVideoEnabled" class="form-control" onchange="updateLiveMobilePreview()">
+                              <option value="true">Aktif (ON)</option>
+                              <option value="false">Matikan (OFF)</option>
+                            </select>
+                          </div>
+                          <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label">Section Live Streaming</label>
+                            <select id="edSectionLivestreamEnabled" class="form-control" onchange="updateLiveMobilePreview()">
+                              <option value="true">Aktif (ON)</option>
+                              <option value="false">Matikan (OFF)</option>
+                            </select>
+                          </div>
+                          <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label">Section Amplop Digital</label>
+                            <select id="edSectionGiftEnabled" class="form-control" onchange="updateLiveMobilePreview()">
+                              <option value="true">Aktif (ON)</option>
+                              <option value="false">Matikan (OFF)</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                 <!-- 0B. Slot Foto Dinamis Khusus Tema Ini (Berbeda Jumlah & Fungsi per Tema) -->
                 <div class="card" style="border-color:var(--primary);">
                   <div class="card-header">
                     <div>
                       <div class="card-title" id="themeSlotsCardTitle">Slot Foto Khusus Tema: 1. Elegant Floral (Wajib 6 Foto)</div>
-                      <div class="card-subtitle" id="themeSlotsCardSubtitle">Setiap tema menyimpan daftar fotonya sendiri secara terpisah agar tidak bercampur saat ganti tema</div>
+                      <div class="card-subtitle" id="themeSlotsCardSubtitle">Setiap tema menyimpan daftar fotonya sendiri · Paste link Google Drive (otomatis dikonversi ke lh3.googleusercontent.com/d/FILE_ID) atau Upload langsung</div>
                     </div>
                     <span id="themeSlotsCountBadge" class="badge badge-gold">6 Slot Foto</span>
                   </div>

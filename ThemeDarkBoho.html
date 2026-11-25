@@ -3,328 +3,650 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Dark Boho — Editorial Wedding</title>
+  <meta name="theme-color" content="#1d1d1b">
+  <title>Dark Boho — Wedding Invitation</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&family=Pinyon+Script&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Great+Vibes&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
-    :root {
-      --boho-dark: #1d1d1b;
-      --boho-dark-card: #252421;
-      --boho-sand: #cebba2;
-      --boho-bronze: #87683a;
-      --boho-stone: #827e76;
-      --boho-slate: #4f6368;
-      --boho-white: #ffffff;
-      --boho-muted: rgba(255, 255, 255, 0.78);
-      --border-sand: rgba(206, 187, 162, 0.34);
-      --success: #3B9B72;
+    /* ==========================================================================
+       DESIGN TOKENS: DARK BOHO
+       ========================================================================== */
+    :root,
+    body[data-theme="dark_boho"] {
+      --bg-canvas: #121210;
+      --bg-surface: #1d1d1b;
+      --bg-elevated: #252320;
+      --bg-sand: #cebba2;
+      --bg-slate: #4f6368;
+      --text-primary: #efe6d8;
+      --text-muted: rgba(239, 230, 216, 0.78);
+      --text-dark: #1d1d1b;
+      --accent-terracotta: #b5651d;
+      --accent-sage: #8a9a7b;
+      --accent-gold: #c9a86a;
+      --border-soft: rgba(201, 168, 106, 0.34);
+      --cover-overlay-rgb: 29, 29, 27;
+      --cover-overlay-opacity: 0.68;
+      --cover-text: #efe6d8;
+      --success: #8a9a7b;
       --danger: #D95C5C;
       --font-title: 'Cormorant Garamond', Georgia, serif;
-      --font-script: 'Pinyon Script', cursive;
-      --font-sans: 'Montserrat', sans-serif;
+      --font-script: 'Great Vibes', cursive;
+      --font-sans: 'Jost', -apple-system, BlinkMacSystemFont, sans-serif;
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     html { scroll-behavior: smooth; }
     html, body {
       width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 0 !important;
       overflow-x: hidden !important; overscroll-behavior-x: none; touch-action: pan-y; position: relative;
     }
-    body { font-family: var(--font-sans); background-color: #121210; color: var(--boho-white); min-height: 100vh; display: block; -webkit-font-smoothing: antialiased; }
-    .mobile-frame { display: block; margin: 0 auto !important; width: 100%; max-width: 430px; min-height: 100vh; background-color: var(--boho-dark); position: relative; overflow-x: hidden !important; box-shadow: 0 0 55px rgba(0, 0, 0, 0.85); }
-    .state-screen { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 36px 28px; text-align: center; background: var(--boho-dark); }
-    .spinner-ring { width: 44px; height: 44px; border: 2px solid rgba(206,187,162,0.22); border-top-color: var(--boho-sand); border-radius: 50%; animation: spin 0.9s linear infinite; margin-bottom: 16px; }
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-canvas);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: block;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Mobile-first container (max 480px centered on desktop) + subtle organic grain texture */
+    .mobile-frame {
+      display: block;
+      margin: 0 auto !important;
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      background-color: var(--bg-surface);
+      position: relative;
+      overflow-x: hidden !important;
+      box-shadow: 0 0 60px rgba(0, 0, 0, 0.85);
+    }
+    .mobile-frame::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      max-width: 480px;
+      margin: 0 auto;
+      pointer-events: none;
+      z-index: 2;
+      opacity: 0.045;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    .state-screen {
+      min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 36px 28px; text-align: center; background: var(--bg-surface); position: relative; z-index: 3;
+    }
+    .spinner-ring {
+      width: 44px; height: 44px; border: 2px solid rgba(201,168,106,0.22);
+      border-top-color: var(--accent-gold); border-radius: 50%;
+      animation: spin 0.9s linear infinite; margin-bottom: 16px;
+    }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* ==========================================================================
+       1. COVER SECTION (Configurable style + overlay color/opacity + guest card)
+       ========================================================================== */
     .opening-cover {
-      position: fixed; top: 0; left: 0; right: 0; margin: 0 auto; width: 100%; max-width: 430px;
-      height: 100vh; height: 100dvh; z-index: 120;
-      background-color: var(--boho-dark);
-      background-image:
-        linear-gradient(180deg, rgba(28, 45, 71, 0.4) 0%, rgba(29, 29, 27, 0.25) 45%, rgba(29, 29, 27, 0.95) 93%),
-        var(--cover-bg-url, url('https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=900&q=80'));
+      position: fixed; top: 0; left: 0; right: 0; margin: 0 auto;
+      width: 100%; max-width: 480px; height: 100vh; height: 100dvh; z-index: 120;
+      background-color: var(--bg-surface);
+      background-image: var(--cover-bg-url, url('https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=900&q=80'));
       background-size: cover; background-position: center;
       display: flex; flex-direction: column; justify-content: space-between; align-items: center;
-      padding: 46px 24px 38px; text-align: center; overflow-y: auto; overflow-x: hidden !important;
+      padding: 42px 24px 36px; text-align: center; overflow-y: auto; overflow-x: hidden !important;
+      color: var(--cover-text);
       transition: transform 0.95s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.75s ease;
     }
-    .opening-cover.opened { transform: perspective(1300px) translate3d(0, -104%, -80px) rotateX(12deg); opacity: 0; pointer-events: none; }
-    .boho-eyebrow { font-size: 10px; letter-spacing: 0.28em; text-indent: 0.28em; text-transform: uppercase; color: var(--boho-sand); font-weight: 500; }
-    .boho-couple-hero { font-family: var(--font-title); font-size: 42px; font-weight: 500; color: #fff; line-height: 1.08; margin: 6px 0; text-shadow: 0 3px 16px rgba(0,0,0,0.65); }
-    .btn-boho { display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 13px 20px; border-radius: 0; background: var(--boho-sand); color: var(--boho-dark); border: 1px solid var(--boho-sand); font-size: 10.5px; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase; cursor: pointer; text-decoration: none; }
-    .btn-boho-outline { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 16px; border-radius: 0; background: transparent; color: var(--boho-sand); border: 1px solid var(--boho-sand); font-size: 10.5px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; cursor: pointer; text-decoration: none; }
+    .opening-cover.no-cover-photo {
+      background-image: radial-gradient(circle at 50% 25%, rgba(181, 101, 29, 0.16), var(--bg-surface)) !important;
+    }
+    .opening-cover.cover-style-default { justify-content: center; gap: 28px; }
+    .opening-cover.cover-style-top-cover { justify-content: flex-start; gap: 22px; padding-top: 56px; }
+    .opening-cover.cover-style-space-between { justify-content: space-between; }
+    .opening-cover-tint {
+      position: absolute; inset: 0; z-index: 0;
+      background: var(--cover-overlay-color, #1d1d1b);
+      opacity: var(--cover-overlay-opacity, 0.68);
+      pointer-events: none;
+    }
+    .opening-cover-inner {
+      position: relative; z-index: 2; width: 100%;
+      display: flex; flex-direction: column; align-items: center;
+      height: 100%; justify-content: inherit; gap: inherit;
+    }
+    .opening-cover.opened {
+      transform: translate3d(0, -104%, 0);
+      opacity: 0; pointer-events: none;
+    }
+    .cover-pampas-tl { position: absolute; top: 8px; left: 8px; color: var(--accent-gold); opacity: 0.48; pointer-events: none; z-index: 1; }
+    .cover-pampas-br { position: absolute; bottom: 8px; right: 8px; color: var(--accent-sage); opacity: 0.48; transform: rotate(180deg); pointer-events: none; z-index: 1; }
 
-    .main-invitation { display: none; width: 100%; overflow-x: hidden; }
+    .boho-eyebrow {
+      font-size: 10.5px; letter-spacing: 0.28em; text-indent: 0.28em;
+      text-transform: uppercase; color: var(--accent-gold); font-weight: 500;
+    }
+    .boho-script-accent {
+      font-family: var(--font-script);
+      font-size: 38px;
+      color: var(--accent-gold);
+      line-height: 1.15;
+      font-weight: 400;
+    }
+    .boho-couple-hero {
+      font-family: var(--font-title); font-size: 42px; font-weight: 500;
+      color: var(--cover-text); line-height: 1.08; margin: 4px 0;
+      text-shadow: 0 3px 18px rgba(0,0,0,0.6);
+    }
+
+    .btn-boho {
+      display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+      width: 100%; padding: 13px 20px; border-radius: 999px;
+      background: var(--accent-terracotta); color: #fff;
+      border: 1px solid rgba(201, 168, 106, 0.55);
+      font-family: var(--font-sans); font-size: 11px; font-weight: 600;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      cursor: pointer; text-decoration: none;
+      transition: transform 0.2s ease, background-color 0.25s ease;
+    }
+    .btn-boho:hover { background: #9c5416; }
+    .btn-boho:active { transform: scale(0.98); }
+    .btn-boho:focus-visible, .btn-boho-outline:focus-visible {
+      outline: 2px solid var(--accent-gold); outline-offset: 3px;
+    }
+    .btn-boho-outline {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 10px 18px; border-radius: 999px;
+      background: transparent; color: var(--accent-gold);
+      border: 1px solid var(--accent-gold);
+      font-family: var(--font-sans); font-size: 10.5px; font-weight: 600;
+      letter-spacing: 0.16em; text-transform: uppercase; cursor: pointer; text-decoration: none;
+    }
+
+    /* ==========================================================================
+       2. MAIN CANVAS SECTIONS & ORNAMENT SLOTS
+       ========================================================================== */
+    .main-invitation { display: none; width: 100%; overflow-x: hidden; position: relative; z-index: 3; }
     .main-invitation.visible { display: block; animation: fadeIn 0.7s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-    .sec-boho-dark { padding: 40px 20px; background: var(--boho-dark); color: #fff; text-align: center; position: relative; }
-    .sec-boho-sand { padding: 40px 20px; background: var(--boho-sand); color: var(--boho-dark); text-align: center; position: relative; }
-    .sec-boho-slate { padding: 40px 20px; background: var(--boho-slate); color: #fff; text-align: center; position: relative; }
+    .sec-boho-dark { padding: 44px 22px; background: var(--bg-surface); color: var(--text-primary); text-align: center; position: relative; }
+    .sec-boho-elevated { padding: 44px 22px; background: var(--bg-elevated); color: var(--text-primary); text-align: center; position: relative; }
+    .sec-boho-sand { padding: 44px 22px; background: var(--bg-sand); color: var(--text-dark); text-align: center; position: relative; }
+    .sec-boho-slate { padding: 44px 22px; background: var(--bg-slate); color: var(--text-primary); text-align: center; position: relative; }
     .boho-sec-title { font-family: var(--font-title); font-size: 32px; font-weight: 500; margin: 4px 0 12px; }
-    .boho-sec-title .title-italic { font-style: italic; font-weight: 400; }
+    .boho-sec-title .title-italic { font-style: italic; font-weight: 400; color: var(--accent-gold); }
+    .boho-ornament-slot { color: var(--accent-gold); margin: 4px auto 12px; opacity: 0.9; }
+    .sec-boho-sand .boho-ornament-slot { color: var(--accent-terracotta); }
 
-    /* Hero Parallax Full Banner fading into #1d1d1b */
+    /* Hero Arch Frame + Countdown + Save The Date */
     .boho-hero-full {
-      min-height: 490px; padding: 38px 22px 32px; display: flex; flex-direction: column; justify-content: flex-end; text-align: center;
-      background: linear-gradient(180deg, rgba(29,29,27,0.12) 45%, #1d1d1b 96%), var(--hero-bg-url, var(--cover-bg-url));
-      background-size: cover; background-position: center;
+      min-height: 520px; padding: 42px 22px 36px;
+      display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+      background: linear-gradient(180deg, rgba(29,29,27,0.38) 0%, #1d1d1b 96%), var(--hero-bg-url, var(--cover-bg-url));
+      background-size: cover; background-position: center; position: relative;
+    }
+    .boho-hero-arch {
+      width: 210px; height: 270px; margin: 14px auto;
+      border-radius: 130px 130px 10px 10px;
+      padding: 6px; border: 1.5px solid var(--accent-gold);
+      background: rgba(29,29,27,0.55); position: relative;
+    }
+    .boho-hero-arch img {
+      width: 100%; height: 100%; object-fit: cover;
+      border-radius: 124px 124px 6px 6px; display: block;
+    }
+    .boho-monogram-pill {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 5px 16px; border: 1px solid var(--border-soft);
+      border-radius: 999px; background: rgba(29,29,27,0.68);
+      font-family: var(--font-title); font-size: 17px; color: var(--accent-gold);
+      letter-spacing: 0.14em; margin-bottom: 10px;
     }
 
-    /* Monogram Crest Box (#quote-words) */
+    .countdown-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; width: 100%; margin-top: 16px; }
+    .cd-boho { background: rgba(29,29,27,0.78); border: 1px solid var(--border-soft); border-radius: 10px; padding: 11px 4px; }
+    .cd-num { font-family: var(--font-title); font-size: 25px; color: var(--accent-gold); line-height: 1; }
+    .cd-lbl { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; margin-top: 4px; }
+
+    /* Monogram Crest & Quote */
     .boho-crest-box {
-      width: 104px; height: 142px; margin: 0 auto 16px; border: 1.5px solid var(--boho-sand); border-radius: 70px 70px 0 0;
+      width: 96px; height: 126px; margin: 0 auto 14px;
+      border: 1.5px solid var(--accent-gold); border-radius: 70px 70px 0 0;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: rgba(181, 101, 29, 0.08);
     }
-    .boho-crest-star { width: 18px; height: 18px; fill: var(--boho-sand); }
-    .boho-crest-letter { font-family: var(--font-title); font-size: 28px; color: var(--boho-sand); line-height: 1.02; }
+    .boho-crest-star { width: 15px; height: 15px; fill: var(--accent-gold); }
+    .boho-crest-letter { font-family: var(--font-title); font-size: 26px; color: var(--text-primary); line-height: 1.05; }
 
-    /* Boxless Editorial Full-Bleed Portraits (Dark Boho Authentic Style) */
-    .boho-portrait-editorial { margin-top: 22px; text-align: center; position: relative; }
-    .boho-tall-frame { width: 82%; height: 320px; margin: 0 auto 14px; overflow: hidden; border-radius: 140px 140px 0 0; border-bottom: 2px solid var(--boho-sand); }
-    .boho-tall-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .boho-divider-v { display: block; width: 1px; height: 64px; background: var(--boho-sand); opacity: 0.45; margin: 22px auto; }
+    /* Alternating Bride -> Groom Split Layout */
+    .boho-couple-split {
+      display: flex; align-items: center; gap: 16px; text-align: left;
+      background: var(--bg-elevated); border: 1px solid var(--border-soft);
+      border-radius: 16px; padding: 16px; margin-top: 16px; position: relative; overflow: hidden;
+    }
+    .boho-couple-split.right { flex-direction: row-reverse; text-align: right; }
+    .boho-split-arch {
+      width: 122px; min-width: 122px; height: 164px;
+      border-radius: 90px 90px 8px 8px; padding: 4px;
+      border: 1.5px solid var(--accent-gold); overflow: hidden;
+      background: var(--bg-surface);
+    }
+    .boho-split-arch img { width: 100%; height: 100%; object-fit: cover; border-radius: 86px 86px 4px 4px; display: block; }
+    .boho-couple-info { flex: 1; min-width: 0; }
+    .boho-person-role { font-size: 9.5px; letter-spacing: 0.22em; color: var(--accent-sage); text-transform: uppercase; font-weight: 600; }
+    .boho-person-name { font-family: var(--font-title); font-size: 25px; color: var(--text-primary); line-height: 1.15; margin: 4px 0 6px; }
+    .boho-person-meta { font-size: 11.5px; color: var(--text-muted); line-height: 1.5; margin-bottom: 6px; }
+    .boho-ig-link {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 10px; border-radius: 999px;
+      border: 1px solid var(--border-soft); color: var(--accent-gold);
+      font-size: 10.5px; text-decoration: none; margin-top: 4px;
+    }
 
-    /* Live Streaming Pill Photo + Overlapping Heading (#live_igfilter from 6d3e1d8.js) */
-    .live-pill-photo { width: 180px; height: 220px; border-radius: 140px; object-fit: cover; margin: 0 auto 12px; display: block; border: 2px solid var(--boho-sand); }
-    .live-overlap-title { font-family: var(--font-title); font-size: 32px; font-style: italic; text-transform: uppercase; letter-spacing: 0.04em; color: var(--boho-sand); margin-top: -28px; position: relative; z-index: 2; text-shadow: 0 4px 16px rgba(0,0,0,0.55); }
-
-    /* Straddling Overlap Gift Box (#gift overlapping into #wishes!) */
-    .gift-overlap-section { background: var(--boho-sand); color: var(--boho-dark); padding: 40px 20px 0; text-align: center; position: relative; z-index: 5; }
-    .gift-straddle-card { background: var(--boho-slate); color: #fff; padding: 24px 18px; position: relative; bottom: -36px; box-shadow: 0 18px 36px rgba(0,0,0,0.28); }
-    .boho-gift-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 14px 0; }
-    .boho-gift-tab { padding: 11px 8px; background: rgba(29, 29, 27, 0.25); border: 1px solid rgba(206, 187, 162, 0.45); color: var(--boho-sand); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; }
-    .boho-gift-tab.active { background: var(--boho-sand); color: var(--boho-dark); }
-
-    /* Masonry Precious Moment + Video */
-    .boho-video-box { position: relative; width: 100%; padding-bottom: 56.25%; margin-bottom: 18px; background: #000; }
+    /* Video + Precious Moment Gallery (4-Photo Grid + Lightbox) */
+    .boho-video-box { position: relative; width: 100%; padding-bottom: 56.25%; margin-top: 14px; background: #000; border: 1px solid var(--border-soft); border-radius: 12px; overflow: hidden; }
     .boho-video-box iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
     .gallery-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
-    .gallery-thumb { width: 100%; height: 185px; object-fit: cover; cursor: pointer; }
-    .gallery-thumb:nth-child(3n+1) { height: 225px; }
+    .gallery-thumb {
+      width: 100%; height: 180px; object-fit: cover; cursor: pointer;
+      border-radius: 10px; border: 1px solid rgba(29,29,27,0.18);
+      transition: transform 0.28s ease;
+    }
+    .gallery-thumb:hover { transform: scale(1.02); }
+    .gallery-thumb:first-child { border-radius: 70px 10px 10px 10px; }
+    .gallery-thumb:nth-child(4) { border-radius: 10px 10px 70px 10px; }
 
-    .countdown-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 16px; }
-    .cd-boho { background: rgba(29,29,27,0.75); border: 1px solid var(--border-sand); padding: 12px 4px; }
-    .cd-num { font-family: var(--font-title); font-size: 24px; color: var(--boho-sand); }
-    .cd-lbl { font-size: 9px; color: var(--boho-muted); text-transform: uppercase; letter-spacing: 0.1em; }
-
+    /* Story & Event Cards */
     .story-timeline { display: flex; flex-direction: column; gap: 12px; margin-top: 14px; text-align: left; }
-    .story-card { border-bottom: 1px solid var(--border-sand); padding: 12px 0; }
-    .story-year { font-size: 10.5px; font-weight: 700; color: var(--boho-sand); letter-spacing: 0.16em; }
-    .story-card h4 { font-family: var(--font-title); font-size: 20px; color: #fff; margin: 2px 0 4px; }
-    .story-card p { font-size: 12px; color: var(--boho-muted); line-height: 1.6; }
+    .story-card {
+      background: var(--bg-elevated); border-left: 2px solid var(--accent-terracotta);
+      padding: 13px 15px; border-radius: 0 10px 10px 0;
+    }
+    .story-year { font-size: 10px; font-weight: 700; color: var(--accent-gold); letter-spacing: 0.18em; }
+    .story-card h4 { font-family: var(--font-title); font-size: 20px; color: var(--text-primary); margin: 2px 0 4px; }
+    .story-card p { font-size: 12px; color: var(--text-muted); line-height: 1.6; }
 
-    /* Half-Fade Horizontal Closing (#closing from dark-boho) */
-    .boho-also-invite { list-style: none; margin: 14px auto; padding: 12px 0; border-top: 1px solid var(--border-sand); border-bottom: 1px solid var(--border-sand); }
-    .boho-also-invite li { font-size: 11.5px; color: var(--boho-muted); padding: 3px 0; }
-    .boho-closing-wrap { position: relative; min-height: 360px; display: flex; flex-direction: column; justify-content: flex-end; text-align: center; padding: 36px 22px; overflow: hidden; }
-    .boho-closing-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
-    .boho-closing-overlay { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(29,29,27,0.35) 0%, #1d1d1b 85%); z-index: 1; }
-    .boho-closing-inner { position: relative; z-index: 2; }
+    .event-boho-card {
+      background: var(--bg-elevated); border: 1px solid var(--border-soft);
+      border-radius: 14px; padding: 20px 18px; margin-bottom: 14px;
+    }
+    .maps-embed-frame {
+      width: 100%; height: 220px; border: 1px solid var(--border-soft);
+      border-radius: 12px; margin: 14px 0; background: #141412;
+    }
 
-    .guest-input { width: 100%; padding: 11px 13px; border: 1px solid var(--border-sand); border-radius: 0; background: #141412; color: #fff; font-family: var(--font-sans); font-size: 13px; margin-bottom: 10px; }
-    .wishes-feed { max-height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-top: 12px; text-align: left; }
-    .wish-item { border-bottom: 1px solid rgba(206,187,162,0.2); padding: 12px 0; }
-    .wish-header { display: flex; justify-content: space-between; margin-bottom: 4px; }
-    .wish-sender { font-weight: 700; font-size: 12.5px; color: var(--boho-sand); letter-spacing: 0.08em; text-transform: uppercase; }
-    .wish-badge { font-size: 10px; padding: 2px 6px; }
-    .wish-badge.hadir { background: rgba(59,155,114,0.2); color: #6CD4A6; }
+    /* Live Streaming Pill */
+    .live-pill-photo { width: 170px; height: 210px; border-radius: 140px; object-fit: cover; margin: 0 auto 12px; display: block; border: 2px solid var(--accent-gold); }
+    .live-overlap-title { font-family: var(--font-title); font-size: 32px; font-style: italic; color: var(--text-primary); margin-top: -26px; position: relative; z-index: 2; text-shadow: 0 4px 16px rgba(0,0,0,0.65); }
+
+    /* Straddling Gift Card */
+    .gift-overlap-section { background: var(--bg-sand); color: var(--text-dark); padding: 40px 22px 0; text-align: center; position: relative; z-index: 5; }
+    .gift-straddle-card {
+      background: var(--bg-slate); color: #fff; padding: 24px 18px; border-radius: 14px;
+      position: relative; bottom: -34px; box-shadow: 0 18px 36px rgba(0,0,0,0.32);
+    }
+    .boho-gift-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 14px 0; }
+    .boho-gift-tab {
+      padding: 10px 8px; background: rgba(29, 29, 27, 0.25);
+      border: 1px solid rgba(206, 187, 162, 0.45); border-radius: 999px;
+      color: var(--text-primary); font-size: 10px; font-weight: 600;
+      letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer;
+    }
+    .boho-gift-tab.active { background: var(--accent-gold); color: var(--text-dark); border-color: var(--accent-gold); }
+
+    /* Form & Wishes */
+    .guest-input {
+      width: 100%; padding: 11px 14px; border: 1px solid var(--border-soft);
+      border-radius: 10px; background: #141412; color: var(--text-primary);
+      font-family: var(--font-sans); font-size: 13px; margin-bottom: 10px;
+    }
+    .guest-input:focus { outline: none; border-color: var(--accent-gold); }
+    .wishes-feed { max-height: 340px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-top: 12px; text-align: left; }
+    .wish-item {
+      background: var(--bg-elevated); border: 1px solid rgba(201,168,106,0.22);
+      border-radius: 12px; padding: 13px 14px;
+    }
+    .wish-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 5px; }
+    .wish-sender { font-weight: 600; font-size: 12.5px; color: var(--accent-gold); letter-spacing: 0.06em; text-transform: uppercase; }
+    .wish-badge { font-size: 10px; padding: 2px 8px; border-radius: 999px; font-weight: 600; }
+    .wish-badge.hadir { background: rgba(138,154,123,0.22); color: #b6cca1; }
     .wish-badge.absen { background: rgba(217,92,92,0.2); color: #F28B8B; }
 
-    .lightbox-overlay { position: fixed; inset: 0; background: rgba(18, 18, 16, 0.94); z-index: 300; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+    /* Closing */
+    .boho-also-invite { list-style: none; margin: 14px auto; padding: 12px 0; border-top: 1px solid var(--border-soft); border-bottom: 1px solid var(--border-soft); }
+    .boho-also-invite li { font-size: 12px; color: var(--text-muted); padding: 3px 0; }
+    .boho-closing-wrap { position: relative; min-height: 360px; display: flex; flex-direction: column; justify-content: flex-end; text-align: center; padding: 40px 22px; overflow: hidden; }
+    .boho-closing-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+    .boho-closing-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(29,29,27,0.45) 0%, #1d1d1b 85%); z-index: 1; }
+    .boho-closing-inner { position: relative; z-index: 2; }
+
+    /* Upgraded Vanilla Lightbox with Prev / Next / Swipe */
+    .lightbox-overlay {
+      position: fixed; inset: 0; background: rgba(14, 14, 12, 0.96); z-index: 300;
+      display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px;
+    }
     .lightbox-overlay.open { display: flex; }
-    .lightbox-Overlay-img { max-width: 100%; max-height: 75vh; }
-    .floating-music-btn { position: fixed; bottom: 20px; right: max(16px, calc(50% - 198px)); width: 44px; height: 44px; border-radius: 50%; background: var(--boho-slate); border: 1.5px solid var(--boho-sand); color: var(--boho-sand); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 95; }
-    .floating-music-btn.playing { animation: spin 5s linear infinite; background: var(--boho-bronze); color: #fff; }
+    .lightbox-Overlay-img { max-width: 92vw; max-height: 72vh; object-fit: contain; border-radius: 8px; border: 1px solid var(--border-soft); }
+    .lightbox-nav-bar { display: flex; align-items: center; gap: 16px; margin-top: 14px; }
+    .lightbox-nav-btn {
+      width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--accent-gold);
+      background: rgba(29,29,27,0.85); color: var(--accent-gold); font-size: 18px;
+      cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+    }
+    .lightbox-close-btn {
+      position: absolute; top: 18px; right: 18px; width: 38px; height: 38px;
+      border-radius: 50%; border: 1px solid var(--border-soft);
+      background: rgba(29,29,27,0.85); color: var(--text-primary); font-size: 18px; cursor: pointer;
+    }
+
+    /* Floating Music Button Only (NO sticky bottom menu!) */
+    .floating-music-btn {
+      position: fixed; bottom: 20px; right: max(16px, calc(50% - 218px));
+      width: 46px; height: 46px; border-radius: 50%;
+      background: var(--bg-elevated); border: 1.5px solid var(--accent-gold); color: var(--accent-gold);
+      display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 95;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+    .floating-music-btn.playing { animation: spin 5s linear infinite; background: var(--accent-terracotta); color: #fff; }
     .bottom-touch-nav { display: none !important; }
-    @media (max-width: 480px) { .mobile-frame, .opening-cover { width: 100% !important; max-width: 100% !important; box-shadow: none !important; } }
+
+    @media (max-width: 480px) {
+      .mobile-frame, .opening-cover { width: 100% !important; max-width: 100% !important; box-shadow: none !important; }
+      .boho-couple-split, .boho-couple-split.right { flex-direction: column; text-align: center; }
+      .boho-split-arch { width: 150px; height: 195px; }
+    }
   </style>
 </head>
-<body>
+<body data-theme="dark_boho">
   <div class="mobile-frame">
-    <div id="guestLoadingScreen" class="state-screen"><div class="spinner-ring"></div><div class="boho-eyebrow">DARK BOHO</div></div>
-    <div id="guestErrorScreen" class="state-screen" style="display:none;"><h1 class="boho-sec-title" style="color:var(--boho-sand);">Undangan Tidak Ditemukan</h1><p id="guestErrorMessage" style="font-size:13px; color:var(--boho-muted);"></p></div>
+    <div id="guestLoadingScreen" class="state-screen">
+      <div class="spinner-ring"></div>
+      <div class="boho-eyebrow">DARK BOHO</div>
+    </div>
+    <div id="guestErrorScreen" class="state-screen" style="display:none;">
+      <h1 class="boho-sec-title" style="color:var(--accent-gold);">Undangan Tidak Ditemukan</h1>
+      <p id="guestErrorMessage" style="font-size:13px; color:var(--text-muted);"></p>
+    </div>
 
-    <section id="openingCoverPage" class="opening-cover" style="display:none;">
-      <div style="width:100%;">
-        <div class="boho-eyebrow">THE WEDDING OF</div>
-        <h1 id="openCoupleNames" class="boho-couple-hero">Romeo &amp; Juliet</h1>
-        <div id="openWeddingDate" style="font-size:11.5px; letter-spacing:0.24em; color:var(--boho-sand);"></div>
-        <img id="openCoverPhoto" src="" alt="" style="display:none;">
-      </div>
-      <div style="width:100%;">
-        <div style="background:rgba(29,29,27,0.68); border:1px solid var(--border-sand); padding:16px; margin-bottom:14px;">
-          <div style="font-size:10px; letter-spacing:0.2em; color:var(--boho-sand);">KEPADA YTH.</div>
-          <div id="openGuestName" style="font-family:var(--font-title); font-size:24px; color:#fff; margin:4px 0;">-</div>
+    <!-- 1. COVER SECTION -->
+    <section id="openingCoverPage" class="opening-cover cover-style-space-between" style="display:none;">
+      <div id="bohoCoverTint" class="opening-cover-tint"></div>
+      <div class="cover-pampas-tl" data-ornament="pampas-corner"></div>
+      <div class="cover-pampas-br" data-ornament="pampas-corner"></div>
+      <div class="opening-cover-inner">
+        <div style="width:100%;">
+          <div class="boho-ornament-slot" data-ornament="arch-crown"></div>
+          <div class="boho-eyebrow" style="color:inherit; opacity:0.85;">THE WEDDING OF</div>
+          <h1 id="openCoupleNames" class="boho-couple-hero">Romeo &amp; Juliet</h1>
+          <div id="openWeddingDate" style="font-size:11.5px; letter-spacing:0.24em; color:var(--accent-gold);"></div>
+          <img id="openCoverPhoto" src="" alt="Cover Pasangan" style="display:none;">
         </div>
-        <button type="button" class="btn-boho" onclick="handleOpenInvitationClick()"><span>OPEN INVITATION</span></button>
+        <div style="width:100%;">
+          <div id="bohoCoverGuestBox" style="background:rgba(29,29,27,0.72); border:1px solid var(--border-soft); border-radius:14px; padding:16px; margin-bottom:14px;">
+            <div style="font-size:10px; letter-spacing:0.22em; color:var(--accent-gold);">KEPADA YTH.</div>
+            <div id="openGuestName" style="font-family:var(--font-title); font-size:24px; color:var(--text-primary); margin:4px 0;">-</div>
+          </div>
+          <button type="button" class="btn-boho" onclick="handleOpenInvitationClick()">
+            <span>Buka Undangan</span>
+          </button>
+        </div>
       </div>
     </section>
 
     <main id="mainInvitationPage" class="main-invitation">
-      <!-- 1. Full-Bleed Hero + Countdown -->
+      <!-- 2. HERO + MONOGRAM + COUNTDOWN + SAVE THE DATE -->
       <section id="sec-hero" class="boho-hero-full">
         <img id="mainHeroPhoto" src="" alt="" style="display:none;">
-        <div class="boho-eyebrow">SAVE THE DATE</div>
+        <div class="boho-ornament-slot" data-ornament="moon-sun"></div>
+        <div id="bohoHeroMonogram" class="boho-monogram-pill">R &amp; J</div>
+        <div class="boho-eyebrow">THE WEDDING CELEBRATION OF</div>
         <h2 id="mainHeroCoupleTitle" class="boho-couple-hero"></h2>
-        <div id="mainCountdownDateText" style="font-family:var(--font-title); font-size:18px; color:var(--boho-sand);"></div>
-        <div id="sec-countdown">
+        <div id="mainCountdownDateText" style="font-family:var(--font-title); font-size:18px; color:var(--accent-gold); margin-top:4px;"></div>
+
+        <div class="boho-hero-arch reveal-3d">
+          <img id="bohoHeroArchImg" src="" alt="Potret Pasangan Dark Boho" loading="lazy">
+        </div>
+
+        <div id="sec-countdown" style="width:100%;">
           <div class="countdown-grid">
-            <div class="cd-boho"><div id="cdDays" class="cd-num">00</div><div class="cd-lbl">Days</div></div>
-            <div class="cd-boho"><div id="cdHours" class="cd-num">00</div><div class="cd-lbl">Hours</div></div>
-            <div class="cd-boho"><div id="cdMinutes" class="cd-num">00</div><div class="cd-lbl">Mins</div></div>
-            <div class="cd-boho"><div id="cdSeconds" class="cd-num">00</div><div class="cd-lbl">Secs</div></div>
+            <div class="cd-boho"><div id="cdDays" class="cd-num">00</div><div class="cd-lbl">Hari</div></div>
+            <div class="cd-boho"><div id="cdHours" class="cd-num">00</div><div class="cd-lbl">Jam</div></div>
+            <div class="cd-boho"><div id="cdMinutes" class="cd-num">00</div><div class="cd-lbl">Menit</div></div>
+            <div class="cd-boho"><div id="cdSeconds" class="cd-num">00</div><div class="cd-lbl">Detik</div></div>
+          </div>
+          <div style="margin-top:16px;">
+            <a id="bohoCalendarBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn-boho-outline">
+              <span>Save The Date (Google Calendar)</span>
+            </a>
           </div>
         </div>
       </section>
 
-      <!-- 2. Monogram Arched Crest + Quote -->
-      <section id="mainQuoteWrapper" class="sec-boho-dark" style="background:#171715;">
+      <!-- 3. AYAT / QUOTE PEMBUKA -->
+      <section id="mainQuoteWrapper" class="sec-boho-elevated">
         <div class="boho-crest-box">
           <svg class="boho-crest-star" viewBox="308 337 250 180"><path d="M 529.5625 432.050781 C 441.691406 437.378906 437.382812 441.691406 432.050781 529.554688 C 426.730469 441.691406 422.410156 437.378906 334.546875 432.050781 C 422.410156 426.722656 426.730469 422.40625 432.050781 334.550781 C 437.382812 422.40625 441.691406 426.722656 529.5625 432.050781 Z"/></svg>
           <div id="bohoCrestInitial1" class="boho-crest-letter">R</div>
           <div id="bohoCrestInitial2" class="boho-crest-letter">J</div>
           <svg class="boho-crest-star" viewBox="308 337 250 180"><path d="M 529.5625 432.050781 C 441.691406 437.378906 437.382812 441.691406 432.050781 529.554688 C 426.730469 441.691406 422.410156 437.378906 334.546875 432.050781 C 422.410156 426.722656 426.730469 422.40625 432.050781 334.550781 C 437.382812 422.40625 441.691406 426.722656 529.5625 432.050781 Z"/></svg>
         </div>
-        <p id="mainQuoteText" style="font-family:var(--font-title); font-style:italic; font-size:16.5px; color:var(--boho-sand); line-height:1.7;"></p>
-        <div id="mainQuoteSource" style="font-size:10.5px; font-weight:700; letter-spacing:0.18em; color:var(--boho-stone); margin-top:8px;"></div>
-        <p id="mainHeroDescription" style="font-size:12px; color:var(--boho-muted); margin-top:12px; line-height:1.65;"></p>
+        <p id="mainQuoteText" style="font-family:var(--font-title); font-style:italic; font-size:17px; color:var(--accent-gold); line-height:1.7;"></p>
+        <div id="mainQuoteSource" style="font-size:10.5px; font-weight:600; letter-spacing:0.18em; color:var(--accent-sage); margin-top:8px;"></div>
+        <div class="boho-ornament-slot" data-ornament="fern-divider"></div>
+        <p id="mainHeroDescription" style="font-size:12.5px; color:var(--text-muted); line-height:1.65;"></p>
       </section>
 
-      <!-- 3. Boxless Editorial Tall Arched Portraits (#profile) -->
+      <!-- 4. MEMPELAI WANITA LALU PRIA (Tata Letak Berseling Kiri / Kanan) -->
       <section id="sec-couple" class="sec-boho-dark">
-        <div class="boho-portrait-editorial">
-          <div class="boho-tall-frame"><img id="mainBridePhoto" src="" alt="The Bride" loading="lazy"></div>
-          <div class="boho-eyebrow">THE BRIDE</div>
-          <div id="mainBrideFullName" style="font-family:var(--font-title); font-size:28px; color:#fff; margin:4px 0;"></div>
-          <p id="mainBrideParents" style="font-size:12px; color:var(--boho-muted);"></p>
-        </div>
+        <div class="boho-eyebrow">BRIDE &amp; GROOM</div>
+        <h3 class="boho-sec-title">The <span class="title-italic">Beloved</span></h3>
 
-        <span class="boho-divider-v"></span>
+        <article class="boho-couple-split reveal-3d">
+          <div class="boho-split-arch"><img id="mainBridePhoto" src="" alt="Foto Mempelai Wanita" loading="lazy"></div>
+          <div class="boho-couple-info">
+            <div class="boho-person-role">Mempelai Wanita</div>
+            <div id="mainBrideFullName" class="boho-person-name"></div>
+            <p id="mainBrideParents" class="boho-person-meta"></p>
+            <div id="bohoBrideOrigin" class="boho-person-meta" style="color:var(--accent-gold);"></div>
+            <a id="bohoBrideIg" href="#" target="_blank" rel="noopener noreferrer" class="boho-ig-link" style="display:none;"></a>
+          </div>
+        </article>
 
-        <div class="boho-portrait-editorial" style="margin-top:0;">
-          <div class="boho-tall-frame"><img id="mainGroomPhoto" src="" alt="The Groom" loading="lazy"></div>
-          <div class="boho-eyebrow">THE GROOM</div>
-          <div id="mainGroomFullName" style="font-family:var(--font-title); font-size:28px; color:#fff; margin:4px 0;"></div>
-          <p id="mainGroomParents" style="font-size:12px; color:var(--boho-muted);"></p>
+        <article class="boho-couple-split right reveal-3d">
+          <div class="boho-split-arch"><img id="mainGroomPhoto" src="" alt="Foto Mempelai Pria" loading="lazy"></div>
+          <div class="boho-couple-info">
+            <div class="boho-person-role">Mempelai Pria</div>
+            <div id="mainGroomFullName" class="boho-person-name"></div>
+            <p id="mainGroomParents" class="boho-person-meta"></p>
+            <div id="bohoGroomOrigin" class="boho-person-meta" style="color:var(--accent-gold);"></div>
+            <a id="bohoGroomIg" href="#" target="_blank" rel="noopener noreferrer" class="boho-ig-link" style="display:none;"></a>
+          </div>
+        </article>
+      </section>
+
+      <!-- 5. VIDEO PREWEDDING (Opsional Toggle) -->
+      <section id="sec-video-block" class="sec-boho-elevated" style="display:none;">
+        <div class="boho-eyebrow">CINEMA</div>
+        <h3 class="boho-sec-title">Prewedding <span class="title-italic">Film</span></h3>
+        <div id="bohoVideoWrap" class="boho-video-box" style="display:none;">
+          <iframe id="bohoVideoIframe" src="" title="Prewedding Video" allowfullscreen loading="lazy"></iframe>
         </div>
       </section>
 
-      <!-- 4. Precious Moment Masonry Gallery + Video (#cebba2) -->
+      <!-- 6. GALERI "PRECIOUS MOMENT" (4 Foto Grid + Quote + Lightbox) -->
       <section id="sec-gallery" class="sec-boho-sand">
-        <div class="boho-eyebrow" style="color:var(--boho-bronze);">GALLERIES</div>
-        <h3 class="boho-sec-title" style="color:var(--boho-dark);">Precious <span class="title-italic">moment</span></h3>
-        <div id="bohoVideoWrap" class="boho-video-box" style="display:none;"><iframe id="bohoVideoIframe" src="" title="Prewedding Video" allowfullscreen></iframe></div>
+        <div class="boho-eyebrow" style="color:var(--accent-terracotta);">OUR MEMORIES</div>
+        <h3 class="boho-sec-title" style="color:var(--text-dark);">Precious <span class="title-italic" style="color:var(--accent-terracotta);">Moment</span></h3>
+        <div class="boho-ornament-slot" data-ornament="botanical-cluster"></div>
+        <p id="bohoGalleryQuote" style="font-family:var(--font-title); font-style:italic; font-size:15px; color:rgba(29,29,27,0.84); margin-bottom:10px;"></p>
         <div id="mainGalleryGrid" class="gallery-grid"></div>
       </section>
 
-      <!-- 5. Minimal Editorial Story + Event (#1d1d1b) -->
+      <!-- 7. LOVE STORY -->
       <section id="sec-story" class="sec-boho-dark">
-        <div class="boho-eyebrow">LOVE JOURNEY</div>
-        <h3 class="boho-sec-title">Our <span class="title-italic">Story</span></h3>
+        <div class="boho-eyebrow">OUR JOURNEY</div>
+        <h3 class="boho-sec-title">Love <span class="title-italic">Story</span></h3>
+        <div class="boho-ornament-slot" data-ornament="fern-divider"></div>
         <div id="mainStoryList" class="story-timeline"></div>
       </section>
 
-      <section id="sec-event-info" class="sec-boho-dark" style="padding-top:10px;">
-        <div class="boho-eyebrow">RUNDOWN</div>
-        <h3 class="boho-sec-title">Save <span class="title-italic">the date</span></h3>
-        <div style="border-top:1px solid var(--border-sand); padding:18px 0;">
-          <h4 id="mainAkadTitle" style="font-family:var(--font-title); font-size:23px; color:var(--boho-sand);">Marriage Contract</h4>
-          <div id="mainAkadDate" style="font-size:13px; margin:4px 0;"></div>
-          <div id="mainAkadTime" style="font-size:12.5px; color:var(--boho-muted);"></div>
+      <!-- 8. JADWAL ACARA (AKAD & RESEPSI) + KALENDER -->
+      <section id="sec-event-info" class="sec-boho-elevated">
+        <div class="boho-ornament-slot" data-ornament="macrame-border"></div>
+        <div class="boho-eyebrow">WEDDING SCHEDULE</div>
+        <h3 class="boho-sec-title">Save <span class="title-italic">the Date</span></h3>
+
+        <div class="event-boho-card reveal-3d">
+          <div class="boho-eyebrow" style="margin-bottom:4px;">CEREMONY I</div>
+          <h4 id="mainAkadTitle" style="font-family:var(--font-title); font-size:24px; color:var(--accent-gold);">Akad Nikah</h4>
+          <div id="mainAkadDate" style="font-size:13px; margin:6px 0 3px;"></div>
+          <div id="mainAkadTime" style="font-size:12.5px; color:var(--text-muted);"></div>
         </div>
-        <div style="border-top:1px solid var(--border-sand); border-bottom:1px solid var(--border-sand); padding:18px 0; margin-bottom:18px;">
-          <h4 id="mainReceptionTitle" style="font-family:var(--font-title); font-size:23px; color:var(--boho-sand);">Reception</h4>
-          <div id="mainReceptionDate" style="font-size:13px; margin:4px 0;"></div>
-          <div id="mainReceptionTime" style="font-size:12.5px; color:var(--boho-muted);"></div>
+
+        <div class="event-boho-card reveal-3d">
+          <div class="boho-eyebrow" style="margin-bottom:4px;">CELEBRATION II</div>
+          <h4 id="mainReceptionTitle" style="font-family:var(--font-title); font-size:24px; color:var(--accent-gold);">Resepsi</h4>
+          <div id="mainReceptionDate" style="font-size:13px; margin:6px 0 3px;"></div>
+          <div id="mainReceptionTime" style="font-size:12.5px; color:var(--text-muted);"></div>
         </div>
-        <h4 id="mainVenueName" style="font-family:var(--font-title); font-size:21px; color:var(--boho-sand);"></h4>
-        <p id="mainVenueAddress" style="font-size:12px; color:var(--boho-muted); margin:6px 0 16px;"></p>
-        <a id="mainGoogleMapsBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn-boho"><span>SEE LOCATION</span></a>
+
+        <h4 id="mainVenueName" style="font-family:var(--font-title); font-size:22px; color:var(--accent-gold);"></h4>
+        <p id="mainVenueAddress" style="font-size:12px; color:var(--text-muted); margin:6px 0 16px; line-height:1.55;"></p>
+        <div style="display:grid; grid-template-columns:1fr; gap:8px;">
+          <a id="mainGoogleMapsBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn-boho"><span>Lihat Lokasi</span></a>
+          <a id="bohoCalendarEventBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn-boho-outline"><span>Simpan ke Kalender</span></a>
+        </div>
       </section>
 
-      <!-- 6. Live Streaming Pill Overlap (#4f6368) -->
+      <!-- Anchor slot jika posisi Peta & RSVP dipilih "below_event" -->
+      <div id="bohoBelowEventSlot"></div>
+
+      <!-- 9. LOKASI & PETA EMBED (Tanpa API Key) -->
+      <section id="sec-location" class="sec-boho-dark">
+        <div class="boho-eyebrow">VENUE DIRECTION</div>
+        <h3 class="boho-sec-title">Maps <span class="title-italic">Location</span></h3>
+        <iframe id="bohoMapsIframe" class="maps-embed-frame" src="" title="Peta Lokasi Acara" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <a id="bohoMapsDirectBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn-boho-outline" style="width:100%;"><span>Buka di Google Maps</span></a>
+      </section>
+
+      <!-- 10. LIVE STREAMING (Opsional Toggle) -->
       <section id="sec-livestream" class="sec-boho-slate" style="display:none;">
-        <img id="bohoLivePhoto" class="live-pill-photo" src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80" alt="Live">
+        <img id="bohoLivePhoto" class="live-pill-photo" src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80" alt="Live Streaming" loading="lazy">
         <h3 class="live-overlap-title">Live Streaming</h3>
-        <p style="font-size:12px; color:var(--boho-muted); margin:8px 0 16px;">Meet us <strong>virtually</strong> to witness our wedding celebration.</p>
-        <a id="bohoLivestreamBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn-boho" style="background:var(--boho-dark); color:var(--boho-sand); border-color:var(--boho-sand);"><span>GO TO STREAMING</span></a>
+        <p style="font-size:12.5px; color:var(--text-primary); margin:10px 0 16px;">Saksikan momen sakral kami secara langsung dari jarak jauh melalui siaran virtual.</p>
+        <a id="bohoLivestreamBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn-boho" style="background:var(--bg-surface); color:var(--accent-gold); border-color:var(--accent-gold);"><span>Buka Streaming</span></a>
       </section>
 
-      <!-- 7. Overlapping Gift Card (#gift straddling into #wishes) -->
+      <!-- 11. AMPLOP DIGITAL (Opsional Toggle) -->
       <section id="sec-gift" class="gift-overlap-section">
-        <div class="boho-eyebrow" style="color:var(--boho-bronze);">WEDDING GIFT</div>
-        <h3 class="boho-sec-title" style="color:var(--boho-dark);">Send <span class="title-italic">your gift</span></h3>
-        <p id="bohoGiftNote" style="font-size:12.5px; color:rgba(29,29,27,0.82);"></p>
+        <div class="boho-eyebrow" style="color:var(--accent-terracotta);">AMPLOP DIGITAL</div>
+        <h3 class="boho-sec-title" style="color:var(--text-dark);">Wedding <span class="title-italic" style="color:var(--accent-terracotta);">Gift</span></h3>
+        <p id="bohoGiftNote" style="font-size:12.5px; color:rgba(29,29,27,0.85);"></p>
 
         <div class="gift-straddle-card">
           <div class="boho-gift-tabs">
-            <button type="button" id="bohoGiftTabDirect" class="boho-gift-tab active" onclick="switchBohoGiftMethod('direct')">Direct Transfer</button>
-            <button type="button" id="bohoGiftTabAddr" class="boho-gift-tab" onclick="switchBohoGiftMethod('address')">Send Gift</button>
+            <button type="button" id="bohoGiftTabDirect" class="boho-gift-tab active" onclick="switchBohoGiftMethod('direct')">Transfer Langsung</button>
+            <button type="button" id="bohoGiftTabAddr" class="boho-gift-tab" onclick="switchBohoGiftMethod('address')">Kirim Kado</button>
           </div>
           <div id="bohoGiftDirectBox">
             <div id="bohoBankName" style="font-family:var(--font-title); font-size:24px; color:#fff;">BCA</div>
-            <div id="bohoBankNumber" style="font-family:monospace; font-size:19px; font-weight:700; color:var(--boho-sand); margin:4px 0;">1234567890</div>
-            <div id="bohoBankOwner" style="font-size:11.5px; color:var(--boho-muted); margin-bottom:12px;"></div>
+            <div id="bohoBankNumber" style="font-family:monospace; font-size:19px; font-weight:700; color:var(--accent-gold); margin:4px 0;">1234567890</div>
+            <div id="bohoBankOwner" style="font-size:11.5px; color:var(--text-muted); margin-bottom:12px;"></div>
             <button type="button" class="btn-boho-outline" onclick="copyBohoText('bohoBankNumber', 'Nomor rekening disalin!')"><span>Salin No. Rekening</span></button>
           </div>
           <div id="bohoGiftAddressBox" style="display:none;">
-            <p id="bohoGiftAddress" style="font-size:12.5px; color:#fff; margin-bottom:12px;"></p>
+            <p id="bohoGiftAddress" style="font-size:12.5px; color:#fff; margin-bottom:12px; line-height:1.55;"></p>
             <button type="button" class="btn-boho-outline" onclick="copyBohoText('bohoGiftAddress', 'Alamat kado disalin!')"><span>Salin Alamat</span></button>
           </div>
         </div>
       </section>
 
-      <!-- 8. Wishes & RSVP (Top padding accommodates overlapping Gift card!) -->
-      <section id="sec-rsvp" class="sec-boho-dark" style="padding-top:70px;">
-        <div class="boho-eyebrow">RESERVATION</div>
-        <h3 class="boho-sec-title">Wishes <span class="title-italic">&amp; RSVP</span></h3>
+      <!-- 12. RSVP & UCAPAN DOA -->
+      <section id="sec-rsvp" class="sec-boho-dark" style="padding-top:72px;">
+        <div class="boho-eyebrow">RESERVATION &amp; PRAYER</div>
+        <h3 class="boho-sec-title">RSVP &amp; <span class="title-italic">Wishes</span></h3>
         <form id="guestRsvpForm" style="text-align:left; margin-top:12px;" action="javascript:void(0);" onsubmit="handleGuestRsvpSubmit(event); return false;">
-          <input type="text" id="rsvpFormGuestName" class="guest-input" readonly>
-          <select id="rsvpFormAttendance" class="guest-input" onchange="handleRsvpAttendanceChange()"><option value="Hadir">Yes, I'll Be There</option><option value="Tidak Hadir">Sorry, I Can't</option></select>
-          <div id="rsvpGuestCountWrapper"><select id="rsvpFormGuestCount" class="guest-input"><option value="1">1 Orang</option><option value="2">2 Orang</option><option value="3">3 Orang</option><option value="4">4 Orang</option><option value="5">5 Orang</option></select></div>
-          <textarea id="rsvpFormWishes" class="guest-input" style="min-height:85px;" required placeholder="Tuliskan ucapan & doa..."></textarea>
-          <button type="button" id="rsvpSubmitBtn" onclick="handleGuestRsvpSubmit(event)" class="btn-boho">SUBMIT CONFIRMATION</button>
+          <input type="text" id="rsvpFormGuestName" class="guest-input" aria-label="Nama Tamu" readonly>
+          <select id="rsvpFormAttendance" class="guest-input" aria-label="Konfirmasi Kehadiran" onchange="handleRsvpAttendanceChange()">
+            <option value="Hadir">Hadir — Saya Akan Datang</option>
+            <option value="Tidak Hadir">Tidak Hadir — Maaf Belum Bisa Datang</option>
+          </select>
+          <div id="rsvpGuestCountWrapper">
+            <select id="rsvpFormGuestCount" class="guest-input" aria-label="Jumlah Tamu">
+              <option value="1">1 Orang</option>
+              <option value="2">2 Orang</option>
+              <option value="3">3 Orang</option>
+              <option value="4">4 Orang</option>
+              <option value="5">5 Orang</option>
+            </select>
+          </div>
+          <textarea id="rsvpFormWishes" class="guest-input" style="min-height:85px;" required placeholder="Tuliskan ucapan & doa restu..." aria-label="Ucapan dan Doa"></textarea>
+          <button type="button" id="rsvpSubmitBtn" onclick="handleGuestRsvpSubmit(event)" class="btn-boho">Kirim Konfirmasi &amp; Ucapan</button>
         </form>
-        <div id="sec-wishes" style="margin-top:20px;">
-          <p id="wishesTotalLabel" style="font-size:11px; color:var(--boho-sand);"></p>
+        <div id="sec-wishes" style="margin-top:22px;">
+          <p id="wishesTotalLabel" style="font-size:11.5px; color:var(--accent-gold);"></p>
           <div id="mainWishesFeed" class="wishes-feed"></div>
         </div>
       </section>
 
+      <!-- 13. QR CHECK-IN PASS (Dikontrol toggle QR) -->
       <section id="sec-qrcode" class="sec-boho-sand">
-        <div class="boho-eyebrow" style="color:var(--boho-bronze);">GUEST PASS</div>
-        <h3 class="boho-sec-title" style="color:var(--boho-dark);">QR Check-in</h3>
-        <div style="background:var(--boho-dark); color:#fff; padding:20px;">
-          <div id="qrPassGuestName" style="font-family:var(--font-title); font-size:21px; color:var(--boho-sand); margin-bottom:10px;"></div>
-          <div id="guestQrCodeContainer" style="display:inline-block; padding:12px; background:#fff;"></div>
-          <div id="qrPassCategoryBadge" style="margin-top:8px;"></div>
-          <div id="qrPassCheckinStatus" style="margin-top:4px; font-size:11.5px; color:var(--boho-muted);"></div>
+        <div class="boho-eyebrow" style="color:var(--accent-terracotta);">GUEST PASS</div>
+        <h3 class="boho-sec-title" style="color:var(--text-dark);">QR Check-in</h3>
+        <div style="background:var(--bg-surface); color:#fff; padding:22px; border-radius:14px; border:1px solid var(--border-soft);">
+          <div id="qrPassGuestName" style="font-family:var(--font-title); font-size:21px; color:var(--accent-gold); margin-bottom:10px;"></div>
+          <div id="guestQrCodeContainer" style="display:inline-block; padding:12px; background:#fff; border-radius:8px;"></div>
+          <div id="qrPassCategoryBadge" style="margin-top:10px;"></div>
+          <div id="qrPassCheckinStatus" style="margin-top:6px; font-size:11.5px; color:var(--text-muted);"></div>
         </div>
       </section>
 
+      <!-- 14. PENUTUP & TURUT MENGUNDANG -->
       <section id="sec-closing" class="boho-closing-wrap">
-        <img id="bohoClosingPhoto" class="boho-closing-bg" src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=900&q=80" alt="Closing">
+        <img id="bohoClosingPhoto" class="boho-closing-bg" src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=900&q=80" alt="Closing Portrait" loading="lazy">
         <div class="boho-closing-overlay"></div>
         <div class="boho-closing-inner">
-          <div class="boho-eyebrow" style="margin-bottom:6px;">ALSO INVITING</div>
+          <div class="boho-ornament-slot" data-ornament="macrame-border"></div>
+          <div class="boho-eyebrow" style="margin-bottom:6px;">TURUT MENGUNDANG</div>
           <ul id="bohoAlsoInviteList" class="boho-also-invite"></ul>
-          <p id="mainClosingText" style="font-size:12px; color:var(--boho-muted); margin-bottom:12px;"></p>
-          <div class="boho-eyebrow">THANK YOU</div>
+          <p id="mainClosingText" style="font-size:12.5px; color:var(--text-muted); margin-bottom:14px; line-height:1.6;"></p>
+          <div class="boho-eyebrow">TERIMA KASIH</div>
           <h3 id="mainClosingCouple" class="boho-couple-hero" style="font-size:34px; margin-top:4px;"></h3>
+          <div style="font-size:10px; color:var(--text-muted); margin-top:12px; letter-spacing:0.16em;">DARK BOHO WEDDING EDITION</div>
         </div>
       </section>
     </main>
 
-    <div id="galleryLightbox" class="lightbox-overlay" onclick="closeGalleryLightbox()"><img id="lightboxImgEl" class="lightbox-Overlay-img" src="" alt="Preview"><div id="lightboxCaptionEl" style="color:#FFF; margin-top:10px;"></div></div>
+    <!-- LIGHTBOX VANILLA DENGAN PREV / NEXT / SWIPE -->
+    <div id="galleryLightbox" class="lightbox-overlay" onclick="if(event.target===this) closeGalleryLightbox()">
+      <button type="button" class="lightbox-close-btn" aria-label="Tutup Lightbox" onclick="closeGalleryLightbox()">✕</button>
+      <img id="lightboxImgEl" class="lightbox-Overlay-img" src="" alt="Preview Foto Galeri">
+      <div id="lightboxCaptionEl" style="color:var(--text-primary); font-size:13px; margin-top:10px;"></div>
+      <div class="lightbox-nav-bar">
+        <button type="button" class="lightbox-nav-btn" aria-label="Foto Sebelumnya" onclick="event.stopPropagation(); navigateGalleryLightbox(-1)">‹</button>
+        <span id="lightboxCounterEl" style="font-size:11.5px; color:var(--accent-gold); letter-spacing:0.14em;"></span>
+        <button type="button" class="lightbox-nav-btn" aria-label="Foto Berikutnya" onclick="event.stopPropagation(); navigateGalleryLightbox(1)">›</button>
+      </div>
+    </div>
+
     <audio id="bgMusicAudio" loop preload="none"></audio>
-    <button type="button" id="floatingMusicBtn" class="floating-music-btn" onclick="toggleBackgroundMusic()"><i data-lucide="disc-3" style="width:20px;height:20px;"></i></button>
-    <nav id="bottomTouchNav" class="bottom-touch-nav"><a href="#sec-qrcode"></a></nav>
+    <button type="button" id="floatingMusicBtn" class="floating-music-btn" aria-label="Putar atau Hentikan Musik" onclick="toggleBackgroundMusic()">
+      <i data-lucide="disc-3" style="width:20px;height:20px;"></i>
+    </button>
+    <nav id="bottomTouchNav" class="bottom-touch-nav" aria-hidden="true"><a href="#sec-qrcode"></a></nav>
   </div>
-  <script>window.__INITIAL_INVITATION_TOKEN__ = "<?= initialToken ?>";</script>
+  <script>
+    window.__INITIAL_INVITATION_TOKEN__ = "<?= initialToken ?>";
+    window.__INITIAL_GUEST_NAME__ = "<?= typeof initialGuestName !== 'undefined' ? initialGuestName : '' ?>";
+  </script>
+  <?!= include('OrnamentsDarkBoho'); ?>
   <?!= include('ScriptsGuest'); ?>
 </body>
 </html>

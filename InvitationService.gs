@@ -185,6 +185,21 @@ function getWeddingConfigData(bypassCache, targetWeddingId) {
     gift_note: settings.gift_note !== undefined ? settings.gift_note : APP_CONFIG.DEFAULT_SETTINGS.gift_note,
     also_invite_text: settings.also_invite_text !== undefined ? settings.also_invite_text : APP_CONFIG.DEFAULT_SETTINGS.also_invite_text,
     closing_text: settings.closing_text || APP_CONFIG.DEFAULT_SETTINGS.closing_text,
+    groom_origin: settings.groom_origin !== undefined ? settings.groom_origin : APP_CONFIG.DEFAULT_SETTINGS.groom_origin,
+    bride_origin: settings.bride_origin !== undefined ? settings.bride_origin : APP_CONFIG.DEFAULT_SETTINGS.bride_origin,
+    groom_ig: settings.groom_ig !== undefined ? settings.groom_ig : APP_CONFIG.DEFAULT_SETTINGS.groom_ig,
+    bride_ig: settings.bride_ig !== undefined ? settings.bride_ig : APP_CONFIG.DEFAULT_SETTINGS.bride_ig,
+    gallery_quote: settings.gallery_quote !== undefined ? settings.gallery_quote : APP_CONFIG.DEFAULT_SETTINGS.gallery_quote,
+    cover_style: settings.cover_style || APP_CONFIG.DEFAULT_SETTINGS.cover_style,
+    cover_use_photo: String(settings.cover_use_photo !== undefined ? settings.cover_use_photo : APP_CONFIG.DEFAULT_SETTINGS.cover_use_photo) === 'true',
+    cover_show_guest_name: String(settings.cover_show_guest_name !== undefined ? settings.cover_show_guest_name : APP_CONFIG.DEFAULT_SETTINGS.cover_show_guest_name) === 'true',
+    cover_overlay_color: settings.cover_overlay_color || APP_CONFIG.DEFAULT_SETTINGS.cover_overlay_color,
+    cover_overlay_opacity: settings.cover_overlay_opacity !== undefined ? String(settings.cover_overlay_opacity) : APP_CONFIG.DEFAULT_SETTINGS.cover_overlay_opacity,
+    cover_text_color: settings.cover_text_color || APP_CONFIG.DEFAULT_SETTINGS.cover_text_color,
+    boho_rsvp_map_position: settings.boho_rsvp_map_position || APP_CONFIG.DEFAULT_SETTINGS.boho_rsvp_map_position,
+    section_video_enabled: String(settings.section_video_enabled !== undefined ? settings.section_video_enabled : APP_CONFIG.DEFAULT_SETTINGS.section_video_enabled) === 'true',
+    section_livestream_enabled: String(settings.section_livestream_enabled !== undefined ? settings.section_livestream_enabled : APP_CONFIG.DEFAULT_SETTINGS.section_livestream_enabled) === 'true',
+    section_gift_enabled: String(settings.section_gift_enabled !== undefined ? settings.section_gift_enabled : APP_CONFIG.DEFAULT_SETTINGS.section_gift_enabled) === 'true',
     wa_message_template: settings.wa_message_template || APP_CONFIG.DEFAULT_SETTINGS.wa_message_template,
     gallery: gallery.map(function (img, idx) {
       return {
@@ -376,8 +391,6 @@ function updateWeddingSettings(sessionToken, payload) {
       status: sanitizeString(payload.status || current.status || 'Published', 30)
     };
 
-    replaceSheetRecords(APP_CONFIG.SHEETS.WEDDINGS.name, [updatedWeddingRow]);
-
     // Sanitasi array cerita pasangan
     var storyList = current.our_story || [];
     if (Array.isArray(payload.our_story)) {
@@ -469,7 +482,22 @@ function updateWeddingSettings(sessionToken, payload) {
       closing_text: sanitizeString(
         payload.closing_text !== undefined ? payload.closing_text : current.closing_text,
         500
-      )
+      ),
+      groom_origin: sanitizeString(payload.groom_origin !== undefined ? payload.groom_origin : current.groom_origin, 100),
+      bride_origin: sanitizeString(payload.bride_origin !== undefined ? payload.bride_origin : current.bride_origin, 100),
+      groom_ig: sanitizeTextPlain(payload.groom_ig !== undefined ? payload.groom_ig : current.groom_ig, 120),
+      bride_ig: sanitizeTextPlain(payload.bride_ig !== undefined ? payload.bride_ig : current.bride_ig, 120),
+      gallery_quote: sanitizeString(payload.gallery_quote !== undefined ? payload.gallery_quote : current.gallery_quote, 300),
+      cover_style: sanitizeTextPlain(payload.cover_style !== undefined ? payload.cover_style : current.cover_style, 30) || 'space-between',
+      cover_use_photo: payload.cover_use_photo !== undefined ? String(!!payload.cover_use_photo) : String(current.cover_use_photo !== false),
+      cover_show_guest_name: payload.cover_show_guest_name !== undefined ? String(!!payload.cover_show_guest_name) : String(current.cover_show_guest_name !== false),
+      cover_overlay_color: sanitizeTextPlain(payload.cover_overlay_color !== undefined ? payload.cover_overlay_color : current.cover_overlay_color, 30) || '#1d1d1b',
+      cover_overlay_opacity: sanitizeTextPlain(payload.cover_overlay_opacity !== undefined ? payload.cover_overlay_opacity : current.cover_overlay_opacity, 10) || '0.68',
+      cover_text_color: sanitizeTextPlain(payload.cover_text_color !== undefined ? payload.cover_text_color : current.cover_text_color, 30) || '#efe6d8',
+      boho_rsvp_map_position: sanitizeTextPlain(payload.boho_rsvp_map_position !== undefined ? payload.boho_rsvp_map_position : current.boho_rsvp_map_position, 40) || 'separate_sections',
+      section_video_enabled: payload.section_video_enabled !== undefined ? String(!!payload.section_video_enabled) : String(current.section_video_enabled !== false),
+      section_livestream_enabled: payload.section_livestream_enabled !== undefined ? String(!!payload.section_livestream_enabled) : String(current.section_livestream_enabled !== false),
+      section_gift_enabled: payload.section_gift_enabled !== undefined ? String(!!payload.section_gift_enabled) : String(current.section_gift_enabled !== false)
     };
 
     if (payload.wa_message_template !== undefined) {

@@ -75,12 +75,14 @@ function doGet(e) {
     var targetHtmlFile = themeFileMap[selectedThemeKey] || 'ThemeElegantFloral';
     var guestTpl = HtmlService.createTemplateFromFile(targetHtmlFile);
     guestTpl.initialToken = sanitizeTextPlain(token, 120);
+    guestTpl.initialGuestName = sanitizeTextPlain(params.to || '', 100);
     guestTpl.webAppUrl = getWebAppBaseUrl();
 
     return guestTpl
       .evaluate()
       .setTitle('Wedding Invitation')
       .addMetaTag('viewport', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no')
+      .addMetaTag('theme-color', selectedThemeKey === 'dark_boho' ? '#1d1d1b' : '#FAF7F0')
       .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
   }
 

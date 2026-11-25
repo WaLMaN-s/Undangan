@@ -200,6 +200,21 @@ var APP_CONFIG = {
     gift_note: 'Doa restu Anda merupakan karunia terindah bagi kami. Namun jika berkenan memberikan tanda kasih, dapat melalui rekening atau alamat di bawah ini.',
     also_invite_text: 'Keluarga Besar Mempelai Pria\nKeluarga Besar Mempelai Wanita\nSahabat & Rekan Kerja',
     closing_text: 'Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir untuk memberikan doa restu kepada kami.',
+    groom_origin: 'Jakarta Selatan',
+    bride_origin: 'Bandung',
+    groom_ig: '@romeo.montague',
+    bride_ig: '@juliet.capulet',
+    gallery_quote: 'Every moment with you feels like home — captured softly in warm light.',
+    cover_style: 'space-between',
+    cover_use_photo: 'true',
+    cover_show_guest_name: 'true',
+    cover_overlay_color: '#1d1d1b',
+    cover_overlay_opacity: '0.68',
+    cover_text_color: '#efe6d8',
+    boho_rsvp_map_position: 'separate_sections',
+    section_video_enabled: 'true',
+    section_livestream_enabled: 'true',
+    section_gift_enabled: 'true',
     wa_message_template:
       'Halo {{nama_tamu}},\n\n' +
       'Dengan penuh sukacita, kami mengundang Anda untuk menghadiri pernikahan kami:\n' +

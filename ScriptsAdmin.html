@@ -993,6 +993,21 @@
       if (document.getElementById('edGiftNote')) document.getElementById('edGiftNote').value = w.gift_note || '';
       if (document.getElementById('edAlsoInviteText')) document.getElementById('edAlsoInviteText').value = w.also_invite_text || '';
       document.getElementById('edClosingText').value = w.closing_text || '';
+      if (document.getElementById('edGroomOrigin')) document.getElementById('edGroomOrigin').value = w.groom_origin || '';
+      if (document.getElementById('edBrideOrigin')) document.getElementById('edBrideOrigin').value = w.bride_origin || '';
+      if (document.getElementById('edGroomIg')) document.getElementById('edGroomIg').value = w.groom_ig || '';
+      if (document.getElementById('edBrideIg')) document.getElementById('edBrideIg').value = w.bride_ig || '';
+      if (document.getElementById('edGalleryQuote')) document.getElementById('edGalleryQuote').value = w.gallery_quote || '';
+      if (document.getElementById('edCoverStyle')) document.getElementById('edCoverStyle').value = w.cover_style || 'space-between';
+      if (document.getElementById('edCoverUsePhoto')) document.getElementById('edCoverUsePhoto').value = String(w.cover_use_photo !== false);
+      if (document.getElementById('edCoverShowGuest')) document.getElementById('edCoverShowGuest').value = String(w.cover_show_guest_name !== false);
+      if (document.getElementById('edCoverOverlayColor')) document.getElementById('edCoverOverlayColor').value = w.cover_overlay_color || '#1d1d1b';
+      if (document.getElementById('edCoverOverlayOpacity')) document.getElementById('edCoverOverlayOpacity').value = w.cover_overlay_opacity || '0.68';
+      if (document.getElementById('edCoverTextColor')) document.getElementById('edCoverTextColor').value = w.cover_text_color || '#efe6d8';
+      if (document.getElementById('edBohoRsvpMapPosition')) document.getElementById('edBohoRsvpMapPosition').value = w.boho_rsvp_map_position || 'separate_sections';
+      if (document.getElementById('edSectionVideoEnabled')) document.getElementById('edSectionVideoEnabled').value = String(w.section_video_enabled !== false);
+      if (document.getElementById('edSectionLivestreamEnabled')) document.getElementById('edSectionLivestreamEnabled').value = String(w.section_livestream_enabled !== false);
+      if (document.getElementById('edSectionGiftEnabled')) document.getElementById('edSectionGiftEnabled').value = String(w.section_gift_enabled !== false);
 
       ADMIN_STATE.storyDraft = Array.isArray(w.our_story) ? JSON.parse(JSON.stringify(w.our_story)) : [];
       ADMIN_STATE.galleryDraft = Array.isArray(w.gallery) ? JSON.parse(JSON.stringify(w.gallery)) : [];
@@ -1353,11 +1368,26 @@
     if (brideEl && slotMap.bride_photo) brideEl.value = slotMap.bride_photo;
   }
 
+  function normalizeDriveImageUrl(url) {
+    const raw = String(url || '').trim();
+    if (!raw) return '';
+    const matchFile = raw.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (matchFile && matchFile[1]) {
+      return 'https:\/\/lh3.googleusercontent.com/d/' + matchFile[1];
+    }
+    const matchId = raw.match(/drive\.google\.com\/(?:open|uc)\?[^#]*\bid=([a-zA-Z0-9_-]+)/);
+    if (matchId && matchId[1]) {
+      return 'https:\/\/lh3.googleusercontent.com/d/' + matchId[1];
+    }
+    return raw;
+  }
+
   function handleThemeSlotUrlChange(themeId, slotKey, newUrl) {
     const slotMap = ensureThemeSlotMap(themeId);
-    slotMap[slotKey] = newUrl.trim();
+    const normalized = normalizeDriveImageUrl(newUrl);
+    slotMap[slotKey] = normalized;
     const thumb = document.getElementById('slotThumb_' + slotKey);
-    if (thumb && newUrl.trim()) thumb.src = newUrl.trim();
+    if (thumb && normalized) thumb.src = normalized;
     syncThemeSlotsToMainInputs(themeId);
     renderFullInteractivePhonePreview(themeId);
   }
@@ -1662,8 +1692,64 @@
     }
 
     updateOwlShowcaseBanner(chosen);
+    renderThemeSpecificFields(chosen);
     renderThemePhotoSlotsEditor(chosen);
     renderFullInteractivePhonePreview(chosen);
+  }
+
+  const THEME_SPECIFIC_GUIDES = {
+    dark_boho: {
+      badge: 'Dark Boho Modular',
+      subtitle: 'Ornamen pampas/fern/arch/macramé, tekstur grain #1d1d1b, lightbox swipe, Google Maps embed & kontrol cover penuh',
+      info: ''
+    },
+    first_class_vows: {
+      badge: 'Passport & Boarding Pass',
+      subtitle: 'Fokus tema penerbangan: Crew 2 kolom, perforasi tiket Gate 01/02, pelacak rute & barcode pass',
+      info: 'Tema First Class Vows menggunakan format Paspor & Boarding Pass. Gunakan Nama Panggilan, Akad/Resepsi (Gate 01 & Gate 02), 3 foto Travel Album, dan Cerita Cinta bergaya Flight Log.'
+    },
+    cypress_linen: {
+      badge: 'Botanical Editorial',
+      subtitle: 'Sampul segel lilin, majalah split hero, tab 3 acara & pita profil botani berselang-seling',
+      info: 'Tema Cypress & Linen menampilkan tab interaktif (1. Akad, 2. Resepsi, 3. Lokasi), dek cerita horizontal & bingkai pil botani. Pastikan slot Galeri 1–2 terisi.'
+    },
+    traditional_java: {
+      badge: 'Keraton Adat Jawa',
+      subtitle: 'Gunungan Wayang, kaligrafi mandala Jawa, galeri sinkron thumbnail strip #sync1/#sync2 & Batik timeline',
+      info: 'Tema Traditional Java menampilkan galeri besar dengan strip thumbnail yang bisa diklik dan lengkung Gunungan. Isi seluruh 4 foto prosesi adat (Siraman, Panggih, Resepsi, Keluarga).'
+    },
+    thelove_cinematic: {
+      badge: 'Cinematic Slideshow',
+      subtitle: '12 slot media penuh termasuk 3 foto hero slideshow & foto per bab Our Journey',
+      info: 'Tema Thelove Cinematic mendukung slideshow hero 3D dan foto terpisah untuk setiap bab Our Journey. Pastikan minimal 3 bab cerita dan seluruh slot 1–12 terisi.'
+    }
+  };
+
+  function renderThemeSpecificFields(themeId) {
+    const isBoho = themeId === 'dark_boho';
+    const bohoPanel = document.getElementById('darkBohoSpecificPanel');
+    const bannerEl = document.getElementById('otherThemeSpecificBanner');
+    const titleEl = document.getElementById('themeSpecificTitle');
+    const subEl = document.getElementById('themeSpecificSubtitle');
+    const badgeEl = document.getElementById('themeSpecificBadge');
+    const guide = THEME_SPECIFIC_GUIDES[themeId] || {
+      badge: THEME_LABELS[themeId] || themeId,
+      subtitle: 'Informasi dan slot media disesuaikan dengan karakter tema pilihan Anda',
+      info: 'Tema ini menggunakan foto slot spesifik di bawah serta data profil mempelai, jadwal acara, kutipan, cerita cinta, dan galeri foto.'
+    };
+
+    if (bohoPanel) bohoPanel.style.display = isBoho ? 'block' : 'none';
+    if (bannerEl) {
+      if (!isBoho && guide.info) {
+        bannerEl.style.display = 'block';
+        bannerEl.textContent = guide.info;
+      } else {
+        bannerEl.style.display = 'none';
+      }
+    }
+    if (titleEl) titleEl.textContent = 'Pengaturan Khusus Tema: ' + (THEME_LABELS[themeId] || themeId);
+    if (subEl) subEl.textContent = guide.subtitle;
+    if (badgeEl) badgeEl.textContent = guide.badge;
   }
 
   async function handleQuickApplyTheme() {
@@ -1763,92 +1849,116 @@
       const bankName = (document.getElementById('edGiftBankName') && document.getElementById('edGiftBankName').value) || 'BCA';
       const bankNum = (document.getElementById('edGiftAccountNumber') && document.getElementById('edGiftAccountNumber').value) || '1234567890';
       const bankOwner = (document.getElementById('edGiftAccountName') && document.getElementById('edGiftAccountName').value) || coupleShort;
+      const overlayHex = (document.getElementById('edCoverOverlayColor') && document.getElementById('edCoverOverlayColor').value) || '#1d1d1b';
+      const overlayOpacity = (document.getElementById('edCoverOverlayOpacity') && document.getElementById('edCoverOverlayOpacity').value) || '0.68';
+      const coverTextHex = (document.getElementById('edCoverTextColor') && document.getElementById('edCoverTextColor').value) || '#efe6d8';
+      const coverStyleVal = (document.getElementById('edCoverStyle') && document.getElementById('edCoverStyle').value) || 'space-between';
+      const coverUsePhoto = !document.getElementById('edCoverUsePhoto') || document.getElementById('edCoverUsePhoto').value === 'true';
+      const coverShowGuest = !document.getElementById('edCoverShowGuest') || document.getElementById('edCoverShowGuest').value === 'true';
+      const groomOrig = (document.getElementById('edGroomOrigin') && document.getElementById('edGroomOrigin').value) || 'Jakarta Selatan';
+      const brideOrig = (document.getElementById('edBrideOrigin') && document.getElementById('edBrideOrigin').value) || 'Bandung';
+      const galQuote = (document.getElementById('edGalleryQuote') && document.getElementById('edGalleryQuote').value) || 'Every moment with you feels like home.';
+      const coverJustify = coverStyleVal === 'default' ? 'center' : (coverStyleVal === 'top-cover' ? 'flex-start' : 'space-between');
+      const coverBgRule = coverUsePhoto ? `url('${escapeHtml(coverImg)}') center/cover` : 'radial-gradient(circle at 50% 25%, rgba(181,101,29,0.22), #1d1d1b)';
+
       screen.innerHTML = `
-        <div style="background:#1d1d1b; color:#FFFFFF; font-family:'Montserrat',sans-serif; text-align:center; width:100%; box-sizing:border-box;">
-          <div id="prev-sec-cover" style="min-height:430px; background:linear-gradient(180deg,rgba(28,45,71,0.36),rgba(29,29,27,0.92)),url('${escapeHtml(coverImg)}') center/cover; display:flex; flex-direction:column; justify-content:space-between; padding:28px 18px;">
-            <div>
-              <div style="font-size:10px; letter-spacing:0.26em; color:#cebba2;">THE WEDDING OF</div>
+        <div style="background:#1d1d1b; color:#efe6d8; font-family:'Jost',sans-serif; text-align:center; width:100%; box-sizing:border-box;">
+          <div id="prev-sec-cover" style="min-height:430px; position:relative; background:${coverBgRule}; color:${escapeHtml(coverTextHex)}; display:flex; flex-direction:column; justify-content:${coverJustify}; gap:16px; padding:28px 18px; overflow:hidden;">
+            <div style="position:absolute; inset:0; background:${escapeHtml(overlayHex)}; opacity:${escapeHtml(overlayOpacity)}; pointer-events:none;"></div>
+            <div style="position:relative; z-index:2;">
+              <div style="font-size:10px; letter-spacing:0.26em; color:#c9a86a;">THE WEDDING OF</div>
               <div style="font-family:'Cormorant Garamond',serif; font-size:32px; font-weight:500; margin:6px 0;">${coupleShort}</div>
-              <div style="font-size:11px; letter-spacing:0.22em; color:#cebba2;">${readableDate}</div>
+              <div style="font-size:11px; letter-spacing:0.22em; color:#c9a86a;">${readableDate}</div>
             </div>
-            <div>
-              <div style="background:rgba(29,29,27,0.7); border:1px solid rgba(206,187,162,0.35); padding:12px; margin-bottom:10px;">
-                <div style="font-size:10px; color:#cebba2; letter-spacing:0.15em;">KEPADA YTH.</div>
-                <div style="font-family:'Cormorant Garamond',serif; font-size:20px; margin-top:3px;">Budi Santoso</div>
-              </div>
-              <div style="background:#cebba2; color:#1d1d1b; padding:10px; font-size:10.5px; font-weight:700; letter-spacing:0.22em;">OPEN INVITATION</div>
+            <div style="position:relative; z-index:2;">
+              ${coverShowGuest ? `
+                <div style="background:rgba(29,29,27,0.72); border:1px solid rgba(201,168,106,0.38); border-radius:12px; padding:12px; margin-bottom:10px;">
+                  <div style="font-size:10px; color:#c9a86a; letter-spacing:0.15em;">KEPADA YTH.</div>
+                  <div style="font-family:'Cormorant Garamond',serif; font-size:20px; margin-top:3px;">Budi Santoso</div>
+                </div>
+              ` : ''}
+              <div style="background:#b5651d; color:#fff; padding:10px; border-radius:999px; font-size:10.5px; font-weight:600; letter-spacing:0.2em;">BUKA UNDANGAN</div>
             </div>
           </div>
 
           <div id="prev-sec-hero" style="padding:26px 16px; background:#1d1d1b;">
-            <div style="font-size:10px; letter-spacing:0.24em; color:#cebba2;">SAVE THE DATE</div>
-            <div style="width:170px; height:220px; margin:12px auto; border-radius:100px 100px 0 0; padding:5px; border:1px solid #cebba2;">
-              <img src="${escapeHtml(heroImg)}" style="width:100%; height:100%; object-fit:cover; border-radius:95px 95px 0 0;">
+            <div style="display:inline-block; padding:3px 12px; border:1px solid rgba(201,168,106,0.4); border-radius:999px; color:#c9a86a; font-family:'Cormorant Garamond',serif; font-size:14px; margin-bottom:8px;">${gInit} &amp; ${bInit}</div>
+            <div style="width:168px; height:215px; margin:8px auto; border-radius:100px 100px 8px 8px; padding:5px; border:1.5px solid #c9a86a;">
+              <img src="${escapeHtml(heroImg)}" style="width:100%; height:100%; object-fit:cover; border-radius:95px 95px 6px 6px;">
             </div>
             <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-top:12px;">
-              <div style="background:#262522; border:1px solid rgba(206,187,162,0.3); padding:8px 2px;"><div style="font-family:'Cormorant Garamond',serif; font-size:20px; color:#cebba2;">18</div><div style="font-size:8.5px;">DAYS</div></div>
-              <div style="background:#262522; border:1px solid rgba(206,187,162,0.3); padding:8px 2px;"><div style="font-family:'Cormorant Garamond',serif; font-size:20px; color:#cebba2;">09</div><div style="font-size:8.5px;">HOURS</div></div>
-              <div style="background:#262522; border:1px solid rgba(206,187,162,0.3); padding:8px 2px;"><div style="font-family:'Cormorant Garamond',serif; font-size:20px; color:#cebba2;">42</div><div style="font-size:8.5px;">MINS</div></div>
-              <div style="background:#262522; border:1px solid rgba(206,187,162,0.3); padding:8px 2px;"><div style="font-family:'Cormorant Garamond',serif; font-size:20px; color:#cebba2;">15</div><div style="font-size:8.5px;">SECS</div></div>
+              <div style="background:#252320; border:1px solid rgba(201,168,106,0.3); border-radius:8px; padding:8px 2px;"><div style="font-family:'Cormorant Garamond',serif; font-size:20px; color:#c9a86a;">18</div><div style="font-size:8.5px;">HARI</div></div>
+              <div style="background:#252320; border:1px solid rgba(201,168,106,0.3); border-radius:8px; padding:8px 2px;"><div style="font-family:'Cormorant Garamond',serif; font-size:20px; color:#c9a86a;">09</div><div style="font-size:8.5px;">JAM</div></div>
+              <div style="background:#252320; border:1px solid rgba(201,168,106,0.3); border-radius:8px; padding:8px 2px;"><div style="font-family:'Cormorant Garamond',serif; font-size:20px; color:#c9a86a;">42</div><div style="font-size:8.5px;">MENIT</div></div>
+              <div style="background:#252320; border:1px solid rgba(201,168,106,0.3); border-radius:8px; padding:8px 2px;"><div style="font-family:'Cormorant Garamond',serif; font-size:20px; color:#c9a86a;">15</div><div style="font-size:8.5px;">DETIK</div></div>
             </div>
           </div>
 
-          <div style="padding:24px 16px; background:#171715;">
-            <div style="width:76px; height:98px; margin:0 auto 10px; border:1px solid #cebba2; border-radius:60px 60px 0 0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#cebba2; font-family:'Cormorant Garamond',serif; font-size:21px;">
+          <div style="padding:24px 16px; background:#252320;">
+            <div style="width:76px; height:98px; margin:0 auto 10px; border:1px solid #c9a86a; border-radius:60px 60px 0 0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#c9a86a; font-family:'Cormorant Garamond',serif; font-size:21px;">
               <div>✦</div><div>${gInit}</div><div>${bInit}</div><div>✦</div>
             </div>
-            <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:13.5px; color:#cebba2; line-height:1.6;">${escapeHtml(quoteText)}</div>
-            <div style="font-size:10px; font-weight:700; color:#827e76; margin-top:6px;">${escapeHtml(quoteSource)}</div>
+            <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:13.5px; color:#c9a86a; line-height:1.6;">${escapeHtml(quoteText)}</div>
+            <div style="font-size:10px; font-weight:600; color:#8a9a7b; margin-top:6px;">${escapeHtml(quoteSource)}</div>
           </div>
 
           <div id="prev-sec-couple" style="padding:26px 16px; background:#1d1d1b;">
-            <div style="font-family:'Cormorant Garamond',serif; font-size:22px; margin-bottom:12px;">Bride &amp; <i>Groom</i></div>
-            <div style="background:#262522; border:1px solid rgba(206,187,162,0.3); padding:16px; margin-bottom:10px;">
-              <img src="${escapeHtml(bridePhoto)}" style="width:92px; height:112px; border-radius:60px 60px 0 0; object-fit:cover; border:1px solid #cebba2; margin-bottom:8px;">
-              <div style="font-family:'Cormorant Garamond',serif; font-size:19px;">${escapeHtml(brideName)}</div>
-              <div style="font-size:11px; color:rgba(255,255,255,0.7);">${escapeHtml(brideParents)}</div>
+            <div style="font-family:'Cormorant Garamond',serif; font-size:22px; margin-bottom:12px;">The <i>Beloved</i></div>
+            <div style="display:flex; align-items:center; gap:10px; background:#252320; border:1px solid rgba(201,168,106,0.3); border-radius:12px; padding:12px; margin-bottom:10px; text-align:left;">
+              <img src="${escapeHtml(bridePhoto)}" style="width:76px; height:102px; border-radius:60px 60px 6px 6px; object-fit:cover; border:1px solid #c9a86a; flex-shrink:0;">
+              <div>
+                <div style="font-size:9px; color:#8a9a7b; letter-spacing:0.14em;">MEMPELAI WANITA</div>
+                <div style="font-family:'Cormorant Garamond',serif; font-size:17px;">${escapeHtml(brideName)}</div>
+                <div style="font-size:10px; color:#efe6d8; opacity:0.78;">${escapeHtml(brideParents)}</div>
+                <div style="font-size:10px; color:#c9a86a; margin-top:3px;">${escapeHtml(brideOrig)}</div>
+              </div>
             </div>
-            <div style="background:#262522; border:1px solid rgba(206,187,162,0.3); padding:16px;">
-              <img src="${escapeHtml(groomPhoto)}" style="width:92px; height:112px; border-radius:60px 60px 0 0; object-fit:cover; border:1px solid #cebba2; margin-bottom:8px;">
-              <div style="font-family:'Cormorant Garamond',serif; font-size:19px;">${escapeHtml(groomName)}</div>
-              <div style="font-size:11px; color:rgba(255,255,255,0.7);">${escapeHtml(groomParents)}</div>
+            <div style="display:flex; flex-direction:row-reverse; align-items:center; gap:10px; background:#252320; border:1px solid rgba(201,168,106,0.3); border-radius:12px; padding:12px; text-align:right;">
+              <img src="${escapeHtml(groomPhoto)}" style="width:76px; height:102px; border-radius:60px 60px 6px 6px; object-fit:cover; border:1px solid #c9a86a; flex-shrink:0;">
+              <div>
+                <div style="font-size:9px; color:#8a9a7b; letter-spacing:0.14em;">MEMPELAI PRIA</div>
+                <div style="font-family:'Cormorant Garamond',serif; font-size:17px;">${escapeHtml(groomName)}</div>
+                <div style="font-size:10px; color:#efe6d8; opacity:0.78;">${escapeHtml(groomParents)}</div>
+                <div style="font-size:10px; color:#c9a86a; margin-top:3px;">${escapeHtml(groomOrig)}</div>
+              </div>
             </div>
           </div>
 
           <div id="prev-sec-gallery" style="padding:26px 16px; background:#cebba2; color:#1d1d1b;">
-            <div style="font-size:10px; letter-spacing:0.2em; color:#87683a;">GALLERIES</div>
-            <div style="font-family:'Cormorant Garamond',serif; font-size:23px; margin-bottom:10px;">Precious <i>moment</i></div>
+            <div style="font-size:10px; letter-spacing:0.2em; color:#b5651d;">OUR MEMORIES</div>
+            <div style="font-family:'Cormorant Garamond',serif; font-size:23px; margin-bottom:4px;">Precious <i style="color:#b5651d;">Moment</i></div>
+            <div style="font-size:11px; font-style:italic; margin-bottom:10px;">${escapeHtml(galQuote)}</div>
             <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:6px;">
-              ${gallery.slice(0, 4).map((g) => `<img src="${escapeHtml(g.image_url)}" style="width:100%; height:100px; object-fit:cover; border:1px solid rgba(29,29,27,0.25);">`).join('')}
+              ${gallery.slice(0, 4).map((g) => `<img src="${escapeHtml(g.image_url)}" style="width:100%; height:98px; border-radius:8px; object-fit:cover; border:1px solid rgba(29,29,27,0.2);">`).join('')}
             </div>
           </div>
 
-          <div id="prev-sec-event" style="padding:26px 16px; background:#1d1d1b;">
-            <div style="font-family:'Cormorant Garamond',serif; font-size:22px; margin-bottom:12px;">Save <i>the date</i></div>
-            <div style="background:#262522; border:1px solid rgba(206,187,162,0.3); padding:14px; margin-bottom:10px;">
-              <div style="font-family:'Cormorant Garamond',serif; font-size:18px; color:#cebba2;">${escapeHtml(akadTitle)}</div>
-              <div style="font-size:12px; margin:4px 0;">${readableDate} • Pukul ${escapeHtml(akadTime)}</div>
+          <div id="prev-sec-event" style="padding:26px 16px; background:#252320;">
+            <div style="font-family:'Cormorant Garamond',serif; font-size:22px; margin-bottom:12px;">Save <i style="color:#c9a86a;">the Date</i></div>
+            <div style="background:#1d1d1b; border:1px solid rgba(201,168,106,0.3); border-radius:10px; padding:14px; margin-bottom:10px;">
+              <div style="font-family:'Cormorant Garamond',serif; font-size:18px; color:#c9a86a;">${escapeHtml(akadTitle)}</div>
+              <div style="font-size:11.5px; margin:4px 0;">${readableDate} • Pukul ${escapeHtml(akadTime)}</div>
             </div>
-            <div style="background:#262522; border:1px solid rgba(206,187,162,0.3); padding:14px;">
-              <div style="font-family:'Cormorant Garamond',serif; font-size:18px; color:#cebba2;">${escapeHtml(recTitle)}</div>
-              <div style="font-size:11.5px; color:rgba(255,255,255,0.75); margin:6px 0 10px;">${escapeHtml(venue)} — ${escapeHtml(address)}</div>
-              <span style="display:inline-block; background:#cebba2; color:#1d1d1b; padding:7px 14px; font-size:10.5px; font-weight:700; letter-spacing:0.16em;">SEE LOCATION</span>
+            <div style="background:#1d1d1b; border:1px solid rgba(201,168,106,0.3); border-radius:10px; padding:14px;">
+              <div style="font-family:'Cormorant Garamond',serif; font-size:18px; color:#c9a86a;">${escapeHtml(recTitle)}</div>
+              <div style="font-size:11px; color:rgba(239,230,216,0.78); margin:6px 0 10px;">${escapeHtml(venue)} — ${escapeHtml(address)}</div>
+              <span style="display:inline-block; background:#b5651d; color:#fff; border-radius:999px; padding:7px 14px; font-size:10px; font-weight:600; letter-spacing:0.14em;">LIHAT LOKASI &amp; PETA</span>
             </div>
           </div>
 
           <div style="padding:22px 16px; background:#cebba2; color:#1d1d1b;">
-            <div style="font-family:'Cormorant Garamond',serif; font-size:21px; margin-bottom:8px;">Send <i>your gift</i></div>
-            <div style="background:#4f6368; color:#fff; padding:14px;">
+            <div style="font-family:'Cormorant Garamond',serif; font-size:21px; margin-bottom:8px;">Wedding <i style="color:#b5651d;">Gift</i></div>
+            <div style="background:#4f6368; color:#fff; border-radius:12px; padding:14px;">
               <div style="font-size:12px; font-weight:700;">${escapeHtml(bankName)}</div>
-              <div style="font-family:monospace; font-size:15px; color:#cebba2; margin:4px 0;">${escapeHtml(bankNum)}</div>
+              <div style="font-family:monospace; font-size:15px; color:#c9a86a; margin:4px 0;">${escapeHtml(bankNum)}</div>
               <div style="font-size:11px;">a.n. ${escapeHtml(bankOwner)}</div>
             </div>
           </div>
 
-          <div id="prev-sec-rsvp" style="padding:24px 16px; background:linear-gradient(180deg,rgba(29,29,27,0.7),#1d1d1b),url('${escapeHtml(coverImg)}') center/cover;">
-            <div style="font-family:'Cormorant Garamond',serif; font-size:20px; color:#cebba2; margin-bottom:8px;">Wishes &amp; RSVP${qrEnabled ? ' + QR Pass' : ''}</div>
-            <div style="font-size:11px; color:rgba(255,255,255,0.72); margin-bottom:10px;">${escapeHtml(closingText)}</div>
-            <div style="font-family:'Cormorant Garamond',serif; font-size:24px; color:#cebba2;">${coupleShort}</div>
+          <div id="prev-sec-rsvp" style="padding:24px 16px; background:linear-gradient(180deg,rgba(29,29,27,0.72),#1d1d1b),url('${escapeHtml(coverImg)}') center/cover;">
+            <div style="font-family:'Cormorant Garamond',serif; font-size:20px; color:#c9a86a; margin-bottom:8px;">RSVP &amp; Wishes${qrEnabled ? ' + QR Pass' : ''}</div>
+            <div style="font-size:11px; color:rgba(239,230,216,0.78); margin-bottom:10px;">${escapeHtml(closingText)}</div>
+            <div style="font-family:'Cormorant Garamond',serif; font-size:24px; color:#c9a86a;">${coupleShort}</div>
           </div>
         </div>
       `;
@@ -2494,7 +2604,22 @@
       gift_address: document.getElementById('edGiftAddress') ? document.getElementById('edGiftAddress').value.trim() : '',
       gift_note: document.getElementById('edGiftNote') ? document.getElementById('edGiftNote').value.trim() : '',
       also_invite_text: document.getElementById('edAlsoInviteText') ? document.getElementById('edAlsoInviteText').value.trim() : '',
-      closing_text: document.getElementById('edClosingText').value.trim()
+      closing_text: document.getElementById('edClosingText').value.trim(),
+      groom_origin: document.getElementById('edGroomOrigin') ? document.getElementById('edGroomOrigin').value.trim() : '',
+      bride_origin: document.getElementById('edBrideOrigin') ? document.getElementById('edBrideOrigin').value.trim() : '',
+      groom_ig: document.getElementById('edGroomIg') ? document.getElementById('edGroomIg').value.trim() : '',
+      bride_ig: document.getElementById('edBrideIg') ? document.getElementById('edBrideIg').value.trim() : '',
+      gallery_quote: document.getElementById('edGalleryQuote') ? document.getElementById('edGalleryQuote').value.trim() : '',
+      cover_style: document.getElementById('edCoverStyle') ? document.getElementById('edCoverStyle').value : 'space-between',
+      cover_use_photo: document.getElementById('edCoverUsePhoto') ? document.getElementById('edCoverUsePhoto').value === 'true' : true,
+      cover_show_guest_name: document.getElementById('edCoverShowGuest') ? document.getElementById('edCoverShowGuest').value === 'true' : true,
+      cover_overlay_color: document.getElementById('edCoverOverlayColor') ? document.getElementById('edCoverOverlayColor').value : '#1d1d1b',
+      cover_overlay_opacity: document.getElementById('edCoverOverlayOpacity') ? document.getElementById('edCoverOverlayOpacity').value : '0.68',
+      cover_text_color: document.getElementById('edCoverTextColor') ? document.getElementById('edCoverTextColor').value : '#efe6d8',
+      boho_rsvp_map_position: document.getElementById('edBohoRsvpMapPosition') ? document.getElementById('edBohoRsvpMapPosition').value : 'separate_sections',
+      section_video_enabled: document.getElementById('edSectionVideoEnabled') ? document.getElementById('edSectionVideoEnabled').value === 'true' : true,
+      section_livestream_enabled: document.getElementById('edSectionLivestreamEnabled') ? document.getElementById('edSectionLivestreamEnabled').value === 'true' : true,
+      section_gift_enabled: document.getElementById('edSectionGiftEnabled') ? document.getElementById('edSectionGiftEnabled').value === 'true' : true
     };
 
     try {
