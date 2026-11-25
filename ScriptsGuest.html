@@ -163,7 +163,8 @@
       modern_minimalist: true,
       romantic_sunset: true,
       dark_luxury: true,
-      thelove_cinematic: true
+      thelove_cinematic: true,
+      dark_boho: true
     };
     const urlTheme = resolveThemeOverrideFromUrl();
     const activeTheme = VALID_THEMES[urlTheme]
@@ -558,6 +559,13 @@
           transform: translate3d(0, -102%, 0) scale(1.08) !important;
           opacity: 0;
         }
+        body[data-theme="dark_boho"] .opening-cover {
+          transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.85s ease;
+        }
+        body[data-theme="dark_boho"] .opening-cover.opened {
+          transform: perspective(1300px) translate3d(0, -104%, -80px) rotateX(12deg) !important;
+          opacity: 0;
+        }
         #sec-hero {
           transition: background-image 1.2s ease-in-out;
         }
@@ -614,6 +622,9 @@
         body[data-theme="thelove_cinematic"] .reveal-3d {
           transform: perspective(900px) translate3d(0, 24px, -75px) scale(0.89);
         }
+        body[data-theme="dark_boho"] .reveal-3d {
+          transform: perspective(900px) translate3d(0, 26px, -40px) rotateX(10deg) scale(0.95);
+        }
         .reveal-3d.in-view-3d {
           opacity: 1 !important;
           transform: perspective(1000px) translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg) scale(1) !important;
@@ -625,6 +636,7 @@
     const targets = document.querySelectorAll(
       '.floral-card, .gorga-card, .minimal-card, .glass-sunset-card, .luxury-card, ' +
       '.thelove-portrait-card, .thelove-event-card, .couple-card, .event-detail-card, ' +
+      '.boho-card-dark, .boho-card-sand, .cd-boho, ' +
       '.story-card, .gallery-thumb, .cd-pill, .cd-box, .cd-minimal, .cd-sunset, .cd-lux, .cd-thelove, .countdown-box'
     );
     targets.forEach((el) => el.classList.add('reveal-3d'));

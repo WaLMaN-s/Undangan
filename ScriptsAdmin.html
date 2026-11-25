@@ -1157,7 +1157,8 @@
     modern_minimalist: '3. Modern Minimalist (5 Foto • 3D Parallax)',
     romantic_sunset: '4. Romantic Sunset (7 Foto • 3D Horizon)',
     dark_luxury: '5. Dark Luxury (9 Foto • 3D Coverflow)',
-    thelove_cinematic: '6. Thelove Cinematic (12 Foto • 3D Slideshow)'
+    thelove_cinematic: '6. Thelove Cinematic (12 Foto • 3D Slideshow)',
+    dark_boho: '7. Dark Boho (8 Foto • 3D Boho Lift)'
   };
 
   const THEME_SLOT_SPECS = {
@@ -1219,6 +1220,16 @@
       { key: 'gallery_1', label: '10. Foto 3D Filmstrip & Galeri I', role: 'gallery' },
       { key: 'gallery_2', label: '11. Foto 3D Filmstrip & Galeri II', role: 'gallery' },
       { key: 'closing_photo', label: '12. Foto Full-Screen Penutup (Thank You)', role: 'closing' }
+    ],
+    dark_boho: [
+      { key: 'cover_photo', label: '1. Foto Full-Bleed Opening Cover Boho', role: 'cover' },
+      { key: 'hero_photo', label: '2. Foto Lengkungan Arch Save The Date', role: 'hero' },
+      { key: 'groom_photo', label: '3. Foto Arch Mempelai Pria', role: 'groom' },
+      { key: 'bride_photo', label: '4. Foto Arch Mempelai Wanita', role: 'bride' },
+      { key: 'gallery_1', label: '5. Foto Precious Moment I', role: 'gallery' },
+      { key: 'gallery_2', label: '6. Foto Precious Moment II', role: 'gallery' },
+      { key: 'gallery_3', label: '7. Foto Precious Moment III', role: 'gallery' },
+      { key: 'gallery_4', label: '8. Foto Precious Moment IV', role: 'gallery' }
     ]
   };
 
@@ -1437,6 +1448,17 @@
       text: '#FFFFFF',
       btnBg: '#313131',
       btnText: '#FFFFFF'
+    },
+    dark_boho: {
+      badge: 'Desain Luxury Boho',
+      tags: 'Dark & Moody · Boho · Editorial 3D',
+      titleHtml: 'Dark <span class="owl-script">Boho</span>',
+      desc: 'Palet #1d1d1b & Warm Boho Sand #cebba2 dengan bingkai lengkung editorial dan transisi 3D Boho Lift.',
+      bg: '#1d1d1b',
+      accent: '#cebba2',
+      text: '#FFFFFF',
+      btnBg: '#cebba2',
+      btnText: '#1d1d1b'
     }
   };
 
@@ -1612,6 +1634,87 @@
           : [{ image_url: coverImg, caption: 'Prewedding' }]);
 
     
+    if (themeId === 'dark_boho') {
+      screen.innerHTML = `
+        <div style="background:#1d1d1b; color:#FFFFFF; font-family:'Montserrat',sans-serif; text-align:center; width:100%; box-sizing:border-box;">
+          <div id="prev-sec-cover" style="min-height:430px; background:linear-gradient(180deg,rgba(29,29,27,0.45),rgba(29,29,27,0.92)),url('${escapeHtml(coverImg)}') center/cover; display:flex; flex-direction:column; justify-content:space-between; padding:28px 18px;">
+            <div>
+              <div style="font-size:10px; letter-spacing:0.26em; color:#cebba2;">THE WEDDING OF</div>
+              <div style="font-family:'Cormorant Garamond',serif; font-size:32px; font-weight:500; margin:6px 0;">${coupleShort}</div>
+              <div style="font-size:11px; letter-spacing:0.22em; color:#cebba2;">${readableDate}</div>
+            </div>
+            <div>
+              <div style="background:rgba(29,29,27,0.7); border:1px solid rgba(206,187,162,0.35); padding:12px; margin-bottom:10px;">
+                <div style="font-size:10px; color:#cebba2; letter-spacing:0.15em;">KEPADA YTH.</div>
+                <div style="font-family:'Cormorant Garamond',serif; font-size:20px; margin-top:3px;">Budi Santoso</div>
+              </div>
+              <div style="background:#cebba2; color:#1d1d1b; padding:10px; font-size:10.5px; font-weight:700; letter-spacing:0.22em;">OPEN INVITATION</div>
+            </div>
+          </div>
+
+          <div id="prev-sec-hero" style="padding:28px 16px; background:#1d1d1b;">
+            <div style="font-size:10px; letter-spacing:0.24em; color:#cebba2;">SAVE THE DATE</div>
+            <div style="width:170px; height:220px; margin:12px auto; border-radius:100px 100px 0 0; padding:5px; border:1px solid #cebba2;">
+              <img src="${escapeHtml(heroImg)}" style="width:100%; height:100%; object-fit:cover; border-radius:95px 95px 0 0;">
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-top:12px;">
+              <div style="background:#262522; border:1px solid rgba(206,187,162,0.3); padding:8px 2px;"><div style="font-family:'Cormorant Garamond',serif; font-size:20px; color:#cebba2;">18</div><div style="font-size:8.5px;">DAYS</div></div>
+              <div style="background:#262522; border:1px solid rgba(206,187,162,0.3); padding:8px 2px;"><div style="font-family:'Cormorant Garamond',serif; font-size:20px; color:#cebba2;">09</div><div style="font-size:8.5px;">HOURS</div></div>
+              <div style="background:#262522; border:1px solid rgba(206,187,162,0.3); padding:8px 2px;"><div style="font-family:'Cormorant Garamond',serif; font-size:20px; color:#cebba2;">42</div><div style="font-size:8.5px;">MINS</div></div>
+              <div style="background:#262522; border:1px solid rgba(206,187,162,0.3); padding:8px 2px;"><div style="font-family:'Cormorant Garamond',serif; font-size:20px; color:#cebba2;">15</div><div style="font-size:8.5px;">SECS</div></div>
+            </div>
+          </div>
+
+          <div style="padding:24px 16px; background:#cebba2; color:#1d1d1b;">
+            <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:14px; line-height:1.6;">${escapeHtml(quoteText)}</div>
+            <div style="font-size:10.5px; font-weight:700; color:#87683a; margin-top:6px;">${escapeHtml(quoteSource)}</div>
+          </div>
+
+          <div id="prev-sec-couple" style="padding:26px 16px; background:#1d1d1b;">
+            <div style="font-family:'Cormorant Garamond',serif; font-size:22px; margin-bottom:12px;">Groom &amp; Bride</div>
+            <div style="background:#262522; border:1px solid rgba(206,187,162,0.3); padding:16px; margin-bottom:10px;">
+              <img src="${escapeHtml(groomPhoto)}" style="width:92px; height:112px; border-radius:60px 60px 0 0; object-fit:cover; border:1px solid #cebba2; margin-bottom:8px;">
+              <div style="font-family:'Cormorant Garamond',serif; font-size:19px;">${escapeHtml(groomName)}</div>
+              <div style="font-size:11px; color:rgba(255,255,255,0.7);">${escapeHtml(groomParents)}</div>
+            </div>
+            <div style="background:#262522; border:1px solid rgba(206,187,162,0.3); padding:16px;">
+              <img src="${escapeHtml(bridePhoto)}" style="width:92px; height:112px; border-radius:60px 60px 0 0; object-fit:cover; border:1px solid #cebba2; margin-bottom:8px;">
+              <div style="font-family:'Cormorant Garamond',serif; font-size:19px;">${escapeHtml(brideName)}</div>
+              <div style="font-size:11px; color:rgba(255,255,255,0.7);">${escapeHtml(brideParents)}</div>
+            </div>
+          </div>
+
+          <div id="prev-sec-event" style="padding:26px 16px; background:#4f6368;">
+            <div style="font-family:'Cormorant Garamond',serif; font-size:22px; margin-bottom:12px;">Wedding Event</div>
+            <div style="background:rgba(29,29,27,0.75); border:1px solid rgba(206,187,162,0.3); padding:14px; margin-bottom:10px;">
+              <div style="font-family:'Cormorant Garamond',serif; font-size:18px; color:#cebba2;">${escapeHtml(akadTitle)}</div>
+              <div style="font-size:12px; margin:4px 0;">${readableDate} • Pukul ${escapeHtml(akadTime)}</div>
+            </div>
+            <div style="background:#1d1d1b; border:1px solid rgba(206,187,162,0.3); padding:14px;">
+              <div style="font-family:'Cormorant Garamond',serif; font-size:18px; color:#cebba2;">${escapeHtml(recTitle)}</div>
+              <div style="font-size:11.5px; color:rgba(255,255,255,0.75); margin:6px 0 10px;">${escapeHtml(venue)} — ${escapeHtml(address)}</div>
+              <span style="display:inline-block; background:#cebba2; color:#1d1d1b; padding:7px 14px; font-size:10.5px; font-weight:700; letter-spacing:0.16em;">SEE LOCATION</span>
+            </div>
+          </div>
+
+          <div id="prev-sec-gallery" style="padding:26px 16px; background:#cebba2; color:#1d1d1b;">
+            <div style="font-size:10px; letter-spacing:0.2em; color:#87683a;">PRECIOUS MOMENT</div>
+            <div style="font-family:'Cormorant Garamond',serif; font-size:22px; margin-bottom:10px;">Our Gallery</div>
+            <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:6px;">
+              ${gallery.slice(0, 4).map((g) => `<img src="${escapeHtml(g.image_url)}" style="width:100%; height:100px; object-fit:cover; border:1px solid rgba(29,29,27,0.25);">`).join('')}
+            </div>
+          </div>
+
+          <div id="prev-sec-rsvp" style="padding:24px 16px; background:#1d1d1b;">
+            <div style="font-family:'Cormorant Garamond',serif; font-size:20px; color:#cebba2; margin-bottom:8px;">RSVP${qrEnabled ? ' &amp; QR Pass' : ''}</div>
+            <div style="font-size:11px; color:rgba(255,255,255,0.72); margin-bottom:10px;">${escapeHtml(closingText)}</div>
+            <div style="font-family:'Cormorant Garamond',serif; font-size:24px; color:#cebba2;">${coupleShort}</div>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
     if (themeId === 'thelove_cinematic') {
       screen.innerHTML = `
         <div style="background:#1B1B18; color:#FFFFFF; font-family:'Inter',sans-serif; text-align:center; width:100%; max-width:100%; overflow-x:hidden; box-sizing:border-box; margin:0 auto;">

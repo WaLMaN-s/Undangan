@@ -36,7 +36,8 @@ function doGet(e) {
       modern_minimalist: 'ThemeModernMinimalist',
       romantic_sunset: 'ThemeRomanticSunset',
       dark_luxury: 'ThemeDarkLuxury',
-      thelove_cinematic: 'ThemeTheloveCinematic'
+      thelove_cinematic: 'ThemeTheloveCinematic',
+      dark_boho: 'ThemeDarkBoho'
     };
 
     var selectedThemeKey = params.theme ? String(params.theme).trim().toLowerCase() : '';
