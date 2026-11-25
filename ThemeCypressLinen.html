@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Undangan Pernikahan — Cypress &amp; Linen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    :root {
+      --linen-bg: #faf6f4;
+      --linen-card: #ffffff;
+      --cypress: #005d17;
+      --cypress-deep: #0b3b17;
+      --terracotta: #a05a4f;
+      --text-main: #222823;
+      --text-muted: #6c726d;
+      --border: #e4dcd6;
+      --success: #3B9B72;
+      --danger: #D95C5C;
+      --font-serif: 'Cormorant Garamond', 'Libre Baskerville', Georgia, serif;
+      --font-sans: 'Plus Jakarta Sans', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; }
+    html, body {
+      width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 0 !important;
+      overflow-x: hidden !important; overscroll-behavior-x: none; touch-action: pan-y; position: relative;
+    }
+    body {
+      font-family: var(--font-sans); background-color: #ebe4df; color: var(--text-main);
+      min-height: 100vh; display: block; -webkit-font-smoothing: antialiased;
+    }
+    .mobile-frame {
+      display: block; margin: 0 auto !important; width: 100%; max-width: 430px; min-height: 100vh;
+      background-color: var(--linen-bg);
+      background-image: radial-gradient(rgba(0, 93, 23, 0.03) 1px, transparent 0);
+      background-size: 16px 16px;
+      position: relative; overflow-x: hidden !important;
+      box-shadow: 0 0 48px rgba(34, 40, 35, 0.14);
+    }
+    .state-screen { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 36px 28px; text-align: center; background: var(--linen-bg); }
+    .spinner-ring { width: 44px; height: 44px; border: 2.5px solid var(--border); border-top-color: var(--cypress); border-radius: 50%; animation: spin 0.9s linear infinite; margin-bottom: 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .opening-cover {
+      position: fixed; top: 0; left: 0; right: 0; margin: 0 auto; width: 100%; max-width: 430px;
+      height: 100vh; height: 100dvh; z-index: 120;
+      background: linear-gradient(180deg, #ffffff 0%, var(--linen-bg) 100%);
+      display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+      padding: 36px 24px 30px; text-align: center; overflow-y: auto; overflow-x: hidden !important;
+      transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.75s ease;
+    }
+    .opening-cover.opened { transform: translate3d(0, -105%, 0); opacity: 0; pointer-events: none; }
+    .cypress-eyebrow { font-size: 10.5px; letter-spacing: 0.24em; text-indent: 0.24em; text-transform: uppercase; color: var(--cypress); font-weight: 700; }
+    .cypress-couple { font-family: var(--font-serif); font-size: 38px; font-weight: 600; color: var(--cypress-deep); margin: 6px 0; }
+    .cypress-arch {
+      width: 210px; height: 255px; margin: 10px auto; border-radius: 120px 120px 14px 14px;
+      padding: 6px; border: 1.5px solid var(--cypress); background: #fff;
+      box-shadow: 0 14px 30px rgba(0, 93, 23, 0.12);
+    }
+    .cypress-arch img { width: 100%; height: 100%; object-fit: cover; border-radius: 114px 114px 10px 10px; display: block; }
+    .cypress-card {
+      background: var(--linen-card); border: 1px solid var(--border); border-radius: 14px;
+      padding: 20px 16px; margin-top: 14px; box-shadow: 0 6px 20px rgba(34, 40, 35, 0.05);
+    }
+    .btn-cypress {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 13px 22px;
+      border-radius: 99px; background: var(--cypress); color: #ffffff; border: none;
+      font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; text-decoration: none;
+    }
+
+    .main-invitation { display: none; padding-bottom: 90px; }
+    .main-invitation.visible { display: block; animation: fadeIn 0.7s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .sec-linen { padding: 38px 22px; border-bottom: 1px solid var(--border); text-align: center; }
+    .sec-linen.white { background: #ffffff; }
+    .sec-title { font-family: var(--font-serif); font-size: 27px; font-weight: 600; color: var(--cypress-deep); margin: 6px 0 10px; }
+    .sec-desc { font-size: 13px; color: var(--text-muted); line-height: 1.65; }
+    .avatar-cypress { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 2px solid var(--cypress); padding: 3px; background: #fff; margin-bottom: 10px; }
+    .countdown-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 16px; }
+    .cd-box { background: #ffffff; border: 1px solid var(--cypress); border-radius: 12px; padding: 12px 4px; }
+    .cd-num { font-family: var(--font-serif); font-size: 24px; font-weight: 700; color: var(--cypress); }
+    .cd-lbl { font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-top: 3px; }
+    .story-timeline { display: flex; flex-direction: column; gap: 14px; margin-top: 18px; text-align: left; }
+    .story-card { background: #ffffff; border: 1px solid var(--border); border-left: 3px solid var(--cypress); border-radius: 12px; padding: 16px; }
+    .story-year { font-size: 11px; font-weight: 700; color: var(--terracotta); text-transform: uppercase; }
+    .story-card h4 { font-family: var(--font-serif); font-size: 18px; color: var(--cypress-deep); margin: 4px 0 6px; }
+    .story-card p { font-size: 12.5px; color: var(--text-muted); line-height: 1.6; }
+    .gallery-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 18px; }
+    .gallery-thumb { width: 100%; height: 165px; object-fit: cover; border-radius: 12px; border: 1px solid var(--border); cursor: pointer; }
+    .guest-input { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--linen-bg); font-family: var(--font-sans); font-size: 13.5px; margin-bottom: 12px; }
+    .wishes-feed { max-height: 350px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-top: 16px; text-align: left; }
+    .wish-item { background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+    .wish-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+    .wish-sender { font-weight: 600; font-size: 13.5px; color: var(--cypress-deep); }
+    .wish-badge { font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: 99px; }
+    .wish-badge.hadir { background: rgba(59, 155, 114, 0.14); color: var(--success); }
+    .wish-badge.absen { background: rgba(217, 92, 92, 0.14); color: var(--danger); }
+    .lightbox-overlay { position: fixed; inset: 0; background: rgba(20, 26, 21, 0.92); z-index: 300; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+    .lightbox-overlay.open { display: flex; }
+    .lightbox-Overlay-img { max-width: 100%; max-height: 75vh; border-radius: 12px; }
+    .floating-music-btn { position: fixed; bottom: 78px; right: max(16px, calc(50% - 198px)); width: 44px; height: 44px; border-radius: 50%; background: #ffffff; border: 1.5px solid var(--cypress); color: var(--cypress); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 95; }
+    .floating-music-btn.playing { animation: spin 6s linear infinite; }
+    .bottom-touch-nav { position: fixed; bottom: 0; left: 0; right: 0; margin: 0 auto; width: 100%; max-width: 430px; height: 62px; background: rgba(255,255,255,0.96); border-top: 1px solid var(--border); display: none; grid-template-columns: repeat(5, 1fr); z-index: 90; }
+    .bottom-touch-nav.visible { display: grid; }
+    .touch-nav-link { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: var(--cypress-deep); font-size: 10.5px; }
+    @media (max-width: 480px) {
+      .mobile-frame, .opening-cover, .bottom-touch-nav { width: 100% !important; max-width: 100% !important; box-shadow: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mobile-frame">
+    <div id="guestLoadingScreen" class="state-screen"><div class="spinner-ring"></div><div style="font-family:var(--font-serif); font-size:18px; color:var(--cypress);">Cypress &amp; Linen</div></div>
+    <div id="guestErrorScreen" class="state-screen" style="display:none;"><h1 class="sec-title">Undangan Tidak Ditemukan</h1><p id="guestErrorMessage" class="sec-desc"></p></div>
+
+    <section id="openingCoverPage" class="opening-cover" style="display:none;">
+      <div style="width:100%;">
+        <svg style="width:84px; height:36px; margin:0 auto 4px; display:block;" viewBox="0 0 100 40" fill="none">
+          <path d="M50 36V6M50 28C38 24 30 16 28 8M50 28C62 24 70 16 72 8M50 18C42 15 38 10 37 4M50 18C58 15 62 10 63 4" stroke="#005d17" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        <div class="cypress-eyebrow">THE WEDDING OF</div>
+        <h1 id="openCoupleNames" class="cypress-couple">Romeo &amp; Juliet</h1>
+        <div class="cypress-arch"><img id="openCoverPhoto" src="" alt="Couple"></div>
+      </div>
+      <div style="width:100%;">
+        <div class="cypress-card" style="margin:6px 0 14px;">
+          <div style="font-size:11px; color:var(--terracotta); font-weight:700; letter-spacing:0.12em;">KEPADA YTH.</div>
+          <div id="openGuestName" style="font-family:var(--font-serif); font-size:22px; font-weight:700; color:var(--cypress-deep); margin:4px 0;">-</div>
+          <p style="font-size:12px; color:var(--text-muted);">Kami mengundang Anda untuk menghadiri hari bahagia kami.</p>
+        </div>
+        <button type="button" class="btn-cypress" onclick="handleOpenInvitationClick()">
+          <i data-lucide="mail-open" style="width:16px;height:16px;"></i><span>Buka Undangan</span>
+        </button>
+        <div id="openWeddingDate" style="font-family:var(--font-serif); font-size:15px; color:var(--cypress); margin-top:10px;"></div>
+      </div>
+    </section>
+
+    <main id="mainInvitationPage" class="main-invitation">
+      <section id="sec-hero" class="sec-linen">
+        <div class="cypress-eyebrow">CYPRESS &amp; LINEN EDITION</div>
+        <h2 id="mainHeroCoupleTitle" class="cypress-couple" style="font-size:34px;"></h2>
+        <div class="cypress-arch" style="width:100%; height:300px;"><img id="mainHeroPhoto" src="" alt="Hero"></div>
+        <p id="mainHeroDescription" class="sec-desc"></p>
+      </section>
+
+      <section id="sec-couple" class="sec-linen white">
+        <div class="cypress-eyebrow">MEMPELAI</div>
+        <h3 class="sec-title">Groom &amp; Bride</h3>
+        <div class="cypress-card">
+          <img id="mainGroomPhoto" class="avatar-cypress" src="" alt="Groom" loading="lazy">
+          <div id="mainGroomFullName" style="font-family:var(--font-serif); font-size:22px; font-weight:600; color:var(--cypress-deep); margin-bottom:6px;"></div>
+          <p id="mainGroomParents" class="sec-desc"></p>
+        </div>
+        <div style="font-family:var(--font-serif); font-size:30px; font-style:italic; color:var(--terracotta); margin-top:12px;">&amp;</div>
+        <div class="cypress-card">
+          <img id="mainBridePhoto" class="avatar-cypress" src="" alt="Bride" loading="lazy">
+          <div id="mainBrideFullName" style="font-family:var(--font-serif); font-size:22px; font-weight:600; color:var(--cypress-deep); margin-bottom:6px;"></div>
+          <p id="mainBrideParents" class="sec-desc"></p>
+        </div>
+      </section>
+
+      <section id="sec-countdown" class="sec-linen">
+        <div class="cypress-eyebrow">SAVE THE DATE</div>
+        <h3 class="sec-title">Hitung Mundur</h3>
+        <p id="mainCountdownDateText" class="sec-desc"></p>
+        <div class="countdown-grid">
+          <div class="cd-box"><div id="cdDays" class="cd-num">00</div><div class="cd-lbl">Hari</div></div>
+          <div class="cd-box"><div id="cdHours" class="cd-num">00</div><div class="cd-lbl">Jam</div></div>
+          <div class="cd-box"><div id="cdMinutes" class="cd-num">00</div><div class="cd-lbl">Menit</div></div>
+          <div class="cd-box"><div id="cdSeconds" class="cd-num">00</div><div class="cd-lbl">Detik</div></div>
+        </div>
+      </section>
+
+      <section id="sec-event-info" class="sec-linen white">
+        <div id="mainQuoteWrapper" class="cypress-card" style="margin-top:0; margin-bottom:18px; background:var(--linen-bg);">
+          <p id="mainQuoteText" style="font-family:var(--font-serif); font-style:italic; font-size:16px; line-height:1.65;"></p>
+          <div id="mainQuoteSource" style="font-size:11.5px; font-weight:700; color:var(--terracotta); margin-top:8px;"></div>
+        </div>
+        <div class="cypress-eyebrow">RANGKAIAN ACARA</div>
+        <h3 class="sec-title">Waktu &amp; Lokasi</h3>
+        <div class="cypress-card"><h4 id="mainAkadTitle" style="font-family:var(--font-serif); font-size:21px; color:var(--cypress);">Akad Nikah</h4><div id="mainAkadDate" style="font-weight:600; margin:6px 0;"></div><div id="mainAkadTime" class="sec-desc"></div></div>
+        <div class="cypress-card"><h4 id="mainReceptionTitle" style="font-family:var(--font-serif); font-size:21px; color:var(--cypress);">Resepsi</h4><div id="mainReceptionDate" style="font-weight:600; margin:6px 0;"></div><div id="mainReceptionTime" class="sec-desc"></div></div>
+        <div class="cypress-card" style="border-color:var(--cypress);">
+          <h4 id="mainVenueName" style="font-family:var(--font-serif); font-size:20px; color:var(--cypress-deep);"></h4>
+          <p id="mainVenueAddress" class="sec-desc" style="margin:8px 0 16px;"></p>
+          <a id="mainGoogleMapsBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn-cypress"><i data-lucide="map-pin" style="width:16px;height:16px;"></i><span>Buka Google Maps</span></a>
+        </div>
+      </section>
+
+      <section id="sec-story" class="sec-linen"><div class="cypress-eyebrow">KISAH KAMI</div><h3 class="sec-title">Our Story</h3><div id="mainStoryList" class="story-timeline"></div></section>
+      <section id="sec-gallery" class="sec-linen white"><div class="cypress-eyebrow">GALERI</div><h3 class="sec-title">Momen Bahagia</h3><div id="mainGalleryGrid" class="gallery-grid"></div></section>
+
+      <section id="sec-rsvp" class="sec-linen">
+        <div class="cypress-eyebrow">RSVP</div><h3 class="sec-title">Konfirmasi Kehadiran</h3>
+        <form id="guestRsvpForm" class="cypress-card" style="text-align:left;" action="javascript:void(0);" onsubmit="handleGuestRsvpSubmit(event); return false;">
+          <label style="font-size:12px; font-weight:600;">Nama Tamu</label><input type="text" id="rsvpFormGuestName" class="guest-input" readonly>
+          <label style="font-size:12px; font-weight:600;">Kehadiran</label>
+          <select id="rsvpFormAttendance" class="guest-input" onchange="handleRsvpAttendanceChange()"><option value="Hadir">Ya, Saya Akan Hadir</option><option value="Tidak Hadir">Maaf, Berhalangan Hadir</option></select>
+          <div id="rsvpGuestCountWrapper"><label style="font-size:12px; font-weight:600;">Jumlah Orang</label><select id="rsvpFormGuestCount" class="guest-input"><option value="1">1 Orang</option><option value="2">2 Orang</option><option value="3">3 Orang</option><option value="4">4 Orang</option><option value="5">5 Orang</option></select></div>
+          <label style="font-size:12px; font-weight:600;">Ucapan &amp; Doa</label><textarea id="rsvpFormWishes" class="guest-input" style="min-height:90px;" required placeholder="Tuliskan ucapan & doa restu..."></textarea>
+          <button type="button" id="rsvpSubmitBtn" onclick="handleGuestRsvpSubmit(event)" class="btn-cypress">Kirim Konfirmasi</button>
+        </form>
+      </section>
+
+      <section id="sec-wishes" class="sec-linen white"><div class="cypress-eyebrow">UCAPAN</div><h3 class="sec-title">Buku Ucapan</h3><p id="wishesTotalLabel" class="sec-desc"></p><div id="mainWishesFeed" class="wishes-feed"></div></section>
+
+      <section id="sec-qrcode" class="sec-linen">
+        <div class="cypress-eyebrow">AKSES MASUK</div><h3 class="sec-title">QR Check-in</h3>
+        <div class="cypress-card" style="border-color:var(--cypress);">
+          <div id="qrPassGuestName" style="font-family:var(--font-serif); font-size:21px; font-weight:700; margin-bottom:12px;"></div>
+          <div id="guestQrCodeContainer" style="display:inline-block; padding:12px; background:#FFF; border-radius:10px; border:1px solid var(--border);"></div>
+          <div id="qrPassCategoryBadge" style="margin-top:10px;"></div>
+          <div id="qrPassCheckinStatus" style="margin-top:6px; font-size:12px; color:var(--text-muted);"></div>
+        </div>
+      </section>
+
+      <section id="sec-closing" class="sec-linen white"><p id="mainClosingText" class="sec-desc" style="margin-bottom:14px;"></p><h3 id="mainClosingCouple" class="cypress-couple" style="font-size:32px;"></h3></section>
+    </main>
+
+    <div id="galleryLightbox" class="lightbox-overlay" onclick="closeGalleryLightbox()"><img id="lightboxImgEl" class="lightbox-Overlay-img" src="" alt="Preview"><div id="lightboxCaptionEl" style="color:#FFF; margin-top:10px;"></div></div>
+    <audio id="bgMusicAudio" loop preload="none"></audio>
+    <button type="button" id="floatingMusicBtn" class="floating-music-btn" onclick="toggleBackgroundMusic()"><i data-lucide="music" style="width:18px;height:18px;"></i></button>
+    <nav id="bottomTouchNav" class="bottom-touch-nav">
+      <a href="#sec-couple" class="touch-nav-link"><i data-lucide="heart" style="width:16px;height:16px;"></i><span>Mempelai</span></a>
+      <a href="#sec-event-info" class="touch-nav-link"><i data-lucide="calendar" style="width:16px;height:16px;"></i><span>Acara</span></a>
+      <a href="#sec-gallery" class="touch-nav-link"><i data-lucide="image" style="width:16px;height:16px;"></i><span>Galeri</span></a>
+      <a href="#sec-rsvp" class="touch-nav-link"><i data-lucide="mail-check" style="width:16px;height:16px;"></i><span>RSVP</span></a>
+      <a href="#sec-qrcode" class="touch-nav-link"><i data-lucide="qr-code" style="width:16px;height:16px;"></i><span>QR Pass</span></a>
+    </nav>
+  </div>
+  <script>window.__INITIAL_INVITATION_TOKEN__ = "<?= initialToken ?>";</script>
+  <?!= include('ScriptsGuest'); ?>
+</body>
+</html>

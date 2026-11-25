@@ -37,7 +37,10 @@ function doGet(e) {
       romantic_sunset: 'ThemeRomanticSunset',
       dark_luxury: 'ThemeDarkLuxury',
       thelove_cinematic: 'ThemeTheloveCinematic',
-      dark_boho: 'ThemeDarkBoho'
+      dark_boho: 'ThemeDarkBoho',
+      cypress_linen: 'ThemeCypressLinen',
+      first_class_vows: 'ThemeFirstClassVows',
+      traditional_java: 'ThemeTraditionalJava'
     };
 
     var selectedThemeKey = params.theme ? String(params.theme).trim().toLowerCase() : '';

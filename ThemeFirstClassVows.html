@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Undangan Pernikahan — First Class Vows</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    :root {
+      --navy: #1f2c4a;
+      --navy-deep: #131c33;
+      --ice: #e4e9f4;
+      --bg-light: #f7f8fc;
+      --gold: #c8a45d;
+      --slate: #4a4f63;
+      --border: #d5dce9;
+      --success: #3B9B72;
+      --danger: #D95C5C;
+      --font-serif: 'Playfair Display', Georgia, serif;
+      --font-mono: 'Space Mono', monospace;
+      --font-sans: 'Plus Jakarta Sans', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; }
+    html, body {
+      width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 0 !important;
+      overflow-x: hidden !important; overscroll-behavior-x: none; touch-action: pan-y; position: relative;
+    }
+    body { font-family: var(--font-sans); background-color: #dce2ee; color: var(--navy); min-height: 100vh; display: block; -webkit-font-smoothing: antialiased; }
+    .mobile-frame { display: block; margin: 0 auto !important; width: 100%; max-width: 430px; min-height: 100vh; background-color: var(--bg-light); position: relative; overflow-x: hidden !important; box-shadow: 0 0 48px rgba(31, 44, 74, 0.22); }
+    .state-screen { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 36px 28px; text-align: center; background: var(--navy); color: #fff; }
+    .spinner-ring { width: 44px; height: 44px; border: 2px solid rgba(255,255,255,0.2); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.9s linear infinite; margin-bottom: 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .opening-cover {
+      position: fixed; top: 0; left: 0; right: 0; margin: 0 auto; width: 100%; max-width: 430px;
+      height: 100vh; height: 100dvh; z-index: 120;
+      background: linear-gradient(180deg, var(--navy) 0%, var(--navy-deep) 100%);
+      color: #ffffff;
+      display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+      padding: 36px 24px 30px; text-align: center; overflow-y: auto; overflow-x: hidden !important;
+      transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.75s ease;
+    }
+    .opening-cover.opened { transform: translate3d(0, -105%, 0); opacity: 0; pointer-events: none; }
+    .boarding-eyebrow { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.2em; text-indent: 0.2em; color: var(--gold); text-transform: uppercase; }
+    .vows-couple { font-family: var(--font-serif); font-size: 36px; font-weight: 600; color: #ffffff; margin: 6px 0; }
+    .passport-frame {
+      width: 205px; height: 245px; margin: 12px auto; border-radius: 16px; padding: 6px;
+      border: 1.5px solid var(--gold); background: rgba(255,255,255,0.06);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+    }
+    .passport-frame img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; display: block; }
+    .boarding-pass-card {
+      background: #ffffff; color: var(--navy); border: 1px solid var(--border); border-radius: 14px;
+      padding: 20px 18px; margin-top: 14px; position: relative;
+      box-shadow: 0 10px 26px rgba(31, 44, 74, 0.08);
+    }
+    .boarding-pass-card::before {
+      content: 'FIRST CLASS • BOARDING PASS';
+      display: block; font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.16em;
+      color: var(--gold); border-bottom: 1px dashed var(--border); padding-bottom: 8px; margin-bottom: 10px;
+    }
+    .btn-firstclass {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 13px 22px;
+      border-radius: 10px; background: var(--gold); color: var(--navy-deep); border: none;
+      font-family: var(--font-mono); font-size: 11.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; text-decoration: none;
+    }
+
+    .main-invitation { display: none; padding-bottom: 90px; }
+    .main-invitation.visible { display: block; animation: fadeIn 0.7s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .sec-fc { padding: 38px 22px; border-bottom: 1px solid var(--border); text-align: center; }
+    .sec-fc.navy { background: var(--navy); color: #ffffff; }
+    .sec-title { font-family: var(--font-serif); font-size: 26px; font-weight: 600; margin: 6px 0 10px; }
+    .sec-desc { font-size: 13px; color: var(--slate); line-height: 1.65; }
+    .sec-fc.navy .sec-desc { color: var(--ice); }
+    .avatar-fc { width: 120px; height: 120px; border-radius: 16px; object-fit: cover; border: 2px solid var(--gold); margin-bottom: 10px; }
+    .countdown-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 16px; }
+    .cd-box { background: rgba(255,255,255,0.08); border: 1px solid var(--gold); border-radius: 10px; padding: 12px 4px; }
+    .cd-num { font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: var(--gold); }
+    .cd-lbl { font-size: 9.5px; color: var(--ice); text-transform: uppercase; margin-top: 3px; }
+    .story-timeline { display: flex; flex-direction: column; gap: 14px; margin-top: 18px; text-align: left; }
+    .story-card { background: #ffffff; border: 1px solid var(--border); border-left: 3px solid var(--navy); border-radius: 12px; padding: 16px; }
+    .story-year { font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--gold); }
+    .story-card h4 { font-family: var(--font-serif); font-size: 17px; color: var(--navy); margin: 4px 0 6px; }
+    .story-card p { font-size: 12.5px; color: var(--slate); line-height: 1.6; }
+    .gallery-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 18px; }
+    .gallery-thumb { width: 100%; height: 165px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border); cursor: pointer; }
+    .guest-input { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-light); font-family: var(--font-sans); font-size: 13.5px; margin-bottom: 12px; }
+    .wishes-feed { max-height: 350px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-top: 16px; text-align: left; }
+    .wish-item { background: #ffffff; border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+    .wish-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+    .wish-sender { font-weight: 600; font-size: 13.5px; color: var(--navy); }
+    .wish-badge { font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: 99px; }
+    .wish-badge.hadir { background: rgba(59, 155, 114, 0.14); color: var(--success); }
+    .wish-badge.absen { background: rgba(217, 92, 92, 0.14); color: var(--danger); }
+    .lightbox-overlay { position: fixed; inset: 0; background: rgba(19, 28, 51, 0.94); z-index: 300; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+    .lightbox-overlay.open { display: flex; }
+    .lightbox-Overlay-img { max-width: 100%; max-height: 75vh; border-radius: 10px; }
+    .floating-music-btn { position: fixed; bottom: 78px; right: max(16px, calc(50% - 198px)); width: 44px; height: 44px; border-radius: 50%; background: var(--navy); border: 1.5px solid var(--gold); color: var(--gold); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 95; }
+    .floating-music-btn.playing { animation: spin 6s linear infinite; }
+    .bottom-touch-nav { position: fixed; bottom: 0; left: 0; right: 0; margin: 0 auto; width: 100%; max-width: 430px; height: 62px; background: rgba(31, 44, 74, 0.96); border-top: 1px solid rgba(200, 164, 93, 0.35); display: none; grid-template-columns: repeat(5, 1fr); z-index: 90; }
+    .bottom-touch-nav.visible { display: grid; }
+    .touch-nav-link { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: var(--ice); font-size: 10.5px; }
+    @media (max-width: 480px) {
+      .mobile-frame, .opening-cover, .bottom-touch-nav { width: 100% !important; max-width: 100% !important; box-shadow: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mobile-frame">
+    <div id="guestLoadingScreen" class="state-screen"><div class="spinner-ring"></div><div class="boarding-eyebrow">PREPARING BOARDING PASS</div></div>
+    <div id="guestErrorScreen" class="state-screen" style="display:none;"><h1 class="sec-title" style="color:var(--gold);">Undangan Tidak Ditemukan</h1><p id="guestErrorMessage" class="sec-desc" style="color:var(--ice);"></p></div>
+
+    <section id="openingCoverPage" class="opening-cover" style="display:none;">
+      <div style="width:100%;">
+        <div class="boarding-eyebrow">✈ FIRST CLASS VOWS</div>
+        <h1 id="openCoupleNames" class="vows-couple">Romeo &amp; Juliet</h1>
+        <div class="passport-frame"><img id="openCoverPhoto" src="" alt="Couple"></div>
+      </div>
+      <div style="width:100%;">
+        <div style="background:rgba(255,255,255,0.07); border:1px solid rgba(200,164,93,0.4); border-radius:12px; padding:16px; margin-bottom:14px;">
+          <div style="font-family:var(--font-mono); font-size:10px; color:var(--gold); letter-spacing:0.16em;">PASSENGER / GUEST NAME</div>
+          <div id="openGuestName" style="font-family:var(--font-serif); font-size:22px; font-weight:700; color:#fff; margin:6px 0;">-</div>
+          <p style="font-size:11.5px; color:var(--ice);">You are invited aboard our wedding celebration.</p>
+        </div>
+        <button type="button" class="btn-firstclass" onclick="handleOpenInvitationClick()">
+          <i data-lucide="plane-takeoff" style="width:16px;height:16px;"></i><span>CHECK IN &amp; OPEN</span>
+        </button>
+        <div id="openWeddingDate" style="font-family:var(--font-mono); font-size:12px; color:var(--gold); margin-top:10px;"></div>
+      </div>
+    </section>
+
+    <main id="mainInvitationPage" class="main-invitation">
+      <section id="sec-hero" class="sec-fc navy">
+        <div class="boarding-eyebrow">DESTINATION: FOREVER</div>
+        <h2 id="mainHeroCoupleTitle" class="vows-couple"></h2>
+        <div class="passport-frame" style="width:100%; height:290px;"><img id="mainHeroPhoto" src="" alt="Hero"></div>
+        <p id="mainHeroDescription" class="sec-desc"></p>
+      </section>
+
+      <section id="sec-couple" class="sec-fc">
+        <div class="boarding-eyebrow" style="color:var(--navy);">CO-PILOTS FOR LIFE</div>
+        <h3 class="sec-title">Groom &amp; Bride</h3>
+        <div class="boarding-pass-card">
+          <img id="mainGroomPhoto" class="avatar-fc" src="" alt="Groom" loading="lazy">
+          <div id="mainGroomFullName" style="font-family:var(--font-serif); font-size:21px; font-weight:600; margin-bottom:6px;"></div>
+          <p id="mainGroomParents" class="sec-desc"></p>
+        </div>
+        <div class="boarding-pass-card">
+          <img id="mainBridePhoto" class="avatar-fc" src="" alt="Bride" loading="lazy">
+          <div id="mainBrideFullName" style="font-family:var(--font-serif); font-size:21px; font-weight:600; margin-bottom:6px;"></div>
+          <p id="mainBrideParents" class="sec-desc"></p>
+        </div>
+      </section>
+
+      <section id="sec-countdown" class="sec-fc navy">
+        <div class="boarding-eyebrow">DEPARTURE COUNTDOWN</div>
+        <h3 class="sec-title">Hitung Mundur</h3>
+        <p id="mainCountdownDateText" class="sec-desc"></p>
+        <div class="countdown-grid">
+          <div class="cd-box"><div id="cdDays" class="cd-num">00</div><div class="cd-lbl">Days</div></div>
+          <div class="cd-box"><div id="cdHours" class="cd-num">00</div><div class="cd-lbl">Hours</div></div>
+          <div class="cd-box"><div id="cdMinutes" class="cd-num">00</div><div class="cd-lbl">Mins</div></div>
+          <div class="cd-box"><div id="cdSeconds" class="cd-num">00</div><div class="cd-lbl">Secs</div></div>
+        </div>
+      </section>
+
+      <section id="sec-event-info" class="sec-fc">
+        <div id="mainQuoteWrapper" class="boarding-pass-card" style="margin-top:0; margin-bottom:16px;">
+          <p id="mainQuoteText" style="font-family:var(--font-serif); font-style:italic; font-size:15.5px; line-height:1.6;"></p>
+          <div id="mainQuoteSource" style="font-family:var(--font-mono); font-size:11px; color:var(--gold); margin-top:8px;"></div>
+        </div>
+        <div class="boarding-eyebrow" style="color:var(--navy);">FLIGHT ITINERARY</div>
+        <h3 class="sec-title">Jadwal Acara</h3>
+        <div class="boarding-pass-card"><h4 id="mainAkadTitle" style="font-family:var(--font-serif); font-size:20px; color:var(--navy);">Akad Nikah</h4><div id="mainAkadDate" style="font-weight:600; margin:6px 0;"></div><div id="mainAkadTime" class="sec-desc"></div></div>
+        <div class="boarding-pass-card"><h4 id="mainReceptionTitle" style="font-family:var(--font-serif); font-size:20px; color:var(--navy);">Resepsi</h4><div id="mainReceptionDate" style="font-weight:600; margin:6px 0;"></div><div id="mainReceptionTime" class="sec-desc"></div></div>
+        <div class="boarding-pass-card" style="border-color:var(--navy);">
+          <h4 id="mainVenueName" style="font-family:var(--font-serif); font-size:19px;"></h4>
+          <p id="mainVenueAddress" class="sec-desc" style="margin:8px 0 16px;"></p>
+          <a id="mainGoogleMapsBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn-firstclass" style="background:var(--navy); color:#fff;"><i data-lucide="map-pin" style="width:16px;height:16px;"></i><span>Terminal / Maps</span></a>
+        </div>
+      </section>
+
+      <section id="sec-story" class="sec-fc" style="background:var(--ice);"><div class="boarding-eyebrow" style="color:var(--navy);">TRAVEL LOG</div><h3 class="sec-title">Our Journey</h3><div id="mainStoryList" class="story-timeline"></div></section>
+      <section id="sec-gallery" class="sec-fc"><div class="boarding-eyebrow" style="color:var(--navy);">ALBUM</div><h3 class="sec-title">Precious Moments</h3><div id="mainGalleryGrid" class="gallery-grid"></div></section>
+
+      <section id="sec-rsvp" class="sec-fc navy">
+        <div class="boarding-eyebrow">PASSENGER CHECK-IN</div><h3 class="sec-title">Konfirmasi RSVP</h3>
+        <form id="guestRsvpForm" class="boarding-pass-card" style="text-align:left;" action="javascript:void(0);" onsubmit="handleGuestRsvpSubmit(event); return false;">
+          <label style="font-size:12px; font-weight:600;">Nama Tamu</label><input type="text" id="rsvpFormGuestName" class="guest-input" readonly>
+          <label style="font-size:12px; font-weight:600;">Kehadiran</label>
+          <select id="rsvpFormAttendance" class="guest-input" onchange="handleRsvpAttendanceChange()"><option value="Hadir">Ya, Saya Akan Hadir</option><option value="Tidak Hadir">Maaf, Berhalangan Hadir</option></select>
+          <div id="rsvpGuestCountWrapper"><label style="font-size:12px; font-weight:600;">Jumlah Orang</label><select id="rsvpFormGuestCount" class="guest-input"><option value="1">1 Orang</option><option value="2">2 Orang</option><option value="3">3 Orang</option><option value="4">4 Orang</option><option value="5">5 Orang</option></select></div>
+          <label style="font-size:12px; font-weight:600;">Ucapan &amp; Doa</label><textarea id="rsvpFormWishes" class="guest-input" style="min-height:90px;" required placeholder="Tuliskan ucapan & doa..."></textarea>
+          <button type="button" id="rsvpSubmitBtn" onclick="handleGuestRsvpSubmit(event)" class="btn-firstclass">Kirim Boarding RSVP</button>
+        </form>
+      </section>
+
+      <section id="sec-wishes" class="sec-fc"><div class="boarding-eyebrow" style="color:var(--navy);">GUESTBOOK</div><h3 class="sec-title">Buku Ucapan</h3><p id="wishesTotalLabel" class="sec-desc"></p><div id="mainWishesFeed" class="wishes-feed"></div></section>
+
+      <section id="sec-qrcode" class="sec-fc" style="background:var(--ice);">
+        <div class="boarding-eyebrow" style="color:var(--navy);">BOARDING GATE QR</div><h3 class="sec-title">First Class Pass</h3>
+        <div class="boarding-pass-card" style="border-color:var(--navy);">
+          <div id="qrPassGuestName" style="font-family:var(--font-serif); font-size:20px; font-weight:700; margin-bottom:12px;"></div>
+          <div id="guestQrCodeContainer" style="display:inline-block; padding:12px; background:#FFF; border:1px solid var(--border); border-radius:8px;"></div>
+          <div id="qrPassCategoryBadge" style="margin-top:10px;"></div>
+          <div id="qrPassCheckinStatus" style="margin-top:6px; font-size:12px; color:var(--slate);"></div>
+        </div>
+      </section>
+
+      <section id="sec-closing" class="sec-fc navy"><p id="mainClosingText" class="sec-desc" style="margin-bottom:14px;"></p><h3 id="mainClosingCouple" class="vows-couple" style="font-size:30px;"></h3></section>
+    </main>
+
+    <div id="galleryLightbox" class="lightbox-overlay" onclick="closeGalleryLightbox()"><img id="lightboxImgEl" class="lightbox-Overlay-img" src="" alt="Preview"><div id="lightboxCaptionEl" style="color:#FFF; margin-top:10px;"></div></div>
+    <audio id="bgMusicAudio" loop preload="none"></audio>
+    <button type="button" id="floatingMusicBtn" class="floating-music-btn" onclick="toggleBackgroundMusic()"><i data-lucide="music" style="width:18px;height:18px;"></i></button>
+    <nav id="bottomTouchNav" class="bottom-touch-nav">
+      <a href="#sec-couple" class="touch-nav-link"><i data-lucide="heart" style="width:16px;height:16px;"></i><span>Couple</span></a>
+      <a href="#sec-event-info" class="touch-nav-link"><i data-lucide="plane" style="width:16px;height:16px;"></i><span>Flight</span></a>
+      <a href="#sec-gallery" class="touch-nav-link"><i data-lucide="image" style="width:16px;height:16px;"></i><span>Gallery</span></a>
+      <a href="#sec-rsvp" class="touch-nav-link"><i data-lucide="mail-check" style="width:16px;height:16px;"></i><span>RSVP</span></a>
+      <a href="#sec-qrcode" class="touch-nav-link"><i data-lucide="qr-code" style="width:16px;height:16px;"></i><span>Pass</span></a>
+    </nav>
+  </div>
+  <script>window.__INITIAL_INVITATION_TOKEN__ = "<?= initialToken ?>";</script>
+  <?!= include('ScriptsGuest'); ?>
+</body>
+</html>

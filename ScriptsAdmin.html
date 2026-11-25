@@ -1158,7 +1158,10 @@
     romantic_sunset: '4. Romantic Sunset (7 Foto • 3D Horizon)',
     dark_luxury: '5. Dark Luxury (9 Foto • 3D Coverflow)',
     thelove_cinematic: '6. Thelove Cinematic (12 Foto • 3D Slideshow)',
-    dark_boho: '7. Dark Boho (8 Foto • 3D Boho Lift)'
+    dark_boho: '7. Dark Boho (8 Foto • 3D Boho Lift)',
+    cypress_linen: '8. Cypress & Linen (6 Foto • 3D Linen Flip)',
+    first_class_vows: '9. First Class Vows (7 Foto • 3D Gate Slide)',
+    traditional_java: '10. Traditional Java (8 Foto • 3D Pendopo)'
   };
 
   const THEME_SLOT_SPECS = {
@@ -1230,6 +1233,33 @@
       { key: 'gallery_2', label: '6. Foto Precious Moment II', role: 'gallery' },
       { key: 'gallery_3', label: '7. Foto Precious Moment III', role: 'gallery' },
       { key: 'gallery_4', label: '8. Foto Precious Moment IV', role: 'gallery' }
+    ],
+    cypress_linen: [
+      { key: 'cover_photo', label: '1. Foto Sampul Arch Cypress', role: 'cover' },
+      { key: 'hero_photo', label: '2. Foto Hero Taman Linen', role: 'hero' },
+      { key: 'groom_photo', label: '3. Foto Mempelai Pria', role: 'groom' },
+      { key: 'bride_photo', label: '4. Foto Mempelai Wanita', role: 'bride' },
+      { key: 'gallery_1', label: '5. Foto Galeri Cypress I', role: 'gallery' },
+      { key: 'gallery_2', label: '6. Foto Galeri Cypress II', role: 'gallery' }
+    ],
+    first_class_vows: [
+      { key: 'cover_photo', label: '1. Foto Paspor Pembuka', role: 'cover' },
+      { key: 'hero_photo', label: '2. Foto Hero Destinasi', role: 'hero' },
+      { key: 'groom_photo', label: '3. Foto Co-Pilot Pria', role: 'groom' },
+      { key: 'bride_photo', label: '4. Foto Co-Pilot Wanita', role: 'bride' },
+      { key: 'gallery_1', label: '5. Foto Travel Album I', role: 'gallery' },
+      { key: 'gallery_2', label: '6. Foto Travel Album II', role: 'gallery' },
+      { key: 'gallery_3', label: '7. Foto Travel Album III', role: 'gallery' }
+    ],
+    traditional_java: [
+      { key: 'cover_photo', label: '1. Foto Sampul Gunungan Jawa', role: 'cover' },
+      { key: 'hero_photo', label: '2. Foto Hero Pahargyan Jawa', role: 'hero' },
+      { key: 'groom_photo', label: '3. Foto Mempelai Pria (Busana Jawa)', role: 'groom' },
+      { key: 'bride_photo', label: '4. Foto Mempelai Wanita (Kebaya Jawa)', role: 'bride' },
+      { key: 'gallery_1', label: '5. Foto Momen Siraman / Midodareni', role: 'gallery' },
+      { key: 'gallery_2', label: '6. Foto Akad / Panggih', role: 'gallery' },
+      { key: 'gallery_3', label: '7. Foto Resepsi Adat', role: 'gallery' },
+      { key: 'gallery_4', label: '8. Foto Keluarga Besar', role: 'gallery' }
     ]
   };
 
@@ -1369,6 +1399,21 @@
         <div style="font-size:11px; color:#D4AF37; letter-spacing:0.2em; margin-bottom:4px;">─── ◆ ❖ ◆ ───</div>
       `;
     }
+    if (themeId === 'cypress_linen') {
+      return `
+        <div style="font-size:11px; color:#005d17; letter-spacing:0.18em; font-weight:700; margin-bottom:4px;">🌿 CYPRESS &amp; LINEN 🌿</div>
+      `;
+    }
+    if (themeId === 'first_class_vows') {
+      return `
+        <div style="font-family:monospace; font-size:10.5px; color:#c8a45d; letter-spacing:0.16em; font-weight:700; margin-bottom:4px;">✈ FIRST CLASS BOARDING PASS</div>
+      `;
+    }
+    if (themeId === 'traditional_java') {
+      return `
+        <div style="font-size:11px; color:#3b1f0d; letter-spacing:0.18em; font-weight:700; margin-bottom:4px;">✦ PAWIWAHAN TRADITIONAL JAVA ✦</div>
+      `;
+    }
     return `
       <div style="font-size:12px; color:#B99A62; letter-spacing:0.15em; margin-bottom:4px;">✿ ─── ❀ ─── ✿</div>
     `;
@@ -1459,6 +1504,39 @@
       text: '#FFFFFF',
       btnBg: '#cebba2',
       btnText: '#1d1d1b'
+    },
+    cypress_linen: {
+      badge: 'Desain Botanical',
+      tags: 'Botanical · Linen · 3D Page Flip',
+      titleHtml: 'Cypress &amp; <span class="owl-script">Linen</span>',
+      desc: 'Kertas linen hangat #faf6f4, hijau cypress #005d17, aksen terracotta #a05a4f & bingkai lengkung botani.',
+      bg: '#faf6f4',
+      accent: '#005d17',
+      text: '#222823',
+      btnBg: '#005d17',
+      btnText: '#FFFFFF'
+    },
+    first_class_vows: {
+      badge: 'Desain Boarding Pass',
+      tags: 'Boarding Pass · Navy Gold · 3D Gate',
+      titleHtml: 'First Class <span class="owl-script">Vows</span>',
+      desc: 'Konsep paspor & boarding pass eksklusif dengan biru navy #1f2c4a, aksen emas #c8a45d & 3D Gate Slide.',
+      bg: '#1f2c4a',
+      accent: '#c8a45d',
+      text: '#FFFFFF',
+      btnBg: '#c8a45d',
+      btnText: '#131c33'
+    },
+    traditional_java: {
+      badge: 'Desain Adat Jawa',
+      tags: 'Adat Jawa · Gunungan · 3D Pendopo',
+      titleHtml: 'Traditional <span class="owl-script">Java</span>',
+      desc: 'Palet keraton #d8cfc9, #5a574e & kayu jati #3b1f0d dengan ornamen Gunungan Wayang & 3D Pendopo Fold.',
+      bg: '#d8cfc9',
+      accent: '#3b1f0d',
+      text: '#3b1f0d',
+      btnBg: '#3b1f0d',
+      btnText: '#ece6e1'
     }
   };
 

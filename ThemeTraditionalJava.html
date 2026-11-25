@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Undangan Pernikahan — Traditional Java</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600&family=Pinyon+Script&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    :root {
+      --java-stone: #d8cfc9;
+      --java-cream: #ece6e1;
+      --java-taupe: #5a574e;
+      --java-teak: #3b1f0d;
+      --java-gold: #b88e44;
+      --border: rgba(59, 31, 13, 0.25);
+      --success: #3B9B72;
+      --danger: #D95C5C;
+      --font-display: 'Cinzel', 'Cormorant Garamond', Georgia, serif;
+      --font-script: 'Pinyon Script', cursive;
+      --font-sans: 'Plus Jakarta Sans', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; }
+    html, body {
+      width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 0 !important;
+      overflow-x: hidden !important; overscroll-behavior-x: none; touch-action: pan-y; position: relative;
+    }
+    body { font-family: var(--font-sans); background-color: #c5bab2; color: var(--java-teak); min-height: 100vh; display: block; -webkit-font-smoothing: antialiased; }
+    .mobile-frame {
+      display: block; margin: 0 auto !important; width: 100%; max-width: 430px; min-height: 100vh;
+      background-color: var(--java-stone);
+      background-image: radial-gradient(rgba(59, 31, 13, 0.05) 1.5px, transparent 1.5px);
+      background-size: 22px 22px;
+      position: relative; overflow-x: hidden !important;
+      border-left: 1px solid var(--border); border-right: 1px solid var(--border);
+      box-shadow: 0 0 50px rgba(59, 31, 13, 0.2);
+    }
+    .state-screen { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 36px 28px; text-align: center; background: var(--java-stone); }
+    .spinner-ring { width: 44px; height: 44px; border: 2px solid rgba(59,31,13,0.2); border-top-color: var(--java-teak); border-radius: 50%; animation: spin 0.9s linear infinite; margin-bottom: 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .opening-cover {
+      position: fixed; top: 0; left: 0; right: 0; margin: 0 auto; width: 100%; max-width: 430px;
+      height: 100vh; height: 100dvh; z-index: 120;
+      background: linear-gradient(180deg, var(--java-cream) 0%, var(--java-stone) 100%);
+      display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+      padding: 32px 24px 28px; text-align: center; overflow-y: auto; overflow-x: hidden !important;
+      transition: transform 0.95s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.75s ease;
+    }
+    .opening-cover.opened { transform: translate3d(0, -105%, 0); opacity: 0; pointer-events: none; }
+    .java-eyebrow { font-family: var(--font-display); font-size: 10.5px; letter-spacing: 0.22em; text-indent: 0.22em; color: var(--java-taupe); font-weight: 700; }
+    .java-couple { font-family: var(--font-display); font-size: 32px; font-weight: 700; color: var(--java-teak); margin: 6px 0; }
+    .gunungan-frame {
+      width: 200px; height: 245px; margin: 10px auto;
+      border-radius: 100px 100px 10px 10px;
+      padding: 6px; border: 2px solid var(--java-teak); background: var(--java-cream);
+      box-shadow: 0 0 0 4px var(--java-stone), 0 0 0 5px var(--java-taupe);
+    }
+    .gunungan-frame img { width: 100%; height: 100%; object-fit: cover; border-radius: 94px 94px 6px 6px; display: block; }
+    .java-card {
+      background: var(--java-cream); border: 1px solid var(--border); border-radius: 14px;
+      padding: 22px 18px; margin-top: 14px;
+      box-shadow: 0 8px 22px rgba(59, 31, 13, 0.08);
+    }
+    .btn-java {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 13px 22px;
+      border-radius: 99px; background: var(--java-teak); color: var(--java-cream); border: 1px solid var(--java-gold);
+      font-family: var(--font-display); font-size: 11.5px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; cursor: pointer; text-decoration: none;
+    }
+
+    .main-invitation { display: none; padding-bottom: 90px; }
+    .main-invitation.visible { display: block; animation: fadeIn 0.7s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .sec-java { padding: 38px 22px; border-bottom: 1px solid var(--border); text-align: center; }
+    .sec-java.teak { background: var(--java-teak); color: var(--java-cream); }
+    .sec-title { font-family: var(--font-display); font-size: 24px; font-weight: 700; margin: 6px 0 10px; }
+    .sec-desc { font-size: 13px; color: var(--java-taupe); line-height: 1.65; }
+    .sec-java.teak .sec-desc { color: var(--java-stone); }
+    .avatar-java { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 2px solid var(--java-teak); padding: 3px; background: var(--java-cream); margin-bottom: 10px; }
+    .countdown-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 16px; }
+    .cd-box { background: var(--java-cream); border: 1px solid var(--java-teak); border-radius: 10px; padding: 12px 4px; }
+    .cd-num { font-family: var(--font-display); font-size: 23px; font-weight: 700; color: var(--java-teak); }
+    .cd-lbl { font-size: 10px; color: var(--java-taupe); text-transform: uppercase; margin-top: 3px; }
+    .story-timeline { display: flex; flex-direction: column; gap: 14px; margin-top: 18px; text-align: left; }
+    .story-card { background: var(--java-cream); border: 1px solid var(--border); border-left: 3px solid var(--java-teak); border-radius: 12px; padding: 16px; }
+    .story-year { font-size: 11px; font-weight: 700; color: var(--java-gold); text-transform: uppercase; }
+    .story-card h4 { font-family: var(--font-display); font-size: 17px; color: var(--java-teak); margin: 4px 0 6px; }
+    .story-card p { font-size: 12.5px; color: var(--java-taupe); line-height: 1.6; }
+    .gallery-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 18px; }
+    .gallery-thumb { width: 100%; height: 165px; object-fit: cover; border-radius: 10px; border: 1px solid var(--java-teak); cursor: pointer; }
+    .guest-input { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; background: #fff; font-family: var(--font-sans); font-size: 13.5px; margin-bottom: 12px; }
+    .wishes-feed { max-height: 350px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-top: 16px; text-align: left; }
+    .wish-item { background: var(--java-cream); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+    .wish-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+    .wish-sender { font-weight: 700; font-size: 13.5px; color: var(--java-teak); }
+    .wish-badge { font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: 99px; }
+    .wish-badge.hadir { background: rgba(59, 155, 114, 0.16); color: var(--success); }
+    .wish-badge.absen { background: rgba(217, 92, 92, 0.16); color: var(--danger); }
+    .lightbox-overlay { position: fixed; inset: 0; background: rgba(59, 31, 13, 0.94); z-index: 300; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+    .lightbox-overlay.open { display: flex; }
+    .lightbox-Overlay-img { max-width: 100%; max-height: 75vh; border-radius: 10px; }
+    .floating-music-btn { position: fixed; bottom: 78px; right: max(16px, calc(50% - 198px)); width: 44px; height: 44px; border-radius: 50%; background: var(--java-teak); border: 1.5px solid var(--java-gold); color: var(--java-cream); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 95; }
+    .floating-music-btn.playing { animation: spin 6s linear infinite; }
+    .bottom-touch-nav { position: fixed; bottom: 0; left: 0; right: 0; margin: 0 auto; width: 100%; max-width: 430px; height: 62px; background: rgba(59, 31, 13, 0.96); border-top: 1px solid var(--java-gold); display: none; grid-template-columns: repeat(5, 1fr); z-index: 90; }
+    .bottom-touch-nav.visible { display: grid; }
+    .touch-nav-link { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: var(--java-stone); font-size: 10.5px; }
+    @media (max-width: 480px) {
+      .mobile-frame, .opening-cover, .bottom-touch-nav { width: 100% !important; max-width: 100% !important; border-left: none !important; border-right: none !important; box-shadow: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mobile-frame">
+    <div id="guestLoadingScreen" class="state-screen"><div class="spinner-ring"></div><div class="java-eyebrow">TRADITIONAL JAVA EDITION</div></div>
+    <div id="guestErrorScreen" class="state-screen" style="display:none;"><h1 class="sec-title">Undangan Tidak Ditemukan</h1><p id="guestErrorMessage" class="sec-desc"></p></div>
+
+    <section id="openingCoverPage" class="opening-cover" style="display:none;">
+      <div style="width:100%;">
+        <!-- Gunungan Wayang Jawa SVG -->
+        <svg style="width:68px; height:52px; margin:0 auto 4px; display:block;" viewBox="0 0 80 60" fill="none">
+          <path d="M40 4C48 18 62 32 62 48C62 52 54 56 40 56C26 56 18 52 18 48C18 32 32 18 40 4Z" stroke="#3b1f0d" stroke-width="1.6" fill="rgba(184,142,68,0.16)"/>
+          <path d="M40 12V54M28 42C34 38 46 38 52 42M32 30C36 27 44 27 48 30" stroke="#3b1f0d" stroke-width="1.2"/>
+        </svg>
+        <div class="java-eyebrow">PAWIWAHAN AGUNG</div>
+        <h1 id="openCoupleNames" class="java-couple">Romeo &amp; Juliet</h1>
+        <div class="gunungan-frame"><img id="openCoverPhoto" src="" alt="Couple"></div>
+      </div>
+      <div style="width:100%;">
+        <div class="java-card" style="margin:6px 0 14px;">
+          <div style="font-size:11px; color:var(--java-taupe); font-weight:700; letter-spacing:0.12em;">Katur Dhumateng / Kepada Yth.</div>
+          <div id="openGuestName" style="font-family:var(--font-display); font-size:21px; font-weight:700; color:var(--java-teak); margin:4px 0;">-</div>
+          <p style="font-size:12px; color:var(--java-taupe);">Tanpa mengurangi rasa hormat, kami mengundang Bapak/Ibu/Saudara/i.</p>
+        </div>
+        <button type="button" class="btn-java" onclick="handleOpenInvitationClick()">
+          <i data-lucide="mail-open" style="width:16px;height:16px;"></i><span>Buka Undangan</span>
+        </button>
+        <div id="openWeddingDate" style="font-family:var(--font-display); font-size:14px; color:var(--java-teak); margin-top:10px;"></div>
+      </div>
+    </section>
+
+    <main id="mainInvitationPage" class="main-invitation">
+      <section id="sec-hero" class="sec-java">
+        <div class="java-eyebrow">TRADITIONAL JAVA</div>
+        <h2 id="mainHeroCoupleTitle" class="java-couple"></h2>
+        <div class="gunungan-frame" style="width:100%; height:300px;"><img id="mainHeroPhoto" src="" alt="Hero"></div>
+        <p id="mainHeroDescription" class="sec-desc"></p>
+      </section>
+
+      <section id="sec-couple" class="sec-java teak">
+        <div class="java-eyebrow" style="color:var(--java-gold);">MEMPELAI</div>
+        <h3 class="sec-title">Putra &amp; Putri</h3>
+        <div class="java-card" style="color:var(--java-teak);">
+          <img id="mainGroomPhoto" class="avatar-java" src="" alt="Groom" loading="lazy">
+          <div id="mainGroomFullName" style="font-family:var(--font-display); font-size:20px; font-weight:700; margin-bottom:6px;"></div>
+          <p id="mainGroomParents" class="sec-desc"></p>
+        </div>
+        <div style="font-family:var(--font-script); font-size:36px; color:var(--java-gold); margin-top:12px;">&amp;</div>
+        <div class="java-card" style="color:var(--java-teak);">
+          <img id="mainBridePhoto" class="avatar-java" src="" alt="Bride" loading="lazy">
+          <div id="mainBrideFullName" style="font-family:var(--font-display); font-size:20px; font-weight:700; margin-bottom:6px;"></div>
+          <p id="mainBrideParents" class="sec-desc"></p>
+        </div>
+      </section>
+
+      <section id="sec-countdown" class="sec-java">
+        <div class="java-eyebrow">DINTEN BAHAGIA</div>
+        <h3 class="sec-title">Hitung Mundur</h3>
+        <p id="mainCountdownDateText" class="sec-desc"></p>
+        <div class="countdown-grid">
+          <div class="cd-box"><div id="cdDays" class="cd-num">00</div><div class="cd-lbl">Hari</div></div>
+          <div class="cd-box"><div id="cdHours" class="cd-num">00</div><div class="cd-lbl">Jam</div></div>
+          <div class="cd-box"><div id="cdMinutes" class="cd-num">00</div><div class="cd-lbl">Menit</div></div>
+          <div class="cd-box"><div id="cdSeconds" class="cd-num">00</div><div class="cd-lbl">Detik</div></div>
+        </div>
+      </section>
+
+      <section id="sec-event-info" class="sec-java">
+        <div id="mainQuoteWrapper" class="java-card" style="margin-top:0; margin-bottom:18px;">
+          <p id="mainQuoteText" style="font-family:var(--font-display); font-style:italic; font-size:15px; line-height:1.65;"></p>
+          <div id="mainQuoteSource" style="font-size:11.5px; font-weight:700; color:var(--java-gold); margin-top:8px;"></div>
+        </div>
+        <div class="java-eyebrow">RANGKAIAN ADAT</div>
+        <h3 class="sec-title">Waktu &amp; Lokasi</h3>
+        <div class="java-card"><h4 id="mainAkadTitle" style="font-family:var(--font-display); font-size:19px;">Akad Nikah</h4><div id="mainAkadDate" style="font-weight:600; margin:6px 0;"></div><div id="mainAkadTime" class="sec-desc"></div></div>
+        <div class="java-card"><h4 id="mainReceptionTitle" style="font-family:var(--font-display); font-size:19px;">Resepsi / Pahargyan</h4><div id="mainReceptionDate" style="font-weight:600; margin:6px 0;"></div><div id="mainReceptionTime" class="sec-desc"></div></div>
+        <div class="java-card" style="border-color:var(--java-teak);">
+          <h4 id="mainVenueName" style="font-family:var(--font-display); font-size:19px;"></h4>
+          <p id="mainVenueAddress" class="sec-desc" style="margin:8px 0 16px;"></p>
+          <a id="mainGoogleMapsBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn-java"><i data-lucide="map-pin" style="width:16px;height:16px;"></i><span>Petunjuk Lokasi</span></a>
+        </div>
+      </section>
+
+      <section id="sec-story" class="sec-java teak"><div class="java-eyebrow" style="color:var(--java-gold);">CARITA TRESNA</div><h3 class="sec-title">Our Story</h3><div id="mainStoryList" class="story-timeline" style="color:var(--java-teak);"></div></section>
+      <section id="sec-gallery" class="sec-java"><div class="java-eyebrow">GALERI</div><h3 class="sec-title">Momen Adat &amp; Prewedding</h3><div id="mainGalleryGrid" class="gallery-grid"></div></section>
+
+      <section id="sec-rsvp" class="sec-java">
+        <div class="java-eyebrow">RSVP</div><h3 class="sec-title">Konfirmasi Kehadiran</h3>
+        <form id="guestRsvpForm" class="java-card" style="text-align:left;" action="javascript:void(0);" onsubmit="handleGuestRsvpSubmit(event); return false;">
+          <label style="font-size:12px; font-weight:600;">Nama Tamu</label><input type="text" id="rsvpFormGuestName" class="guest-input" readonly>
+          <label style="font-size:12px; font-weight:600;">Kehadiran</label>
+          <select id="rsvpFormAttendance" class="guest-input" onchange="handleRsvpAttendanceChange()"><option value="Hadir">Ya, Saya Akan Hadir</option><option value="Tidak Hadir">Maaf, Berhalangan Hadir</option></select>
+          <div id="rsvpGuestCountWrapper"><label style="font-size:12px; font-weight:600;">Jumlah Orang</label><select id="rsvpFormGuestCount" class="guest-input"><option value="1">1 Orang</option><option value="2">2 Orang</option><option value="3">3 Orang</option><option value="4">4 Orang</option><option value="5">5 Orang</option></select></div>
+          <label style="font-size:12px; font-weight:600;">Ucapan &amp; Doa</label><textarea id="rsvpFormWishes" class="guest-input" style="min-height:90px;" required placeholder="Tuliskan ucapan & doa restu..."></textarea>
+          <button type="button" id="rsvpSubmitBtn" onclick="handleGuestRsvpSubmit(event)" class="btn-java">Kirim Konfirmasi</button>
+        </form>
+      </section>
+
+      <section id="sec-wishes" class="sec-java"><div class="java-eyebrow">UCAPAN</div><h3 class="sec-title">Buku Ucapan</h3><p id="wishesTotalLabel" class="sec-desc"></p><div id="mainWishesFeed" class="wishes-feed"></div></section>
+
+      <section id="sec-qrcode" class="sec-java">
+        <div class="java-eyebrow">AKSES TAMU</div><h3 class="sec-title">QR Check-in</h3>
+        <div class="java-card" style="border-color:var(--java-teak);">
+          <div id="qrPassGuestName" style="font-family:var(--font-display); font-size:20px; font-weight:700; margin-bottom:12px;"></div>
+          <div id="guestQrCodeContainer" style="display:inline-block; padding:12px; background:#FFF; border-radius:10px; border:1px solid var(--border);"></div>
+          <div id="qrPassCategoryBadge" style="margin-top:10px;"></div>
+          <div id="qrPassCheckinStatus" style="margin-top:6px; font-size:12px; color:var(--java-taupe);"></div>
+        </div>
+      </section>
+
+      <section id="sec-closing" class="sec-java teak"><p id="mainClosingText" class="sec-desc" style="margin-bottom:14px;"></p><h3 id="mainClosingCouple" class="java-couple" style="color:var(--java-gold);"></h3></section>
+    </main>
+
+    <div id="galleryLightbox" class="lightbox-overlay" onclick="closeGalleryLightbox()"><img id="lightboxImgEl" class="lightbox-Overlay-img" src="" alt="Preview"><div id="lightboxCaptionEl" style="color:#FFF; margin-top:10px;"></div></div>
+    <audio id="bgMusicAudio" loop preload="none"></audio>
+    <button type="button" id="floatingMusicBtn" class="floating-music-btn" onclick="toggleBackgroundMusic()"><i data-lucide="music" style="width:18px;height:18px;"></i></button>
+    <nav id="bottomTouchNav" class="bottom-touch-nav">
+      <a href="#sec-couple" class="touch-nav-link"><i data-lucide="heart" style="width:16px;height:16px;"></i><span>Mempelai</span></a>
+      <a href="#sec-event-info" class="touch-nav-link"><i data-lucide="calendar" style="width:16px;height:16px;"></i><span>Acara</span></a>
+      <a href="#sec-gallery" class="touch-nav-link"><i data-lucide="image" style="width:16px;height:16px;"></i><span>Galeri</span></a>
+      <a href="#sec-rsvp" class="touch-nav-link"><i data-lucide="mail-check" style="width:16px;height:16px;"></i><span>RSVP</span></a>
+      <a href="#sec-qrcode" class="touch-nav-link"><i data-lucide="qr-code" style="width:16px;height:16px;"></i><span>QR Pass</span></a>
+    </nav>
+  </div>
+  <script>window.__INITIAL_INVITATION_TOKEN__ = "<?= initialToken ?>";</script>
+  <?!= include('ScriptsGuest'); ?>
+</body>
+</html>
