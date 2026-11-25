@@ -176,6 +176,14 @@ function getWeddingConfigData(bypassCache, targetWeddingId) {
     our_story: stories,
     music_url: settings.music_url !== undefined ? settings.music_url : APP_CONFIG.DEFAULT_SETTINGS.music_url,
     music_enabled: String(settings.music_enabled || 'true') === 'true',
+    video_url: settings.video_url !== undefined ? settings.video_url : (APP_CONFIG.DEFAULT_SETTINGS.video_url || ''),
+    livestream_url: settings.livestream_url !== undefined ? settings.livestream_url : (APP_CONFIG.DEFAULT_SETTINGS.livestream_url || ''),
+    gift_bank_name: settings.gift_bank_name !== undefined ? settings.gift_bank_name : APP_CONFIG.DEFAULT_SETTINGS.gift_bank_name,
+    gift_account_number: settings.gift_account_number !== undefined ? settings.gift_account_number : APP_CONFIG.DEFAULT_SETTINGS.gift_account_number,
+    gift_account_name: settings.gift_account_name !== undefined ? settings.gift_account_name : APP_CONFIG.DEFAULT_SETTINGS.gift_account_name,
+    gift_address: settings.gift_address !== undefined ? settings.gift_address : APP_CONFIG.DEFAULT_SETTINGS.gift_address,
+    gift_note: settings.gift_note !== undefined ? settings.gift_note : APP_CONFIG.DEFAULT_SETTINGS.gift_note,
+    also_invite_text: settings.also_invite_text !== undefined ? settings.also_invite_text : APP_CONFIG.DEFAULT_SETTINGS.also_invite_text,
     closing_text: settings.closing_text || APP_CONFIG.DEFAULT_SETTINGS.closing_text,
     wa_message_template: settings.wa_message_template || APP_CONFIG.DEFAULT_SETTINGS.wa_message_template,
     gallery: gallery.map(function (img, idx) {
@@ -450,6 +458,14 @@ function updateWeddingSettings(sessionToken, payload) {
         payload.music_url !== undefined ? payload.music_url : current.music_url
       ),
       music_enabled: payload.music_enabled !== undefined ? String(!!payload.music_enabled) : String(current.music_enabled),
+      video_url: sanitizeUrl(payload.video_url !== undefined ? payload.video_url : current.video_url),
+      livestream_url: sanitizeUrl(payload.livestream_url !== undefined ? payload.livestream_url : current.livestream_url),
+      gift_bank_name: sanitizeString(payload.gift_bank_name !== undefined ? payload.gift_bank_name : current.gift_bank_name, 60),
+      gift_account_number: sanitizeTextPlain(payload.gift_account_number !== undefined ? payload.gift_account_number : current.gift_account_number, 60),
+      gift_account_name: sanitizeString(payload.gift_account_name !== undefined ? payload.gift_account_name : current.gift_account_name, 100),
+      gift_address: sanitizeString(payload.gift_address !== undefined ? payload.gift_address : current.gift_address, 300),
+      gift_note: sanitizeString(payload.gift_note !== undefined ? payload.gift_note : current.gift_note, 400),
+      also_invite_text: sanitizeTextPlain(payload.also_invite_text !== undefined ? payload.also_invite_text : current.also_invite_text, 500),
       closing_text: sanitizeString(
         payload.closing_text !== undefined ? payload.closing_text : current.closing_text,
         500
@@ -788,6 +804,14 @@ function getInvitationByToken(rawToken) {
       gallery: weddingConfig.gallery,
       music_url: weddingConfig.music_url,
       music_enabled: weddingConfig.music_enabled,
+      video_url: weddingConfig.video_url || '',
+      livestream_url: weddingConfig.livestream_url || '',
+      gift_bank_name: weddingConfig.gift_bank_name || '',
+      gift_account_number: weddingConfig.gift_account_number || '',
+      gift_account_name: weddingConfig.gift_account_name || '',
+      gift_address: weddingConfig.gift_address || '',
+      gift_note: weddingConfig.gift_note || '',
+      also_invite_text: weddingConfig.also_invite_text || '',
       closing_text: weddingConfig.closing_text
     },
     wishes: publicWishes.slice(0, 60)

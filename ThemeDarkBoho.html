@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Undangan Pernikahan — Dark Boho</title>
+  <title>Undangan Pernikahan — Dark Boho Edition</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;600;700&family=Pinyon+Script&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;600;700&family=Pinyon+Script&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -20,8 +20,8 @@
       --boho-stone: #827e76;
       --boho-slate: #4f6368;
       --boho-white: #ffffff;
-      --boho-muted: rgba(255, 255, 255, 0.74);
-      --border-sand: rgba(206, 187, 162, 0.32);
+      --boho-muted: rgba(255, 255, 255, 0.76);
+      --border-sand: rgba(206, 187, 162, 0.34);
       --success: #3B9B72;
       --danger: #D95C5C;
       --font-title: 'Cormorant Garamond', 'Libre Baskerville', Georgia, serif;
@@ -31,251 +31,146 @@
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     html { scroll-behavior: smooth; }
     html, body {
-      width: 100% !important;
-      max-width: 100% !important;
-      margin: 0 !important;
-      padding: 0 !important;
-      overflow-x: hidden !important;
-      overscroll-behavior-x: none;
-      touch-action: pan-y;
-      position: relative;
+      width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 0 !important;
+      overflow-x: hidden !important; overscroll-behavior-x: none; touch-action: pan-y; position: relative;
     }
     body {
-      font-family: var(--font-sans);
-      background-color: #121210;
-      color: var(--boho-white);
-      min-height: 100vh;
-      display: block;
-      -webkit-font-smoothing: antialiased;
+      font-family: var(--font-sans); background-color: #121210; color: var(--boho-white);
+      min-height: 100vh; display: block; -webkit-font-smoothing: antialiased;
     }
     .mobile-frame {
-      display: block;
-      margin: 0 auto !important;
-      width: 100%;
-      max-width: 430px;
-      min-height: 100vh;
-      background-color: var(--boho-dark);
-      position: relative;
-      overflow-x: hidden !important;
+      display: block; margin: 0 auto !important; width: 100%; max-width: 430px; min-height: 100vh;
+      background-color: var(--boho-dark); position: relative; overflow-x: hidden !important;
       box-shadow: 0 0 55px rgba(0, 0, 0, 0.85);
     }
-    .state-screen {
-      min-height: 100vh; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; padding: 36px 28px;
-      text-align: center; background: var(--boho-dark);
-    }
-    .spinner-ring {
-      width: 44px; height: 44px; border: 2px solid rgba(206,187,162,0.22);
-      border-top-color: var(--boho-sand); border-radius: 50%;
-      animation: spin 0.9s linear infinite; margin-bottom: 16px;
-    }
+    .state-screen { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 36px 28px; text-align: center; background: var(--boho-dark); }
+    .spinner-ring { width: 44px; height: 44px; border: 2px solid rgba(206,187,162,0.22); border-top-color: var(--boho-sand); border-radius: 50%; animation: spin 0.9s linear infinite; margin-bottom: 16px; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ========================================================================
        A. OPENING COVER (DARK BOHO FULL-BLEED + EDITORIAL SERIF)
        ======================================================================== */
     .opening-cover {
-      position: fixed;
-      top: 0; left: 0; right: 0; margin: 0 auto;
-      width: 100%; max-width: 430px; height: 100vh; height: 100dvh;
-      z-index: 120;
+      position: fixed; top: 0; left: 0; right: 0; margin: 0 auto; width: 100%; max-width: 430px;
+      height: 100vh; height: 100dvh; z-index: 120;
       background-color: var(--boho-dark);
       background-image:
-        linear-gradient(180deg, rgba(29, 29, 27, 0.45) 0%, rgba(29, 29, 27, 0.28) 48%, rgba(29, 29, 27, 0.92) 92%),
+        linear-gradient(180deg, rgba(28, 45, 71, 0.36) 0%, rgba(29, 29, 27, 0.25) 45%, rgba(29, 29, 27, 0.92) 93%),
         var(--cover-bg-url, url('https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=900&q=80'));
-      background-size: cover;
-      background-position: center center;
-      display: flex; flex-direction: column; justify-content: space-between;
-      align-items: center;
-      padding: 48px 24px 38px; text-align: center;
+      background-size: cover; background-position: center center;
+      display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+      padding: 46px 24px 38px; text-align: center; overflow-y: auto; overflow-x: hidden !important;
       transition: transform 0.95s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.75s ease;
-      overflow-y: auto;
-      overflow-x: hidden !important;
     }
     .opening-cover.opened { transform: translate3d(0, -105%, 0); opacity: 0; pointer-events: none; }
-    .boho-eyebrow {
-      font-family: var(--font-sans);
-      font-size: 10.5px;
-      letter-spacing: 0.28em;
-      text-indent: 0.28em;
-      text-transform: uppercase;
-      color: var(--boho-sand);
-      font-weight: 500;
-    }
-    .boho-couple-hero {
-      font-family: var(--font-title);
-      font-size: 40px;
-      font-weight: 500;
-      letter-spacing: 0.04em;
-      color: var(--boho-white);
-      line-height: 1.12;
-      margin: 8px 0;
-      text-shadow: 0 3px 16px rgba(0,0,0,0.6);
-    }
-    .boho-date-dot {
-      font-family: var(--font-sans);
-      font-size: 12px;
-      letter-spacing: 0.24em;
-      text-indent: 0.24em;
-      color: var(--boho-sand);
-      margin-top: 4px;
-    }
-    .boho-guest-box {
-      width: 100%;
-      background: rgba(29, 29, 27, 0.65);
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--border-sand);
-      padding: 18px 16px;
-      margin: 12px 0 16px;
-    }
+    .boho-eyebrow { font-family: var(--font-sans); font-size: 10px; letter-spacing: 0.28em; text-indent: 0.28em; text-transform: uppercase; color: var(--boho-sand); font-weight: 500; }
+    .boho-couple-hero { font-family: var(--font-title); font-size: 40px; font-weight: 500; letter-spacing: 0.03em; color: var(--boho-white); line-height: 1.12; margin: 8px 0; text-shadow: 0 3px 16px rgba(0,0,0,0.6); }
+    .boho-date-dot { font-family: var(--font-sans); font-size: 11.5px; letter-spacing: 0.24em; text-indent: 0.24em; color: var(--boho-sand); margin-top: 4px; }
+    .boho-guest-box { width: 100%; background: rgba(29, 29, 27, 0.65); backdrop-filter: blur(8px); border: 1px solid var(--border-sand); padding: 18px 16px; margin: 12px 0 16px; }
     .btn-boho {
-      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-      width: 100%; padding: 13px 22px;
-      border-radius: 0;
-      background: var(--boho-sand);
-      color: var(--boho-dark);
-      border: 1px solid var(--boho-sand);
-      font-family: var(--font-sans);
-      font-size: 11px; font-weight: 600; letter-spacing: 0.26em; text-transform: uppercase;
-      cursor: pointer;
-      text-decoration: none;
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 13px 20px;
+      border-radius: 0; background: var(--boho-sand); color: var(--boho-dark); border: 1px solid var(--boho-sand);
+      font-family: var(--font-sans); font-size: 10.5px; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase; cursor: pointer; text-decoration: none;
       transition: all 0.25s ease;
     }
     .btn-boho:active { transform: scale(0.98); background: var(--boho-bronze); color: #FFF; border-color: var(--boho-bronze); }
     .btn-boho-outline {
-      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-      width: 100%; padding: 12px 22px;
-      border-radius: 0;
-      background: transparent;
-      color: var(--boho-sand);
-      border: 1px solid var(--boho-sand);
-      font-family: var(--font-sans);
-      font-size: 11px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase;
-      cursor: pointer;
-      text-decoration: none;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 16px;
+      border-radius: 0; background: transparent; color: var(--boho-sand); border: 1px solid var(--boho-sand);
+      font-family: var(--font-sans); font-size: 10.5px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; cursor: pointer; text-decoration: none;
     }
 
     /* ========================================================================
-       B. MAIN INVITATION (ALTERNATING #1d1d1b DARK & #cebba2 WARM BOHO SAND)
+       B. TOP EDITORIAL NAV HEADER (#header from dark-boho)
        ======================================================================== */
     .main-invitation { display: none; padding-bottom: 90px; width: 100%; overflow-x: hidden; }
     .main-invitation.visible { display: block; animation: fadeIn 0.7s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-    .sec-boho-dark {
-      width: 100%;
-      background-color: var(--boho-dark);
-      color: var(--boho-white);
-      padding: 42px 22px;
-      text-align: center;
-      position: relative;
-      border-bottom: 1px solid rgba(206, 187, 162, 0.14);
+    .boho-top-header {
+      position: sticky; top: 0; z-index: 80;
+      display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 6px;
+      background: rgba(29, 29, 27, 0.94); backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(206, 187, 162, 0.2);
+      padding: 10px 14px;
     }
-    .sec-boho-sand {
-      width: 100%;
-      background-color: var(--boho-sand);
-      color: var(--boho-dark);
-      padding: 42px 22px;
-      text-align: center;
-      position: relative;
-    }
-    .sec-boho-slate {
-      width: 100%;
-      background-color: var(--boho-slate);
-      color: var(--boho-white);
-      padding: 40px 22px;
-      text-align: center;
-      position: relative;
-    }
+    .boho-nav-side { display: flex; align-items: center; justify-content: space-around; gap: 6px; }
+    .boho-nav-link { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--boho-sand); text-decoration: none; font-weight: 500; }
+    .boho-nav-mono { font-family: var(--font-title); font-size: 19px; color: var(--boho-sand); font-weight: 600; letter-spacing: 0.08em; padding: 0 10px; border-left: 1px solid rgba(206,187,162,0.28); border-right: 1px solid rgba(206,187,162,0.28); }
 
-    .boho-sec-title {
-      font-family: var(--font-title);
-      font-size: 28px;
-      font-weight: 500;
-      margin: 6px 0 12px;
-      letter-spacing: 0.02em;
-    }
+    /* Sections */
+    .sec-boho-dark { width: 100%; background-color: var(--boho-dark); color: var(--boho-white); padding: 40px 20px; text-align: center; position: relative; border-bottom: 1px solid rgba(206, 187, 162, 0.12); }
+    .sec-boho-sand { width: 100%; background-color: var(--boho-sand); color: var(--boho-dark); padding: 40px 20px; text-align: center; position: relative; }
+    .sec-boho-slate { width: 100%; background-color: var(--boho-slate); color: var(--boho-white); padding: 40px 20px; text-align: center; position: relative; }
+
+    .boho-sec-title { font-family: var(--font-title); font-size: 30px; font-weight: 500; margin: 4px 0 12px; letter-spacing: 0.02em; }
+    .boho-sec-title .title-italic { font-style: italic; font-weight: 400; }
     .boho-desc-light { font-size: 12.5px; color: var(--boho-muted); line-height: 1.75; }
-    .boho-desc-dark { font-size: 12.5px; color: rgba(29, 29, 27, 0.82); line-height: 1.75; }
+    .boho-desc-dark { font-size: 12.5px; color: rgba(29, 29, 27, 0.84); line-height: 1.75; }
+    .boho-divider-v { display: block; width: 1px; height: 52px; background: var(--boho-sand); opacity: 0.45; margin: 14px auto; }
 
-    /* Boho Arch Photo Frame */
+    /* Parallax / Arch Hero + Stacked Monogram Crest (#quote-words) */
     .boho-arch-wrap {
-      width: 230px;
-      height: 300px;
-      margin: 14px auto 18px;
-      border-radius: 140px 140px 0 0;
-      padding: 7px;
-      border: 1px solid var(--boho-sand);
-      background: rgba(206, 187, 162, 0.06);
+      width: 240px; height: 315px; margin: 14px auto 18px;
+      border-radius: 140px 140px 0 0; padding: 7px; border: 1px solid var(--boho-sand);
+      background: rgba(206, 187, 162, 0.06); overflow: hidden;
     }
-    .boho-arch-wrap img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 134px 134px 0 0;
-      display: block;
-    }
+    .boho-arch-wrap img { width: 100%; height: 100%; object-fit: cover; border-radius: 134px 134px 0 0; display: block; transition: transform 1.2s ease; }
 
-    .countdown-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 8px;
-      margin-top: 18px;
+    .boho-crest-box {
+      width: 112px; height: 150px; margin: 0 auto 18px;
+      border: 1.5px solid var(--boho-sand); border-radius: 80px 80px 0 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      position: relative; padding: 12px 6px;
     }
-    .cd-boho {
-      background: var(--boho-dark-card);
-      border: 1px solid var(--border-sand);
-      padding: 14px 4px;
-    }
+    .boho-crest-star { width: 22px; height: 22px; fill: var(--boho-sand); opacity: 0.9; }
+    .boho-crest-letter { font-family: var(--font-title); font-size: 30px; color: var(--boho-sand); line-height: 1; font-weight: 500; }
+
+    .countdown-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 16px; }
+    .cd-boho { background: var(--boho-dark-card); border: 1px solid var(--border-sand); padding: 14px 4px; }
     .cd-num { font-family: var(--font-title); font-size: 26px; font-weight: 600; color: var(--boho-sand); }
-    .cd-lbl { font-size: 9.5px; color: var(--boho-muted); text-transform: uppercase; letter-spacing: 0.12em; margin-top: 3px; }
+    .cd-lbl { font-size: 9px; color: var(--boho-muted); text-transform: uppercase; letter-spacing: 0.12em; margin-top: 3px; }
 
-    .boho-card-dark {
-      background: var(--boho-dark-card);
-      border: 1px solid var(--border-sand);
-      padding: 24px 18px;
-      margin-top: 16px;
+    /* Profile Cards (#profile with orb-photo-frame) */
+    .boho-card-dark { background: var(--boho-dark-card); border: 1px solid var(--border-sand); padding: 24px 18px; margin-top: 16px; position: relative; }
+    .orb-portrait-frame {
+      width: 195px; height: 250px; margin: 0 auto 16px; position: relative; overflow: hidden;
+      border-radius: 120px 120px 0 0; border: 1.5px solid var(--boho-sand); padding: 5px; background: var(--boho-dark);
     }
-    .boho-card-sand {
-      background: rgba(255, 255, 255, 0.28);
-      border: 1px solid rgba(29, 29, 27, 0.25);
-      padding: 24px 18px;
-      margin-top: 16px;
-    }
-    .avatar-boho {
-      width: 126px; height: 155px;
-      border-radius: 80px 80px 0 0;
-      object-fit: cover;
-      border: 1.5px solid var(--boho-sand);
-      padding: 4px;
-      background: var(--boho-dark);
-      margin-bottom: 12px;
-    }
+    .orb-portrait-frame img { width: 100%; height: 100%; object-fit: cover; border-radius: 114px 114px 0 0; display: block; }
+
+    /* Masonry Precious Moment Gallery (#galleries) */
+    .boho-video-box { position: relative; width: 100%; padding-bottom: 56.25%; margin-bottom: 18px; border: 1px solid rgba(29,29,27,0.25); background: #000; }
+    .boho-video-box iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+    .gallery-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 16px; width: 100%; }
+    .gallery-thumb { width: 100%; height: 185px; object-fit: cover; border: 1px solid rgba(29, 29, 27, 0.25); cursor: pointer; }
+    .gallery-thumb:nth-child(3n+1) { height: 225px; }
 
     .story-timeline { display: flex; flex-direction: column; gap: 14px; margin-top: 18px; text-align: left; }
-    .story-card {
-      background: rgba(29, 29, 27, 0.08);
-      border: 1px solid rgba(29, 29, 27, 0.22);
-      border-left: 3px solid var(--boho-bronze);
-      padding: 16px;
-    }
-    .story-year { font-size: 11px; font-weight: 700; color: var(--boho-bronze); text-transform: uppercase; letter-spacing: 0.14em; }
-    .story-card h4 { font-family: var(--font-title); font-size: 19px; color: var(--boho-dark); margin: 4px 0 6px; }
-    .story-card p { font-size: 12.5px; color: rgba(29, 29, 27, 0.8); line-height: 1.65; }
+    .story-card { background: var(--boho-dark-card); border: 1px solid var(--border-sand); border-left: 3px solid var(--boho-sand); padding: 16px; }
+    .story-year { font-size: 11px; font-weight: 700; color: var(--boho-sand); text-transform: uppercase; letter-spacing: 0.14em; }
+    .story-card h4 { font-family: var(--font-title); font-size: 19px; color: #fff; margin: 4px 0 6px; }
+    .story-card p { font-size: 12.5px; color: var(--boho-muted); line-height: 1.65; }
 
-    .gallery-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 18px; width: 100%; overflow: hidden; }
-    .gallery-thumb { width: 100%; height: 175px; object-fit: cover; border: 1px solid rgba(29, 29, 27, 0.25); cursor: pointer; }
-
-    .guest-input {
-      width: 100%; padding: 12px 14px;
-      border: 1px solid var(--border-sand);
-      border-radius: 0;
-      background: #141412;
-      color: var(--boho-white);
-      font-family: var(--font-sans);
-      font-size: 13px;
-      margin-bottom: 12px;
+    /* Digital Gift Radio & Card (#gift) */
+    .boho-gift-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 16px 0; }
+    .boho-gift-tab {
+      padding: 12px 10px; background: rgba(29, 29, 27, 0.08); border: 1px solid rgba(29, 29, 27, 0.28);
+      color: var(--boho-dark); font-family: var(--font-sans); font-size: 10.5px; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer;
     }
+    .boho-gift-tab.active { background: var(--boho-dark); color: var(--boho-sand); border-color: var(--boho-dark); }
+    .boho-gift-panel { background: var(--boho-slate); color: #ffffff; padding: 22px 18px; border: 1px solid rgba(29,29,27,0.2); }
+
+    /* Also Invite & Closing Half Fade (#closing) */
+    .boho-also-invite { list-style: none; margin: 16px auto; padding: 14px; border-top: 1px solid var(--border-sand); border-bottom: 1px solid var(--border-sand); }
+    .boho-also-invite li { font-size: 12px; color: var(--boho-muted); padding: 3px 0; }
+    .boho-closing-wrap { position: relative; min-height: 360px; display: flex; flex-direction: column; justify-content: flex-end; text-align: center; padding: 36px 22px; overflow: hidden; }
+    .boho-closing-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+    .boho-closing-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(29,29,27,0.3) 0%, rgba(29,29,27,0.88) 72%, #1d1d1b 100%); z-index: 1; }
+    .boho-closing-inner { position: relative; z-index: 2; }
+
+    .guest-input { width: 100%; padding: 12px 14px; border: 1px solid var(--border-sand); border-radius: 0; background: #141412; color: var(--boho-white); font-family: var(--font-sans); font-size: 13px; margin-bottom: 12px; }
     .wishes-feed { max-height: 350px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-top: 16px; text-align: left; }
     .wish-item { background: var(--boho-dark-card); border: 1px solid var(--border-sand); padding: 14px; }
     .wish-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
@@ -287,18 +182,14 @@
     .lightbox-overlay { position: fixed; inset: 0; background: rgba(18, 18, 16, 0.94); z-index: 300; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
     .lightbox-overlay.open { display: flex; }
     .lightbox-Overlay-img { max-width: 100%; max-height: 75vh; border: 1px solid var(--boho-sand); }
-    .floating-music-btn { position: fixed; bottom: 78px; right: max(16px, calc(50% - 198px)); width: 42px; height: 42px; border-radius: 50%; background: var(--boho-dark-card); border: 1px solid var(--boho-sand); color: var(--boho-sand); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 95; }
-    .floating-music-btn.playing { animation: spin 6s linear infinite; }
+    .floating-music-btn { position: fixed; bottom: 78px; right: max(16px, calc(50% - 198px)); width: 44px; height: 44px; border-radius: 50%; background: var(--boho-slate); border: 1.5px solid var(--boho-sand); color: var(--boho-sand); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 95; box-shadow: 0 4px 16px rgba(0,0,0,0.45); }
+    .floating-music-btn.playing { animation: spin 5s linear infinite; background: var(--boho-bronze); color: #fff; }
     .bottom-touch-nav { position: fixed; bottom: 0; left: 0; right: 0; margin: 0 auto; width: 100%; max-width: 430px; height: 60px; background: rgba(29, 29, 27, 0.96); border-top: 1px solid var(--border-sand); display: none; grid-template-columns: repeat(5, 1fr); z-index: 90; }
     .bottom-touch-nav.visible { display: grid; }
     .touch-nav-link { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: var(--boho-sand); font-size: 10px; }
 
     @media (max-width: 480px) {
-      .mobile-frame, .opening-cover, .bottom-touch-nav {
-        width: 100% !important;
-        max-width: 100% !important;
-        box-shadow: none !important;
-      }
+      .mobile-frame, .opening-cover, .bottom-touch-nav { width: 100% !important; max-width: 100% !important; box-shadow: none !important; }
     }
   </style>
 </head>
@@ -306,7 +197,7 @@
   <div class="mobile-frame">
     <div id="guestLoadingScreen" class="state-screen">
       <div class="spinner-ring"></div>
-      <div style="font-family:var(--font-title); color:var(--boho-sand); font-size:18px; letter-spacing:0.12em;">DARK BOHO EDITION</div>
+      <div style="font-family:var(--font-title); color:var(--boho-sand); font-size:18px; letter-spacing:0.14em;">DARK BOHO EDITION</div>
     </div>
 
     <div id="guestErrorScreen" class="state-screen" style="display:none;">
@@ -317,10 +208,6 @@
     <!-- A. OPENING COVER (DARK BOHO) -->
     <section id="openingCoverPage" class="opening-cover" style="display:none;">
       <div style="width:100%;">
-        <!-- Minimalist Boho Botanical Line SVG -->
-        <svg style="width:72px; height:36px; margin:0 auto 10px; display:block;" viewBox="0 0 80 40" fill="none">
-          <path d="M40 36V6M40 24C30 22 22 14 20 6M40 24C50 22 58 14 60 6M40 16C33 15 28 10 27 4M40 16C47 15 52 10 53 4" stroke="#cebba2" stroke-width="1.2" stroke-linecap="round"/>
-        </svg>
         <div class="boho-eyebrow">THE WEDDING OF</div>
         <h1 id="openCoupleNames" class="boho-couple-hero">Romeo &amp; Juliet</h1>
         <div id="openWeddingDate" class="boho-date-dot">12 . 12 . 2026</div>
@@ -329,7 +216,7 @@
 
       <div style="width:100%;">
         <div class="boho-guest-box">
-          <div style="font-size:10.5px; letter-spacing:0.18em; text-transform:uppercase; color:var(--boho-sand);">Kepada Yth.</div>
+          <div style="font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--boho-sand);">Kepada Yth.</div>
           <div id="openGuestName" style="font-family:var(--font-title); font-size:24px; font-weight:600; color:#FFF; margin:6px 0;">-</div>
           <p style="font-size:11.5px; color:var(--boho-muted);">Merupakan kehormatan bagi kami apabila Anda berkenan hadir.</p>
         </div>
@@ -340,9 +227,22 @@
       </div>
     </section>
 
-    <!-- B. MAIN INVITATION (DARK BOHO) -->
+    <!-- B. MAIN INVITATION (OUR-WEDDING.LINK/DESIGN/DARK-BOHO ANATOMY) -->
     <main id="mainInvitationPage" class="main-invitation">
-      <!-- 1. Hero + Arch Photo + Countdown (#1d1d1b) -->
+      <!-- Top Editorial Nav (#header) -->
+      <header class="boho-top-header">
+        <div class="boho-nav-side">
+          <a href="#sec-couple" class="boho-nav-link">Couple</a>
+          <a href="#sec-gallery" class="boho-nav-link">Galleries</a>
+        </div>
+        <div id="bohoNavMonogram" class="boho-nav-mono">R / J</div>
+        <div class="boho-nav-side">
+          <a href="#sec-event-info" class="boho-nav-link">Location</a>
+          <a href="#sec-rsvp" class="boho-nav-link">Wishes</a>
+        </div>
+      </header>
+
+      <!-- 1. Save The Date + Boho Arch + Countdown (#1d1d1b) -->
       <section id="sec-hero" class="sec-boho-dark">
         <div class="boho-eyebrow">SAVE THE DATE</div>
         <h2 id="mainHeroCoupleTitle" class="boho-couple-hero" style="font-size:36px;"></h2>
@@ -351,64 +251,89 @@
         </div>
         <p id="mainHeroDescription" class="boho-desc-light" style="max-width:340px; margin:0 auto;"></p>
 
-        <div id="sec-countdown" style="margin-top:24px;">
+        <div id="sec-countdown" style="margin-top:22px;">
           <div id="mainCountdownDateText" style="font-family:var(--font-title); font-size:18px; color:var(--boho-sand);"></div>
           <div class="countdown-grid">
             <div class="cd-boho"><div id="cdDays" class="cd-num">00</div><div class="cd-lbl">Days</div></div>
             <div class="cd-boho"><div id="cdHours" class="cd-num">00</div><div class="cd-lbl">Hours</div></div>
-            <div class="cd-boho"><div id="cdMinutes" class="cd-num">00</div><div class="cd-lbl">Mins</div></div>
-            <div class="cd-boho"><div id="cdSeconds" class="cd-num">00</div><div class="cd-lbl">Secs</div></div>
+            <div class="cd-boho"><div id="cdMinutes" class="cd-num">00</div><div class="cd-lbl">Minutes</div></div>
+            <div class="cd-boho"><div id="cdSeconds" class="cd-num">00</div><div class="cd-lbl">Seconds</div></div>
           </div>
         </div>
       </section>
 
-      <!-- 2. Quote / Verse (#cebba2 Warm Boho Sand) -->
-      <section id="mainQuoteWrapper" class="sec-boho-sand">
-        <div id="heroMinimalistMonogram" style="font-family:var(--font-title); font-size:20px; letter-spacing:0.25em; color:var(--boho-bronze); margin-bottom:10px;">R / J</div>
-        <p id="mainQuoteText" style="font-family:var(--font-title); font-style:italic; font-size:17px; color:var(--boho-dark); line-height:1.7;"></p>
-        <div id="mainQuoteSource" style="font-size:11px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:var(--boho-bronze); margin-top:10px;"></div>
+      <!-- 2. Monogram Arched Crest + Sparkle Stars & Quote (#quote-words) -->
+      <section id="mainQuoteWrapper" class="sec-boho-dark" style="background:#171715;">
+        <div class="boho-crest-box">
+          <svg class="boho-crest-star" viewBox="308 337 250 180"><path d="M 529.5625 432.050781 C 441.691406 437.378906 437.382812 441.691406 432.050781 529.554688 C 426.730469 441.691406 422.410156 437.378906 334.546875 432.050781 C 422.410156 426.722656 426.730469 422.40625 432.050781 334.550781 C 437.382812 422.40625 441.691406 426.722656 529.5625 432.050781 Z"/></svg>
+          <div id="bohoCrestInitial1" class="boho-crest-letter">R</div>
+          <div id="bohoCrestInitial2" class="boho-crest-letter">J</div>
+          <svg class="boho-crest-star" viewBox="308 337 250 180"><path d="M 529.5625 432.050781 C 441.691406 437.378906 437.382812 441.691406 432.050781 529.554688 C 426.730469 441.691406 422.410156 437.378906 334.546875 432.050781 C 422.410156 426.722656 426.730469 422.40625 432.050781 334.550781 C 437.382812 422.40625 441.691406 426.722656 529.5625 432.050781 Z"/></svg>
+        </div>
+        <p id="mainQuoteText" style="font-family:var(--font-title); font-style:italic; font-size:17px; color:var(--boho-sand); line-height:1.75;"></p>
+        <div id="mainQuoteSource" style="font-size:11px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:var(--boho-stone); margin-top:10px;"></div>
       </section>
 
-      <!-- 3. Groom & Bride (#1d1d1b) -->
+      <!-- 3. Groom & Bride with Boho Botanical SVG (#profile) -->
       <section id="sec-couple" class="sec-boho-dark">
+        <svg style="width:90px; height:44px; margin:0 auto 6px; display:block;" viewBox="0 0 120 50" fill="none">
+          <path d="M60 46V6M60 32C46 28 36 18 32 8M60 32C74 28 84 18 88 8M60 20C50 17 44 11 42 4M60 20C70 17 76 11 78 4" stroke="#cebba2" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
         <div class="boho-eyebrow">THE COUPLE</div>
-        <h3 class="boho-sec-title">Groom &amp; Bride</h3>
+        <h3 class="boho-sec-title">Bride <span class="title-italic">&amp; Groom</span></h3>
 
         <div class="boho-card-dark">
-          <img id="mainGroomPhoto" class="avatar-boho" src="" alt="Groom" loading="lazy">
-          <div style="font-size:10px; letter-spacing:0.22em; color:var(--boho-sand); margin-bottom:4px;">THE GROOM</div>
-          <div id="mainGroomFullName" style="font-family:var(--font-title); font-size:24px; color:#FFF; margin-bottom:6px;"></div>
-          <p id="mainGroomParents" class="boho-desc-light"></p>
+          <div class="orb-portrait-frame"><img id="mainBridePhoto" src="" alt="The Bride" loading="lazy"></div>
+          <div style="font-size:10px; letter-spacing:0.24em; color:var(--boho-sand); margin-bottom:4px;">THE BRIDE</div>
+          <div id="mainBrideFullName" style="font-family:var(--font-title); font-size:25px; color:#FFF; margin-bottom:6px;"></div>
+          <p id="mainBrideParents" class="boho-desc-light"></p>
         </div>
 
-        <div style="font-family:var(--font-script); font-size:38px; color:var(--boho-sand); margin:10px 0 4px;">&amp;</div>
+        <span class="boho-divider-v"></span>
 
-        <div class="boho-card-dark" style="margin-top:8px;">
-          <img id="mainBridePhoto" class="avatar-boho" src="" alt="Bride" loading="lazy">
-          <div style="font-size:10px; letter-spacing:0.22em; color:var(--boho-sand); margin-bottom:4px;">THE BRIDE</div>
-          <div id="mainBrideFullName" style="font-family:var(--font-title); font-size:24px; color:#FFF; margin-bottom:6px;"></div>
-          <p id="mainBrideParents" class="boho-desc-light"></p>
+        <div class="boho-card-dark" style="margin-top:0;">
+          <div class="orb-portrait-frame"><img id="mainGroomPhoto" src="" alt="The Groom" loading="lazy"></div>
+          <div style="font-size:10px; letter-spacing:0.24em; color:var(--boho-sand); margin-bottom:4px;">THE GROOM</div>
+          <div id="mainGroomFullName" style="font-family:var(--font-title); font-size:25px; color:#FFF; margin-bottom:6px;"></div>
+          <p id="mainGroomParents" class="boho-desc-light"></p>
         </div>
       </section>
 
-      <!-- 4. Wedding Event & Maps (#4f6368 Muted Slate Accent) -->
-      <section id="sec-event-info" class="sec-boho-slate">
-        <div class="boho-eyebrow" style="color:var(--boho-sand-light);">SAVE THE DATE</div>
-        <h3 class="boho-sec-title">Wedding Event</h3>
+      <!-- 4. Precious Moment Gallery & Video (#galleries on #cebba2 Warm Boho Sand) -->
+      <section id="sec-gallery" class="sec-boho-sand">
+        <div class="boho-eyebrow" style="color:var(--boho-bronze);">GALLERIES</div>
+        <h3 class="boho-sec-title" style="color:var(--boho-dark);">Precious <span class="title-italic">moment</span></h3>
+        <div id="bohoVideoWrap" class="boho-video-box" style="display:none;">
+          <iframe id="bohoVideoIframe" src="" title="Prewedding Video" allowfullscreen></iframe>
+        </div>
+        <div id="mainGalleryGrid" class="gallery-grid"></div>
+      </section>
 
-        <div class="boho-card-dark" style="background:rgba(29,29,27,0.72);">
-          <h4 id="mainAkadTitle" style="font-family:var(--font-title); font-size:22px; color:var(--boho-sand);">Akad Nikah</h4>
+      <!-- 5. Our Journey (#story on #1d1d1b) -->
+      <section id="sec-story" class="sec-boho-dark">
+        <div class="boho-eyebrow">LOVE JOURNEY</div>
+        <h3 class="boho-sec-title">Our <span class="title-italic">Story</span></h3>
+        <div id="mainStoryList" class="story-timeline"></div>
+      </section>
+
+      <!-- 6. Save The Date Event & Maps (#rundown) -->
+      <section id="sec-event-info" class="sec-boho-dark">
+        <div class="boho-eyebrow">RUNDOWN</div>
+        <h3 class="boho-sec-title">Save <span class="title-italic">the date</span></h3>
+
+        <div class="boho-card-dark">
+          <h4 id="mainAkadTitle" style="font-family:var(--font-title); font-size:23px; color:var(--boho-sand);">Marriage Contract / Akad</h4>
           <div id="mainAkadDate" style="font-weight:600; font-size:13px; margin:6px 0;"></div>
           <div id="mainAkadTime" class="boho-desc-light"></div>
         </div>
 
-        <div class="boho-card-dark" style="background:rgba(29,29,27,0.72);">
-          <h4 id="mainReceptionTitle" style="font-family:var(--font-title); font-size:22px; color:var(--boho-sand);">Resepsi</h4>
+        <div class="boho-card-dark">
+          <h4 id="mainReceptionTitle" style="font-family:var(--font-title); font-size:23px; color:var(--boho-sand);">Reception</h4>
           <div id="mainReceptionDate" style="font-weight:600; font-size:13px; margin:6px 0;"></div>
           <div id="mainReceptionTime" class="boho-desc-light"></div>
         </div>
 
-        <div class="boho-card-dark" style="background:var(--boho-dark);">
+        <div class="boho-card-dark" style="border-color:var(--boho-sand);">
           <h4 id="mainVenueName" style="font-family:var(--font-title); font-size:21px; color:var(--boho-sand);"></h4>
           <p id="mainVenueAddress" class="boho-desc-light" style="margin:8px 0 16px;"></p>
           <a id="mainGoogleMapsBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn-boho">
@@ -418,23 +343,53 @@
         </div>
       </section>
 
-      <!-- 5. Our Story & Precious Moment Gallery (#cebba2 Warm Boho Sand) -->
-      <section id="sec-story" class="sec-boho-sand" style="border-bottom:1px solid rgba(29,29,27,0.12);">
-        <div class="boho-eyebrow" style="color:var(--boho-bronze);">OUR JOURNEY</div>
-        <h3 class="boho-sec-title" style="color:var(--boho-dark);">Love Story</h3>
-        <div id="mainStoryList" class="story-timeline"></div>
+      <!-- 7. Live Streaming (#live_igfilter on #4f6368 Slate Teal) -->
+      <section id="sec-livestream" class="sec-boho-slate" style="display:none;">
+        <div class="boho-eyebrow" style="color:var(--boho-sand-light);">VIRTUAL CEREMONY</div>
+        <h3 class="boho-sec-title">Live <span class="title-italic">Streaming</span></h3>
+        <p class="boho-desc-light" style="margin-bottom:18px;">Meet us <strong>virtually</strong> to witness our wedding celebration via live broadcast.</p>
+        <a id="bohoLivestreamBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn-boho" style="background:var(--boho-dark); color:var(--boho-sand); border-color:var(--boho-sand);">
+          <i data-lucide="video" style="width:15px;height:15px;"></i>
+          <span>GO TO STREAMING</span>
+        </a>
       </section>
 
-      <section id="sec-gallery" class="sec-boho-sand">
-        <div class="boho-eyebrow" style="color:var(--boho-bronze);">PRECIOUS MOMENT</div>
-        <h3 class="boho-sec-title" style="color:var(--boho-dark);">Our Gallery</h3>
-        <div id="mainGalleryGrid" class="gallery-grid"></div>
+      <!-- 8. Send Your Gift / Amplop Digital (#gift on #cebba2 Warm Boho Sand) -->
+      <section id="sec-gift" class="sec-boho-sand">
+        <div class="boho-eyebrow" style="color:var(--boho-bronze);">WEDDING GIFT</div>
+        <h3 class="boho-sec-title" style="color:var(--boho-dark);">Send <span class="title-italic">your gift</span></h3>
+        <p id="bohoGiftNote" class="boho-desc-dark"></p>
+
+        <div class="boho-gift-tabs">
+          <button type="button" id="bohoGiftTabDirect" class="boho-gift-tab active" onclick="switchBohoGiftMethod('direct')">Direct Transfer</button>
+          <button type="button" id="bohoGiftTabAddr" class="boho-gift-tab" onclick="switchBohoGiftMethod('address')">Send Gift</button>
+        </div>
+
+        <div id="bohoGiftDirectBox" class="boho-gift-panel">
+          <div style="font-size:10px; letter-spacing:0.2em; color:var(--boho-sand);">TRANSFER REKENING</div>
+          <div id="bohoBankName" style="font-family:var(--font-title); font-size:24px; color:#fff; margin-top:6px;">BCA</div>
+          <div id="bohoBankNumber" style="font-family:monospace; font-size:20px; font-weight:700; color:var(--boho-sand); letter-spacing:0.08em; margin:6px 0;">1234567890</div>
+          <div id="bohoBankOwner" style="font-size:12px; color:var(--boho-muted); margin-bottom:14px;">a.n. Mempelai</div>
+          <button type="button" class="btn-boho-outline" onclick="copyBohoText('bohoBankNumber', 'Nomor rekening disalin!')">
+            <i data-lucide="copy" style="width:14px;height:14px;"></i>
+            <span>Salin No. Rekening</span>
+          </button>
+        </div>
+
+        <div id="bohoGiftAddressBox" class="boho-gift-panel" style="display:none;">
+          <div style="font-size:10px; letter-spacing:0.2em; color:var(--boho-sand);">ALAMAT KIRIM KADO</div>
+          <p id="bohoGiftAddress" style="font-size:13px; color:#fff; line-height:1.65; margin:10px 0 14px;"></p>
+          <button type="button" class="btn-boho-outline" onclick="copyBohoText('bohoGiftAddress', 'Alamat pengiriman kado disalin!')">
+            <i data-lucide="copy" style="width:14px;height:14px;"></i>
+            <span>Salin Alamat</span>
+          </button>
+        </div>
       </section>
 
-      <!-- 6. RSVP & Wishes (#1d1d1b) -->
+      <!-- 9. RSVP & Wishes (#wishes on #1d1d1b) -->
       <section id="sec-rsvp" class="sec-boho-dark">
         <div class="boho-eyebrow">RESERVATION</div>
-        <h3 class="boho-sec-title">RSVP &amp; Wishes</h3>
+        <h3 class="boho-sec-title">Wishes <span class="title-italic">&amp; RSVP</span></h3>
         <form id="guestRsvpForm" class="boho-card-dark" style="text-align:left;" action="javascript:void(0);" onsubmit="handleGuestRsvpSubmit(event); return false;">
           <label style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--boho-sand);">Nama Tamu</label>
           <input type="text" id="rsvpFormGuestName" class="guest-input" readonly>
@@ -456,13 +411,13 @@
       </section>
 
       <section id="sec-wishes" class="sec-boho-dark">
-        <div class="boho-eyebrow">WISHES</div>
+        <div class="boho-eyebrow">GUESTBOOK</div>
         <h3 class="boho-sec-title">Buku Ucapan</h3>
         <p id="wishesTotalLabel" class="boho-desc-light"></p>
         <div id="mainWishesFeed" class="wishes-feed"></div>
       </section>
 
-      <!-- 7. QR Code Pass (#cebba2) -->
+      <!-- 10. QR Code Pass (#cebba2) -->
       <section id="sec-qrcode" class="sec-boho-sand">
         <div class="boho-eyebrow" style="color:var(--boho-bronze);">GUEST PASS</div>
         <h3 class="boho-sec-title" style="color:var(--boho-dark);">QR Check-in</h3>
@@ -474,11 +429,17 @@
         </div>
       </section>
 
-      <!-- 8. Closing (#1d1d1b) -->
-      <section id="sec-closing" class="sec-boho-dark">
-        <p id="mainClosingText" class="boho-desc-light" style="margin-bottom:16px;"></p>
-        <div class="boho-eyebrow">THANK YOU</div>
-        <h3 id="mainClosingCouple" class="boho-couple-hero" style="font-size:34px; margin-top:8px;"></h3>
+      <!-- 11. Closing Half-Fade + Also Invite (#also_inviting & #closing) -->
+      <section id="sec-closing" class="boho-closing-wrap">
+        <img id="bohoClosingPhoto" class="boho-closing-bg" src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=900&q=80" alt="Closing">
+        <div class="boho-closing-overlay"></div>
+        <div class="boho-closing-inner">
+          <div class="boho-eyebrow" style="margin-bottom:6px;">ALSO INVITING</div>
+          <ul id="bohoAlsoInviteList" class="boho-also-invite"></ul>
+          <p id="mainClosingText" class="boho-desc-light" style="margin-bottom:14px;"></p>
+          <div class="boho-eyebrow">THANK YOU</div>
+          <h3 id="mainClosingCouple" class="boho-couple-hero" style="font-size:36px; margin-top:6px;"></h3>
+        </div>
       </section>
     </main>
 
@@ -487,13 +448,13 @@
       <div id="lightboxCaptionEl" style="color:#FFF; margin-top:10px;"></div>
     </div>
     <audio id="bgMusicAudio" loop preload="none"></audio>
-    <button type="button" id="floatingMusicBtn" class="floating-music-btn" onclick="toggleBackgroundMusic()"><i data-lucide="music" style="width:18px;height:18px;"></i></button>
+    <button type="button" id="floatingMusicBtn" class="floating-music-btn" onclick="toggleBackgroundMusic()" title="Play/Pause Music"><i data-lucide="disc-3" style="width:20px;height:20px;"></i></button>
     <nav id="bottomTouchNav" class="bottom-touch-nav">
       <a href="#sec-couple" class="touch-nav-link"><i data-lucide="heart" style="width:16px;height:16px;"></i><span>Couple</span></a>
       <a href="#sec-event-info" class="touch-nav-link"><i data-lucide="calendar" style="width:16px;height:16px;"></i><span>Event</span></a>
       <a href="#sec-gallery" class="touch-nav-link"><i data-lucide="image" style="width:16px;height:16px;"></i><span>Gallery</span></a>
+      <a href="#sec-gift" class="touch-nav-link"><i data-lucide="gift" style="width:16px;height:16px;"></i><span>Gift</span></a>
       <a href="#sec-rsvp" class="touch-nav-link"><i data-lucide="mail-check" style="width:16px;height:16px;"></i><span>RSVP</span></a>
-      <a href="#sec-qrcode" class="touch-nav-link"><i data-lucide="qr-code" style="width:16px;height:16px;"></i><span>QR Pass</span></a>
     </nav>
   </div>
   <script>window.__INITIAL_INVITATION_TOKEN__ = "<?= initialToken ?>";</script>

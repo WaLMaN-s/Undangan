@@ -984,6 +984,14 @@
       document.getElementById('edQuoteSource').value = w.quote_source || '';
       document.getElementById('edMusicUrl').value = w.music_url || '';
       document.getElementById('edMusicEnabled').value = String(w.music_enabled !== false);
+      if (document.getElementById('edVideoUrl')) document.getElementById('edVideoUrl').value = w.video_url || '';
+      if (document.getElementById('edLivestreamUrl')) document.getElementById('edLivestreamUrl').value = w.livestream_url || '';
+      if (document.getElementById('edGiftBankName')) document.getElementById('edGiftBankName').value = w.gift_bank_name || '';
+      if (document.getElementById('edGiftAccountNumber')) document.getElementById('edGiftAccountNumber').value = w.gift_account_number || '';
+      if (document.getElementById('edGiftAccountName')) document.getElementById('edGiftAccountName').value = w.gift_account_name || '';
+      if (document.getElementById('edGiftAddress')) document.getElementById('edGiftAddress').value = w.gift_address || '';
+      if (document.getElementById('edGiftNote')) document.getElementById('edGiftNote').value = w.gift_note || '';
+      if (document.getElementById('edAlsoInviteText')) document.getElementById('edAlsoInviteText').value = w.also_invite_text || '';
       document.getElementById('edClosingText').value = w.closing_text || '';
 
       ADMIN_STATE.storyDraft = Array.isArray(w.our_story) ? JSON.parse(JSON.stringify(w.our_story)) : [];
@@ -1752,9 +1760,12 @@
 
     
     if (themeId === 'dark_boho') {
+      const bankName = (document.getElementById('edGiftBankName') && document.getElementById('edGiftBankName').value) || 'BCA';
+      const bankNum = (document.getElementById('edGiftAccountNumber') && document.getElementById('edGiftAccountNumber').value) || '1234567890';
+      const bankOwner = (document.getElementById('edGiftAccountName') && document.getElementById('edGiftAccountName').value) || coupleShort;
       screen.innerHTML = `
         <div style="background:#1d1d1b; color:#FFFFFF; font-family:'Montserrat',sans-serif; text-align:center; width:100%; box-sizing:border-box;">
-          <div id="prev-sec-cover" style="min-height:430px; background:linear-gradient(180deg,rgba(29,29,27,0.45),rgba(29,29,27,0.92)),url('${escapeHtml(coverImg)}') center/cover; display:flex; flex-direction:column; justify-content:space-between; padding:28px 18px;">
+          <div id="prev-sec-cover" style="min-height:430px; background:linear-gradient(180deg,rgba(28,45,71,0.36),rgba(29,29,27,0.92)),url('${escapeHtml(coverImg)}') center/cover; display:flex; flex-direction:column; justify-content:space-between; padding:28px 18px;">
             <div>
               <div style="font-size:10px; letter-spacing:0.26em; color:#cebba2;">THE WEDDING OF</div>
               <div style="font-family:'Cormorant Garamond',serif; font-size:32px; font-weight:500; margin:6px 0;">${coupleShort}</div>
@@ -1769,7 +1780,13 @@
             </div>
           </div>
 
-          <div id="prev-sec-hero" style="padding:28px 16px; background:#1d1d1b;">
+          <div style="display:grid; grid-template-columns:1fr auto 1fr; align-items:center; background:#171715; border-bottom:1px solid rgba(206,187,162,0.2); padding:8px 10px; font-size:9.5px; color:#cebba2; letter-spacing:0.1em;">
+            <div>COUPLE • GALLERY</div>
+            <div style="font-family:'Cormorant Garamond',serif; font-size:15px; padding:0 8px; border-left:1px solid rgba(206,187,162,0.3); border-right:1px solid rgba(206,187,162,0.3);">${gInit} / ${bInit}</div>
+            <div>LOCATION • WISHES</div>
+          </div>
+
+          <div id="prev-sec-hero" style="padding:26px 16px; background:#1d1d1b;">
             <div style="font-size:10px; letter-spacing:0.24em; color:#cebba2;">SAVE THE DATE</div>
             <div style="width:170px; height:220px; margin:12px auto; border-radius:100px 100px 0 0; padding:5px; border:1px solid #cebba2;">
               <img src="${escapeHtml(heroImg)}" style="width:100%; height:100%; object-fit:cover; border-radius:95px 95px 0 0;">
@@ -1782,48 +1799,60 @@
             </div>
           </div>
 
-          <div style="padding:24px 16px; background:#cebba2; color:#1d1d1b;">
-            <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:14px; line-height:1.6;">${escapeHtml(quoteText)}</div>
-            <div style="font-size:10.5px; font-weight:700; color:#87683a; margin-top:6px;">${escapeHtml(quoteSource)}</div>
+          <div style="padding:24px 16px; background:#171715;">
+            <div style="width:76px; height:98px; margin:0 auto 10px; border:1px solid #cebba2; border-radius:60px 60px 0 0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#cebba2; font-family:'Cormorant Garamond',serif; font-size:21px;">
+              <div>✦</div><div>${gInit}</div><div>${bInit}</div><div>✦</div>
+            </div>
+            <div style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:13.5px; color:#cebba2; line-height:1.6;">${escapeHtml(quoteText)}</div>
+            <div style="font-size:10px; font-weight:700; color:#827e76; margin-top:6px;">${escapeHtml(quoteSource)}</div>
           </div>
 
           <div id="prev-sec-couple" style="padding:26px 16px; background:#1d1d1b;">
-            <div style="font-family:'Cormorant Garamond',serif; font-size:22px; margin-bottom:12px;">Groom &amp; Bride</div>
+            <div style="font-family:'Cormorant Garamond',serif; font-size:22px; margin-bottom:12px;">Bride &amp; <i>Groom</i></div>
             <div style="background:#262522; border:1px solid rgba(206,187,162,0.3); padding:16px; margin-bottom:10px;">
-              <img src="${escapeHtml(groomPhoto)}" style="width:92px; height:112px; border-radius:60px 60px 0 0; object-fit:cover; border:1px solid #cebba2; margin-bottom:8px;">
-              <div style="font-family:'Cormorant Garamond',serif; font-size:19px;">${escapeHtml(groomName)}</div>
-              <div style="font-size:11px; color:rgba(255,255,255,0.7);">${escapeHtml(groomParents)}</div>
-            </div>
-            <div style="background:#262522; border:1px solid rgba(206,187,162,0.3); padding:16px;">
               <img src="${escapeHtml(bridePhoto)}" style="width:92px; height:112px; border-radius:60px 60px 0 0; object-fit:cover; border:1px solid #cebba2; margin-bottom:8px;">
               <div style="font-family:'Cormorant Garamond',serif; font-size:19px;">${escapeHtml(brideName)}</div>
               <div style="font-size:11px; color:rgba(255,255,255,0.7);">${escapeHtml(brideParents)}</div>
             </div>
+            <div style="background:#262522; border:1px solid rgba(206,187,162,0.3); padding:16px;">
+              <img src="${escapeHtml(groomPhoto)}" style="width:92px; height:112px; border-radius:60px 60px 0 0; object-fit:cover; border:1px solid #cebba2; margin-bottom:8px;">
+              <div style="font-family:'Cormorant Garamond',serif; font-size:19px;">${escapeHtml(groomName)}</div>
+              <div style="font-size:11px; color:rgba(255,255,255,0.7);">${escapeHtml(groomParents)}</div>
+            </div>
           </div>
 
-          <div id="prev-sec-event" style="padding:26px 16px; background:#4f6368;">
-            <div style="font-family:'Cormorant Garamond',serif; font-size:22px; margin-bottom:12px;">Wedding Event</div>
-            <div style="background:rgba(29,29,27,0.75); border:1px solid rgba(206,187,162,0.3); padding:14px; margin-bottom:10px;">
+          <div id="prev-sec-gallery" style="padding:26px 16px; background:#cebba2; color:#1d1d1b;">
+            <div style="font-size:10px; letter-spacing:0.2em; color:#87683a;">GALLERIES</div>
+            <div style="font-family:'Cormorant Garamond',serif; font-size:23px; margin-bottom:10px;">Precious <i>moment</i></div>
+            <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:6px;">
+              ${gallery.slice(0, 4).map((g) => `<img src="${escapeHtml(g.image_url)}" style="width:100%; height:100px; object-fit:cover; border:1px solid rgba(29,29,27,0.25);">`).join('')}
+            </div>
+          </div>
+
+          <div id="prev-sec-event" style="padding:26px 16px; background:#1d1d1b;">
+            <div style="font-family:'Cormorant Garamond',serif; font-size:22px; margin-bottom:12px;">Save <i>the date</i></div>
+            <div style="background:#262522; border:1px solid rgba(206,187,162,0.3); padding:14px; margin-bottom:10px;">
               <div style="font-family:'Cormorant Garamond',serif; font-size:18px; color:#cebba2;">${escapeHtml(akadTitle)}</div>
               <div style="font-size:12px; margin:4px 0;">${readableDate} • Pukul ${escapeHtml(akadTime)}</div>
             </div>
-            <div style="background:#1d1d1b; border:1px solid rgba(206,187,162,0.3); padding:14px;">
+            <div style="background:#262522; border:1px solid rgba(206,187,162,0.3); padding:14px;">
               <div style="font-family:'Cormorant Garamond',serif; font-size:18px; color:#cebba2;">${escapeHtml(recTitle)}</div>
               <div style="font-size:11.5px; color:rgba(255,255,255,0.75); margin:6px 0 10px;">${escapeHtml(venue)} — ${escapeHtml(address)}</div>
               <span style="display:inline-block; background:#cebba2; color:#1d1d1b; padding:7px 14px; font-size:10.5px; font-weight:700; letter-spacing:0.16em;">SEE LOCATION</span>
             </div>
           </div>
 
-          <div id="prev-sec-gallery" style="padding:26px 16px; background:#cebba2; color:#1d1d1b;">
-            <div style="font-size:10px; letter-spacing:0.2em; color:#87683a;">PRECIOUS MOMENT</div>
-            <div style="font-family:'Cormorant Garamond',serif; font-size:22px; margin-bottom:10px;">Our Gallery</div>
-            <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:6px;">
-              ${gallery.slice(0, 4).map((g) => `<img src="${escapeHtml(g.image_url)}" style="width:100%; height:100px; object-fit:cover; border:1px solid rgba(29,29,27,0.25);">`).join('')}
+          <div style="padding:22px 16px; background:#cebba2; color:#1d1d1b;">
+            <div style="font-family:'Cormorant Garamond',serif; font-size:21px; margin-bottom:8px;">Send <i>your gift</i></div>
+            <div style="background:#4f6368; color:#fff; padding:14px;">
+              <div style="font-size:12px; font-weight:700;">${escapeHtml(bankName)}</div>
+              <div style="font-family:monospace; font-size:15px; color:#cebba2; margin:4px 0;">${escapeHtml(bankNum)}</div>
+              <div style="font-size:11px;">a.n. ${escapeHtml(bankOwner)}</div>
             </div>
           </div>
 
-          <div id="prev-sec-rsvp" style="padding:24px 16px; background:#1d1d1b;">
-            <div style="font-family:'Cormorant Garamond',serif; font-size:20px; color:#cebba2; margin-bottom:8px;">RSVP${qrEnabled ? ' &amp; QR Pass' : ''}</div>
+          <div id="prev-sec-rsvp" style="padding:24px 16px; background:linear-gradient(180deg,rgba(29,29,27,0.7),#1d1d1b),url('${escapeHtml(coverImg)}') center/cover;">
+            <div style="font-family:'Cormorant Garamond',serif; font-size:20px; color:#cebba2; margin-bottom:8px;">Wishes &amp; RSVP${qrEnabled ? ' + QR Pass' : ''}</div>
             <div style="font-size:11px; color:rgba(255,255,255,0.72); margin-bottom:10px;">${escapeHtml(closingText)}</div>
             <div style="font-family:'Cormorant Garamond',serif; font-size:24px; color:#cebba2;">${coupleShort}</div>
           </div>
@@ -2293,6 +2322,14 @@
       gallery: ADMIN_STATE.galleryDraft,
       music_url: document.getElementById('edMusicUrl').value.trim(),
       music_enabled: document.getElementById('edMusicEnabled').value === 'true',
+      video_url: document.getElementById('edVideoUrl') ? document.getElementById('edVideoUrl').value.trim() : '',
+      livestream_url: document.getElementById('edLivestreamUrl') ? document.getElementById('edLivestreamUrl').value.trim() : '',
+      gift_bank_name: document.getElementById('edGiftBankName') ? document.getElementById('edGiftBankName').value.trim() : '',
+      gift_account_number: document.getElementById('edGiftAccountNumber') ? document.getElementById('edGiftAccountNumber').value.trim() : '',
+      gift_account_name: document.getElementById('edGiftAccountName') ? document.getElementById('edGiftAccountName').value.trim() : '',
+      gift_address: document.getElementById('edGiftAddress') ? document.getElementById('edGiftAddress').value.trim() : '',
+      gift_note: document.getElementById('edGiftNote') ? document.getElementById('edGiftNote').value.trim() : '',
+      also_invite_text: document.getElementById('edAlsoInviteText') ? document.getElementById('edAlsoInviteText').value.trim() : '',
       closing_text: document.getElementById('edClosingText').value.trim()
     };
 

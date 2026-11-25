@@ -1042,6 +1042,50 @@
                       </div>
                     </div>
 
+                    <div class="grid-2">
+                      <div class="form-group">
+                        <label class="form-label">URL Video Prewedding YouTube (Opsional)</label>
+                        <input type="url" id="edVideoUrl" class="form-control" placeholder="https://www.youtube.com/watch?v=...">
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">URL Live Streaming Acara (Opsional)</label>
+                        <input type="url" id="edLivestreamUrl" class="form-control" placeholder="https://youtube.com/... atau Instagram Live">
+                      </div>
+                    </div>
+
+                    <div style="background:var(--secondary); border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:14px;">
+                      <div style="font-weight:700; font-size:13px; color:var(--text-primary); margin-bottom:10px;">Amplop Digital &amp; Alamat Kirim Kado (Tema Dark Boho &amp; Gift)</div>
+                      <div class="grid-3">
+                        <div class="form-group" style="margin-bottom:8px;">
+                          <label class="form-label">Nama Bank / E-Wallet</label>
+                          <input type="text" id="edGiftBankName" class="form-control" placeholder="Contoh: BCA / Mandiri" oninput="updateLiveMobilePreview()">
+                        </div>
+                        <div class="form-group" style="margin-bottom:8px;">
+                          <label class="form-label">Nomor Rekening</label>
+                          <input type="text" id="edGiftAccountNumber" class="form-control" placeholder="Contoh: 1234567890" oninput="updateLiveMobilePreview()">
+                        </div>
+                        <div class="form-group" style="margin-bottom:8px;">
+                          <label class="form-label">Atas Nama Pemilik</label>
+                          <input type="text" id="edGiftAccountName" class="form-control" placeholder="Nama pemilik rekening" oninput="updateLiveMobilePreview()">
+                        </div>
+                      </div>
+                      <div class="grid-2">
+                        <div class="form-group" style="margin-bottom:0;">
+                          <label class="form-label">Alamat Pengiriman Kado Fisik</label>
+                          <input type="text" id="edGiftAddress" class="form-control" placeholder="Alamat lengkap penerima kado" oninput="updateLiveMobilePreview()">
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                          <label class="form-label">Catatan Hadiah / Ucapan Terima Kasih</label>
+                          <input type="text" id="edGiftNote" class="form-control" placeholder="Catatan singkat untuk pemberi hadiah" oninput="updateLiveMobilePreview()">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="form-label">Turut Mengundang / Also Inviting (Opsional, 1 baris = 1 nama)</label>
+                      <textarea id="edAlsoInviteText" class="form-control" style="min-height:65px;" placeholder="Keluarga Besar Bpk. ...&#10;Sahabat & Rekan Kerja"></textarea>
+                    </div>
+
                     <div class="form-group">
                       <label class="form-label">Ucapan Penutup</label>
                       <textarea id="edClosingText" class="form-control" style="min-height:70px;" oninput="updateLiveMobilePreview()"></textarea>

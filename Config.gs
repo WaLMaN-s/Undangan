@@ -191,6 +191,14 @@ var APP_CONFIG = {
     ]),
     music_url: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3',
     music_enabled: 'true',
+    video_url: '',
+    livestream_url: '',
+    gift_bank_name: 'BCA',
+    gift_account_number: '1234567890',
+    gift_account_name: 'Romeo Montague',
+    gift_address: 'Jl. Jenderal Sudirman Kav. 52-53, Jakarta Selatan',
+    gift_note: 'Doa restu Anda merupakan karunia terindah bagi kami. Namun jika berkenan memberikan tanda kasih, dapat melalui rekening atau alamat di bawah ini.',
+    also_invite_text: 'Keluarga Besar Mempelai Pria\nKeluarga Besar Mempelai Wanita\nSahabat & Rekan Kerja',
     closing_text: 'Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir untuk memberikan doa restu kepada kami.',
     wa_message_template:
       'Halo {{nama_tamu}},\n\n' +
