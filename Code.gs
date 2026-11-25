@@ -82,7 +82,6 @@ function doGet(e) {
       .evaluate()
       .setTitle('Wedding Invitation')
       .addMetaTag('viewport', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no')
-      .addMetaTag('theme-color', selectedThemeKey === 'dark_boho' ? '#1d1d1b' : '#FAF7F0')
       .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
   }
 
