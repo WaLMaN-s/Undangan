@@ -1596,6 +1596,29 @@
     await openSampleGuestInvitation();
   }
 
+  function setEditorStep(stepNum) {
+    const step = Number(stepNum) === 2 ? 2 : 1;
+    const p1 = document.getElementById('editorStep1Panel');
+    const p2 = document.getElementById('editorStep2Panel');
+    const b1 = document.getElementById('editorStepBtn1');
+    const b2 = document.getElementById('editorStepBtn2');
+    if (p1) p1.style.display = step === 1 ? 'block' : 'none';
+    if (p2) p2.style.display = step === 2 ? 'block' : 'none';
+    if (b1) b1.classList.toggle('active', step === 1);
+    if (b2) b2.classList.toggle('active', step === 2);
+    const chosen = (document.getElementById('edInvitationTheme') && document.getElementById('edInvitationTheme').value) || 'elegant_floral';
+    const step2NameEl = document.getElementById('step2ActiveThemeName');
+    if (step2NameEl) step2NameEl.textContent = THEME_LABELS[chosen] || chosen;
+    refreshIcons();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function chooseThemeAndProceed(themeId) {
+    selectInvitationTheme(themeId);
+    setEditorStep(2);
+    showToast('info', 'Tema "' + (THEME_LABELS[themeId] || themeId) + '" dipilih. Silakan lengkapi foto & data undangan.');
+  }
+
   function selectInvitationTheme(themeId) {
     const chosen = THEME_LABELS[themeId] ? themeId : 'elegant_floral';
     const hiddenInput = document.getElementById('edInvitationTheme');
@@ -1613,6 +1636,10 @@
     const badge = document.getElementById('prevActiveThemeBadge');
     if (badge) {
       badge.textContent = THEME_LABELS[chosen] || '1. Elegant Floral';
+    }
+    const step2NameEl = document.getElementById('step2ActiveThemeName');
+    if (step2NameEl) {
+      step2NameEl.textContent = THEME_LABELS[chosen] || '1. Elegant Floral';
     }
 
     updateOwlShowcaseBanner(chosen);

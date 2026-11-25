@@ -454,22 +454,35 @@
              D. INVITATION EDITOR VIEW (DENGAN LIVE MOBILE PREVIEW)
              ================================================================== -->
         <section id="view-editor" class="view-section">
+          <!-- Stepper Navigasi 2 Langkah: Pilih Tema Dulu -> Baru Isi Foto & Semua Data -->
+          <div class="editor-stepper-bar">
+            <button type="button" id="editorStepBtn1" class="editor-step-btn active" onclick="setEditorStep(1)">
+              <span class="editor-step-num">1</span>
+              <span>Pilih Tema Desain (10 Tema)</span>
+            </button>
+            <div class="editor-step-arrow">→</div>
+            <button type="button" id="editorStepBtn2" class="editor-step-btn" onclick="setEditorStep(2)">
+              <span class="editor-step-num">2</span>
+              <span>Isi Foto, Mempelai, Acara &amp; Konten</span>
+            </button>
+          </div>
+
           <div class="editor-layout">
             <!-- Left Column: Editor Forms -->
             <div>
               <form id="invitationEditorForm" action="javascript:void(0);" onsubmit="handleSaveInvitationEditor(event); return false;">
                 <input type="hidden" id="edInvitationTheme" value="elegant_floral">
 
-                <!-- 0. Katalog Desain Undangan Digital (Gaya our-wedding.link/design) -->
+                <!-- LANGKAH 1: Katalog Desain Undangan Digital -->
+                <div id="editorStep1Panel">
                 <div class="card" style="border-color:var(--primary);">
                   <div class="card-header">
                     <div>
-                      <div class="card-title">Katalog Desain Undangan Digital (10 Tema 3D)</div>
-                      <div class="card-subtitle">Pilih desain sesuai gaya &amp; warna favoritmu, filter berdasarkan kategori, atau klik Coba Langsung</div>
+                      <div class="card-title">Langkah 1: Pilih Tema Undangan Digital (10 Tema 3D)</div>
+                      <div class="card-subtitle">Klik tema yang Anda inginkan terlebih dahulu untuk membuka pengisian foto, data mempelai, tanggal, dan kutipan</div>
                     </div>
-                    <button type="button" class="btn btn-primary btn-sm" onclick="handleQuickApplyTheme()">
-                      <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
-                      <span>Terapkan Template Sekarang</span>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="setEditorStep(2)">
+                      <span>Lanjut Isi Foto &amp; Data →</span>
                     </button>
                   </div>
                   <div class="card-body">
@@ -508,7 +521,7 @@
 
                     <div class="owl-catalog-grid">
                       <!-- 1. Elegant Floral -->
-                      <div class="owl-theme-card active" data-theme-card="elegant_floral" data-tags="all floral 3d" onclick="selectInvitationTheme('elegant_floral')">
+                      <div class="owl-theme-card active" data-theme-card="elegant_floral" data-tags="all floral 3d" onclick="chooseThemeAndProceed('elegant_floral')">
                         <div class="owl-card-stage" style="background:linear-gradient(145deg,#FAF7F0,#EFE6D5);">
                           <span class="owl-card-slot-pill">6 Foto</span>
                           <span class="theme-active-check">Aktif</span>
@@ -524,14 +537,14 @@
                           <div class="owl-card-title">Elegant <span class="owl-script">Floral</span></div>
                           <div class="owl-card-desc">Nuansa Ivory, Putih &amp; Gold dengan lengkung floral, kelopak bunga jatuh &amp; 3D Book Flip.</div>
                           <div class="owl-card-actions">
-                            <button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="event.stopPropagation(); selectInvitationTheme('elegant_floral')">Pilih Tema</button>
+                            <button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="event.stopPropagation(); chooseThemeAndProceed('elegant_floral')">Pilih &amp; Isi Data →</button>
                             <button type="button" class="btn btn-outline btn-sm" onclick="event.stopPropagation(); previewSpecificThemeTab('elegant_floral')">Coba</button>
                           </div>
                         </div>
                       </div>
 
                       <!-- 2. Batak Heritage -->
-                      <div class="owl-theme-card" data-theme-card="batak_heritage" data-tags="all adat 3d dark" onclick="selectInvitationTheme('batak_heritage')">
+                      <div class="owl-theme-card" data-theme-card="batak_heritage" data-tags="all adat 3d dark" onclick="chooseThemeAndProceed('batak_heritage')">
                         <div class="owl-card-stage" style="background:linear-gradient(145deg,#2B090B,#140B0B);">
                           <span class="owl-card-slot-pill">8 Foto</span>
                           <span class="theme-active-check">Aktif</span>
@@ -548,14 +561,14 @@
                           <div class="owl-card-title">Batak <span class="owl-script">Heritage</span></div>
                           <div class="owl-card-desc">Ukiran Gorga Batak, pita tenun Ulos, siluet Rumah Bolon &amp; gerbang 3D Gorga Fold.</div>
                           <div class="owl-card-actions">
-                            <button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="event.stopPropagation(); selectInvitationTheme('batak_heritage')">Pilih Tema</button>
+                            <button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="event.stopPropagation(); chooseThemeAndProceed('batak_heritage')">Pilih &amp; Isi Data →</button>
                             <button type="button" class="btn btn-outline btn-sm" onclick="event.stopPropagation(); previewSpecificThemeTab('batak_heritage')">Coba</button>
                           </div>
                         </div>
                       </div>
 
                       <!-- 3. Modern Minimalist -->
-                      <div class="owl-theme-card" data-theme-card="modern_minimalist" data-tags="all minimalis 3d" onclick="selectInvitationTheme('modern_minimalist')">
+                      <div class="owl-theme-card" data-theme-card="modern_minimalist" data-tags="all minimalis 3d" onclick="chooseThemeAndProceed('modern_minimalist')">
                         <div class="owl-card-stage" style="background:linear-gradient(145deg,#F3EFE8,#E5DDD0);">
                           <span class="owl-card-slot-pill">5 Foto</span>
                           <span class="theme-active-check">Aktif</span>
@@ -571,14 +584,14 @@
                           <div class="owl-card-title">Modern <span class="owl-script">Minimalist</span></div>
                           <div class="owl-card-desc">Layout editorial asimetris bersih, Monogram R|J, whitespace luas &amp; 3D Isometric Slide.</div>
                           <div class="owl-card-actions">
-                            <button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="event.stopPropagation(); selectInvitationTheme('modern_minimalist')">Pilih Tema</button>
+                            <button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="event.stopPropagation(); chooseThemeAndProceed('modern_minimalist')">Pilih &amp; Isi Data →</button>
                             <button type="button" class="btn btn-outline btn-sm" onclick="event.stopPropagation(); previewSpecificThemeTab('modern_minimalist')">Coba</button>
                           </div>
                         </div>
                       </div>
 
                       <!-- 4. Romantic Sunset -->
-                      <div class="owl-theme-card" data-theme-card="romantic_sunset" data-tags="all floral 3d" onclick="selectInvitationTheme('romantic_sunset')">
+                      <div class="owl-theme-card" data-theme-card="romantic_sunset" data-tags="all floral 3d" onclick="chooseThemeAndProceed('romantic_sunset')">
                         <div class="owl-card-stage" style="background:linear-gradient(145deg,#FAD4B8,#F4A27E);">
                           <span class="owl-card-slot-pill">7 Foto</span>
                           <span class="theme-active-check">Aktif</span>
@@ -594,14 +607,14 @@
                           <div class="owl-card-title">Romantic <span class="owl-script">Sunset</span></div>
                           <div class="owl-card-desc">Gradasi langit senja peach &amp; champagne dengan siluet bukit dan animasi 3D Horizon Lift.</div>
                           <div class="owl-card-actions">
-                            <button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="event.stopPropagation(); selectInvitationTheme('romantic_sunset')">Pilih Tema</button>
+                            <button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="event.stopPropagation(); chooseThemeAndProceed('romantic_sunset')">Pilih &amp; Isi Data →</button>
                             <button type="button" class="btn btn-outline btn-sm" onclick="event.stopPropagation(); previewSpecificThemeTab('romantic_sunset')">Coba</button>
                           </div>
                         </div>
                       </div>
 
                       <!-- 5. Dark Luxury -->
-                      <div class="owl-theme-card" data-theme-card="dark_luxury" data-tags="all dark 3d floral" onclick="selectInvitationTheme('dark_luxury')">
+                      <div class="owl-theme-card" data-theme-card="dark_luxury" data-tags="all dark 3d floral" onclick="chooseThemeAndProceed('dark_luxury')">
                         <div class="owl-card-stage" style="background:linear-gradient(145deg,#14382B,#07120D);">
                           <span class="owl-card-slot-pill">9 Foto</span>
                           <span class="theme-active-check">Aktif</span>
@@ -617,14 +630,14 @@
                           <div class="owl-card-title">Dark <span class="owl-script">Luxury</span></div>
                           <div class="owl-card-desc">Forest green &amp; damask emas eksklusif dengan 3D Gold Portal Zoom &amp; 3D Filmstrip Galeri.</div>
                           <div class="owl-card-actions">
-                            <button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="event.stopPropagation(); selectInvitationTheme('dark_luxury')">Pilih Tema</button>
+                            <button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="event.stopPropagation(); chooseThemeAndProceed('dark_luxury')">Pilih &amp; Isi Data →</button>
                             <button type="button" class="btn btn-outline btn-sm" onclick="event.stopPropagation(); previewSpecificThemeTab('dark_luxury')">Coba</button>
                           </div>
                         </div>
                       </div>
 
                       <!-- 6. Thelove Cinematic -->
-                      <div class="owl-theme-card" data-theme-card="thelove_cinematic" data-tags="all dark 3d" onclick="selectInvitationTheme('thelove_cinematic')">
+                      <div class="owl-theme-card" data-theme-card="thelove_cinematic" data-tags="all dark 3d" onclick="chooseThemeAndProceed('thelove_cinematic')">
                         <div class="owl-card-stage" style="background:linear-gradient(145deg,#2B2B28,#141412);">
                           <span class="owl-card-slot-pill">12 Foto</span>
                           <span class="theme-active-check">Aktif</span>
@@ -641,14 +654,14 @@
                           <div class="owl-card-title">Thelove <span class="owl-script">Cinematic</span></div>
                           <div class="owl-card-desc">Full-screen cover, 3D Hero Slideshow, foto per bab Our Journey, 3D Filmstrip &amp; tanggal 3 kolom.</div>
                           <div class="owl-card-actions">
-                            <button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="event.stopPropagation(); selectInvitationTheme('thelove_cinematic')">Pilih Tema</button>
+                            <button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="event.stopPropagation(); chooseThemeAndProceed('thelove_cinematic')">Pilih &amp; Isi Data →</button>
                             <button type="button" class="btn btn-outline btn-sm" onclick="event.stopPropagation(); previewSpecificThemeTab('thelove_cinematic')">Coba</button>
                           </div>
                         </div>
                       </div>
 
                       <!-- 7. Dark Boho (our-wedding.link/design/dark-boho) -->
-                      <div class="owl-theme-card" data-theme-card="dark_boho" data-tags="all dark 3d floral" onclick="selectInvitationTheme('dark_boho')">
+                      <div class="owl-theme-card" data-theme-card="dark_boho" data-tags="all dark 3d floral" onclick="chooseThemeAndProceed('dark_boho')">
                         <div class="owl-card-stage" style="background:linear-gradient(145deg,#2B2A26,#1D1D1B);">
                           <span class="owl-card-slot-pill">8 Foto</span>
                           <span class="theme-active-check">Aktif</span>
@@ -664,14 +677,14 @@
                           <div class="owl-card-title">Dark <span class="owl-script">Boho</span></div>
                           <div class="owl-card-desc">Palet #1d1d1b &amp; Warm Sand #cebba2, bingkai lengkung boho editorial, dan transisi 3D Boho Lift.</div>
                           <div class="owl-card-actions">
-                            <button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="event.stopPropagation(); selectInvitationTheme('dark_boho')">Pilih Tema</button>
+                            <button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="event.stopPropagation(); chooseThemeAndProceed('dark_boho')">Pilih &amp; Isi Data →</button>
                             <button type="button" class="btn btn-outline btn-sm" onclick="event.stopPropagation(); previewSpecificThemeTab('dark_boho')">Coba</button>
                           </div>
                         </div>
                       </div>
 
                       <!-- 8. Cypress & Linen -->
-                      <div class="owl-theme-card" data-theme-card="cypress_linen" data-tags="all floral minimalis 3d" onclick="selectInvitationTheme('cypress_linen')">
+                      <div class="owl-theme-card" data-theme-card="cypress_linen" data-tags="all floral minimalis 3d" onclick="chooseThemeAndProceed('cypress_linen')">
                         <div class="owl-card-stage" style="background:linear-gradient(145deg,#FAF6F4,#E8DFD9);">
                           <span class="owl-card-slot-pill">6 Foto</span>
                           <span class="theme-active-check">Aktif</span>
@@ -687,14 +700,14 @@
                           <div class="owl-card-title">Cypress &amp; <span class="owl-script">Linen</span></div>
                           <div class="owl-card-desc">Kertas linen hangat #faf6f4, hijau cypress #005d17, aksen terracotta #a05a4f &amp; bingkai lengkung botani.</div>
                           <div class="owl-card-actions">
-                            <button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="event.stopPropagation(); selectInvitationTheme('cypress_linen')">Pilih Tema</button>
+                            <button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="event.stopPropagation(); chooseThemeAndProceed('cypress_linen')">Pilih &amp; Isi Data →</button>
                             <button type="button" class="btn btn-outline btn-sm" onclick="event.stopPropagation(); previewSpecificThemeTab('cypress_linen')">Coba</button>
                           </div>
                         </div>
                       </div>
 
                       <!-- 9. First Class Vows -->
-                      <div class="owl-theme-card" data-theme-card="first_class_vows" data-tags="all minimalis 3d" onclick="selectInvitationTheme('first_class_vows')">
+                      <div class="owl-theme-card" data-theme-card="first_class_vows" data-tags="all minimalis 3d" onclick="chooseThemeAndProceed('first_class_vows')">
                         <div class="owl-card-stage" style="background:linear-gradient(145deg,#1F2C4A,#131C33);">
                           <span class="owl-card-slot-pill">7 Foto</span>
                           <span class="theme-active-check">Aktif</span>
@@ -710,14 +723,14 @@
                           <div class="owl-card-title">First Class <span class="owl-script">Vows</span></div>
                           <div class="owl-card-desc">Konsep paspor &amp; boarding pass eksklusif dengan biru navy #1f2c4a, aksen emas #c8a45d &amp; 3D Gate Slide.</div>
                           <div class="owl-card-actions">
-                            <button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="event.stopPropagation(); selectInvitationTheme('first_class_vows')">Pilih Tema</button>
+                            <button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="event.stopPropagation(); chooseThemeAndProceed('first_class_vows')">Pilih &amp; Isi Data →</button>
                             <button type="button" class="btn btn-outline btn-sm" onclick="event.stopPropagation(); previewSpecificThemeTab('first_class_vows')">Coba</button>
                           </div>
                         </div>
                       </div>
 
                       <!-- 10. Traditional Java -->
-                      <div class="owl-theme-card" data-theme-card="traditional_java" data-tags="all adat 3d" onclick="selectInvitationTheme('traditional_java')">
+                      <div class="owl-theme-card" data-theme-card="traditional_java" data-tags="all adat 3d" onclick="chooseThemeAndProceed('traditional_java')">
                         <div class="owl-card-stage" style="background:linear-gradient(145deg,#D8CFC9,#B8AAA0);">
                           <span class="owl-card-slot-pill">8 Foto</span>
                           <span class="theme-active-check">Aktif</span>
@@ -733,15 +746,39 @@
                           <div class="owl-card-title">Traditional <span class="owl-script">Java</span></div>
                           <div class="owl-card-desc">Palet keraton #d8cfc9, #5a574e &amp; kayu jati #3b1f0d dengan ornamen Gunungan Wayang &amp; 3D Pendopo Fold.</div>
                           <div class="owl-card-actions">
-                            <button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="event.stopPropagation(); selectInvitationTheme('traditional_java')">Pilih Tema</button>
+                            <button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="event.stopPropagation(); chooseThemeAndProceed('traditional_java')">Pilih &amp; Isi Data →</button>
                             <button type="button" class="btn btn-outline btn-sm" onclick="event.stopPropagation(); previewSpecificThemeTab('traditional_java')">Coba</button>
                           </div>
                         </div>
                       </div>
                     </div>
+                  </div>
+                </div>
+                </div><!-- End #editorStep1Panel -->
 
-                    <!-- Bar Pengaturan QR Code Check-in (ON / OFF) -->
-                    <div style="margin-top:16px; padding:14px 16px; border-radius:10px; background:var(--secondary); border:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+                <!-- LANGKAH 2: Isi Foto, QR ON/OFF, Mempelai, Acara, Kutipan, Story & Musik -->
+                <div id="editorStep2Panel" style="display:none;">
+                  <div class="card" style="border-color:var(--primary); background:var(--secondary);">
+                    <div class="card-body" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; padding:14px 18px;">
+                      <div>
+                        <div style="font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--primary-hover);">Tema Terpilih (Langkah 2/2)</div>
+                        <div id="step2ActiveThemeName" style="font-family:var(--font-heading); font-size:18px; font-weight:700; color:var(--text-primary);">1. Elegant Floral</div>
+                      </div>
+                      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button type="button" class="btn btn-outline btn-sm" onclick="setEditorStep(1)">
+                          <span>← Ganti Tema</span>
+                        </button>
+                        <button type="submit" class="btn btn-primary btn-sm">
+                          <i data-lucide="save" style="width:14px;height:14px;"></i>
+                          <span>Simpan &amp; Publikasikan</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Pengaturan QR Code Check-in (ON / OFF) -->
+                  <div class="card">
+                    <div class="card-body" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; padding:14px 18px;">
                       <div>
                         <div style="font-weight:600; font-size:13.5px; color:var(--text-primary);">Fitur QR Code Check-in pada Undangan Tamu (Opsional)</div>
                         <div style="font-size:12px; color:var(--text-secondary);">Aktifkan jika acara menggunakan scan QR di gedung, atau nonaktifkan untuk menyembunyikan kartu QR Code dari halaman tamu.</div>
@@ -752,7 +789,6 @@
                       </select>
                     </div>
                   </div>
-                </div>
 
                 <!-- 0B. Slot Foto Dinamis Khusus Tema Ini (Berbeda Jumlah & Fungsi per Tema) -->
                 <div class="card" style="border-color:var(--primary);">
@@ -976,18 +1012,24 @@
                       <textarea id="edClosingText" class="form-control" style="min-height:70px;" oninput="updateLiveMobilePreview()"></textarea>
                     </div>
 
-                    <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:16px;">
-                      <button type="button" class="btn btn-outline" onclick="openSampleGuestInvitation()">
-                        <i data-lucide="external-link" style="width:16px;height:16px;"></i>
-                        <span>Buka Tab Undangan Penuh</span>
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-top:16px;">
+                      <button type="button" class="btn btn-outline" onclick="setEditorStep(1)">
+                        <span>← Kembali Pilih Tema</span>
                       </button>
-                      <button type="submit" class="btn btn-primary">
-                        <i data-lucide="save" style="width:16px;height:16px;"></i>
-                        <span>Simpan & Publikasikan Undangan</span>
-                      </button>
+                      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button type="button" class="btn btn-outline" onclick="openSampleGuestInvitation()">
+                          <i data-lucide="external-link" style="width:16px;height:16px;"></i>
+                          <span>Buka Tab Undangan Penuh</span>
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                          <i data-lucide="save" style="width:16px;height:16px;"></i>
+                          <span>Simpan & Publikasikan Undangan</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
+                </div><!-- End #editorStep2Panel -->
               </form>
             </div>
 
