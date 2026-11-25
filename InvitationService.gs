@@ -15,6 +15,19 @@ function getActiveWeddingId() {
 }
 
 /**
+ * Menormalkan format tanggal pernikahan agar selalu YYYY-MM-DD untuk input type="date"
+ */
+function normalizeWeddingDateIso(rawVal) {
+  if (!rawVal) return '';
+  if (rawVal instanceof Date) {
+    return Utilities.formatDate(rawVal, APP_CONFIG.TIMEZONE || 'Asia/Jakarta', 'yyyy-MM-dd');
+  }
+  var s = String(rawVal).trim();
+  var m = s.match(/^(\d{4}-\d{2}-\d{2})/);
+  return m ? m[1] : s;
+}
+
+/**
  * Mengambil ringkasan seluruh klien/wedding untuk dropdown switcher Admin
  */
 function listAllWeddingsSummary() {
@@ -29,7 +42,7 @@ function listAllWeddingsSummary() {
       wedding_id: w.wedding_id,
       groom_name: w.groom_name || '',
       bride_name: w.bride_name || '',
-      wedding_date: w.wedding_date || '',
+      wedding_date: normalizeWeddingDateIso(w.wedding_date || wSet.wedding_date || ''),
       invitation_theme: wSet.invitation_theme || globalSettings.invitation_theme || 'elegant_floral',
       status: w.status || 'Published'
     };
@@ -145,7 +158,7 @@ function getWeddingConfigData(bypassCache, targetWeddingId) {
     bride_parents: settings.bride_parents || APP_CONFIG.DEFAULT_SETTINGS.bride_parents,
     groom_photo: activeSlots.groom_photo || settings.groom_photo || APP_CONFIG.DEFAULT_SETTINGS.groom_photo,
     bride_photo: activeSlots.bride_photo || settings.bride_photo || APP_CONFIG.DEFAULT_SETTINGS.bride_photo,
-    wedding_date: wedding.wedding_date || APP_CONFIG.DEFAULT_WEDDING.wedding_date,
+    wedding_date: normalizeWeddingDateIso(wedding.wedding_date || settings.wedding_date || APP_CONFIG.DEFAULT_WEDDING.wedding_date),
     akad_title: settings.akad_title || 'Akad Nikah',
     akad_time: wedding.akad_time || APP_CONFIG.DEFAULT_WEDDING.akad_time,
     reception_title: settings.reception_title || 'Resepsi Pernikahan',
@@ -230,6 +243,7 @@ function createWeddingClient(sessionToken, payload) {
 
     var clientSettings = {
       invitation_theme: chosenTheme,
+      wedding_date: weddingDate,
       qr_checkin_enabled: 'true',
       theme_media_json: JSON.stringify(APP_CONFIG.DEFAULT_THEME_MEDIA || {}),
       groom_nickname: groomName.split(' ')[0] || 'Pria',

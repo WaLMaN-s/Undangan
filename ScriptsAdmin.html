@@ -135,7 +135,9 @@
   function formatLongWeddingDate(dateStr) {
     if (!dateStr) return '-';
     try {
-      const d = new Date(dateStr + 'T00:00:00');
+      const m = String(dateStr).trim().match(/^(\d{4}-\d{2}-\d{2})/);
+      const cleanIso = m ? m[1] : String(dateStr).trim();
+      const d = new Date(cleanIso + 'T00:00:00');
       if (isNaN(d.getTime())) return String(dateStr);
       return d.toLocaleDateString('id-ID', {
         weekday: 'long',
@@ -968,7 +970,9 @@
       document.getElementById('edGroomPhoto').value = w.groom_photo || '';
       document.getElementById('edBridePhoto').value = w.bride_photo || '';
       document.getElementById('edDescription').value = w.description || '';
-      document.getElementById('edWeddingDate').value = w.wedding_date || '';
+      const rawDate = String(w.wedding_date || '').trim();
+      const isoDateMatch = rawDate.match(/^(\d{4}-\d{2}-\d{2})/);
+      document.getElementById('edWeddingDate').value = isoDateMatch ? isoDateMatch[1] : rawDate;
       document.getElementById('edVenue').value = w.venue || '';
       document.getElementById('edAkadTitle').value = w.akad_title || 'Akad Nikah';
       document.getElementById('edAkadTime').value = w.akad_time || '';
