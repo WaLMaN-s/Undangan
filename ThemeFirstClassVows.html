@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Undangan Pernikahan — First Class Vows</title>
+  <title>First Class Vows — Wedding Boarding Pass</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -15,10 +15,10 @@
       --navy: #1f2c4a;
       --navy-deep: #131c33;
       --ice: #e4e9f4;
-      --bg-light: #f7f8fc;
+      --bg-paper: #f7f8fc;
       --gold: #c8a45d;
       --slate: #4a4f63;
-      --border: #d5dce9;
+      --border: #cfd8ea;
       --success: #3B9B72;
       --danger: #D95C5C;
       --font-serif: 'Playfair Display', Georgia, serif;
@@ -31,202 +31,335 @@
       width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 0 !important;
       overflow-x: hidden !important; overscroll-behavior-x: none; touch-action: pan-y; position: relative;
     }
-    body { font-family: var(--font-sans); background-color: #dce2ee; color: var(--navy); min-height: 100vh; display: block; -webkit-font-smoothing: antialiased; }
-    .mobile-frame { display: block; margin: 0 auto !important; width: 100%; max-width: 430px; min-height: 100vh; background-color: var(--bg-light); position: relative; overflow-x: hidden !important; box-shadow: 0 0 48px rgba(31, 44, 74, 0.22); }
+    body { font-family: var(--font-sans); background-color: #d3dbe9; color: var(--navy); min-height: 100vh; display: block; -webkit-font-smoothing: antialiased; }
+    .mobile-frame { display: block; margin: 0 auto !important; width: 100%; max-width: 430px; min-height: 100vh; background-color: var(--bg-paper); position: relative; overflow-x: hidden !important; box-shadow: 0 0 48px rgba(31, 44, 74, 0.25); }
     .state-screen { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 36px 28px; text-align: center; background: var(--navy); color: #fff; }
     .spinner-ring { width: 44px; height: 44px; border: 2px solid rgba(255,255,255,0.2); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.9s linear infinite; margin-bottom: 16px; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* ========================================================================
+       A. PASSPORT LEATHER COVER (FOIL STAMP + BOARDING TEAR STUB)
+       ======================================================================== */
     .opening-cover {
       position: fixed; top: 0; left: 0; right: 0; margin: 0 auto; width: 100%; max-width: 430px;
       height: 100vh; height: 100dvh; z-index: 120;
-      background: linear-gradient(180deg, var(--navy) 0%, var(--navy-deep) 100%);
-      color: #ffffff;
+      background:
+        radial-gradient(circle at 50% 25%, rgba(200, 164, 93, 0.14) 0%, transparent 60%),
+        linear-gradient(180deg, #1b2744 0%, #10182b 100%);
+      color: var(--gold);
       display: flex; flex-direction: column; justify-content: space-between; align-items: center;
-      padding: 36px 24px 30px; text-align: center; overflow-y: auto; overflow-x: hidden !important;
-      transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.75s ease;
+      padding: 32px 22px 26px; text-align: center; overflow-y: auto; overflow-x: hidden !important;
+      border: 6px solid #131c33;
+      box-shadow: inset 0 0 0 1px rgba(200, 164, 93, 0.45);
+      transition: transform 0.95s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.75s ease;
     }
-    .opening-cover.opened { transform: translate3d(0, -105%, 0); opacity: 0; pointer-events: none; }
-    .boarding-eyebrow { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.2em; text-indent: 0.2em; color: var(--gold); text-transform: uppercase; }
-    .vows-couple { font-family: var(--font-serif); font-size: 36px; font-weight: 600; color: #ffffff; margin: 6px 0; }
-    .passport-frame {
-      width: 205px; height: 245px; margin: 12px auto; border-radius: 16px; padding: 6px;
-      border: 1.5px solid var(--gold); background: rgba(255,255,255,0.06);
-      box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+    .opening-cover.opened { transform: perspective(1400px) translate3d(105%, 0, -100px) rotateY(-18deg); opacity: 0; pointer-events: none; }
+    .passport-emblem { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.25em; color: var(--gold); border: 1px solid rgba(200,164,93,0.45); padding: 4px 12px; display: inline-block; margin-bottom: 8px; }
+    .vows-couple { font-family: var(--font-serif); font-size: 34px; font-weight: 700; color: #fff; margin: 4px 0; }
+    .passport-window {
+      width: 190px; height: 190px; margin: 10px auto; border-radius: 50%; padding: 6px;
+      border: 2px dashed var(--gold); background: rgba(255,255,255,0.05);
     }
-    .passport-frame img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; display: block; }
-    .boarding-pass-card {
-      background: #ffffff; color: var(--navy); border: 1px solid var(--border); border-radius: 14px;
-      padding: 20px 18px; margin-top: 14px; position: relative;
-      box-shadow: 0 10px 26px rgba(31, 44, 74, 0.08);
-    }
-    .boarding-pass-card::before {
-      content: 'FIRST CLASS • BOARDING PASS';
-      display: block; font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.16em;
-      color: var(--gold); border-bottom: 1px dashed var(--border); padding-bottom: 8px; margin-bottom: 10px;
+    .passport-window img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+    .tear-stub {
+      width: 100%; background: #fff; color: var(--navy); border-radius: 12px;
+      padding: 14px 16px; margin-bottom: 12px; text-align: left;
+      border-top: 4px solid var(--gold);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.35);
     }
     .btn-firstclass {
-      display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 13px 22px;
-      border-radius: 10px; background: var(--gold); color: var(--navy-deep); border: none;
-      font-family: var(--font-mono); font-size: 11.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; text-decoration: none;
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 13px 20px;
+      border-radius: 8px; background: linear-gradient(135deg, #d7b36a, #b48d42); color: var(--navy-deep); border: none;
+      font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; text-decoration: none;
     }
 
-    .main-invitation { display: none; padding-bottom: 90px; }
+    /* ========================================================================
+       B. MAIN INVITATION (AIRLINE BOARDING PASS ARCHITECTURE)
+       ======================================================================== */
+    .main-invitation { display: none; width: 100%; overflow-x: hidden; }
     .main-invitation.visible { display: block; animation: fadeIn 0.7s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    .sec-fc { padding: 38px 22px; border-bottom: 1px solid var(--border); text-align: center; }
-    .sec-fc.navy { background: var(--navy); color: #ffffff; }
-    .sec-title { font-family: var(--font-serif); font-size: 26px; font-weight: 600; margin: 6px 0 10px; }
-    .sec-desc { font-size: 13px; color: var(--slate); line-height: 1.65; }
-    .sec-fc.navy .sec-desc { color: var(--ice); }
-    .avatar-fc { width: 120px; height: 120px; border-radius: 16px; object-fit: cover; border: 2px solid var(--gold); margin-bottom: 10px; }
-    .countdown-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 16px; }
-    .cd-box { background: rgba(255,255,255,0.08); border: 1px solid var(--gold); border-radius: 10px; padding: 12px 4px; }
-    .cd-num { font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: var(--gold); }
-    .cd-lbl { font-size: 9.5px; color: var(--ice); text-transform: uppercase; margin-top: 3px; }
-    .story-timeline { display: flex; flex-direction: column; gap: 14px; margin-top: 18px; text-align: left; }
-    .story-card { background: #ffffff; border: 1px solid var(--border); border-left: 3px solid var(--navy); border-radius: 12px; padding: 16px; }
-    .story-year { font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--gold); }
-    .story-card h4 { font-family: var(--font-serif); font-size: 17px; color: var(--navy); margin: 4px 0 6px; }
-    .story-card p { font-size: 12.5px; color: var(--slate); line-height: 1.6; }
-    .gallery-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 18px; }
-    .gallery-thumb { width: 100%; height: 165px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border); cursor: pointer; }
-    .guest-input { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-light); font-family: var(--font-sans); font-size: 13.5px; margin-bottom: 12px; }
-    .wishes-feed { max-height: 350px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-top: 16px; text-align: left; }
-    .wish-item { background: #ffffff; border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
-    .wish-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
-    .wish-sender { font-weight: 600; font-size: 13.5px; color: var(--navy); }
-    .wish-badge { font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: 99px; }
-    .wish-badge.hadir { background: rgba(59, 155, 114, 0.14); color: var(--success); }
-    .wish-badge.absen { background: rgba(217, 92, 92, 0.14); color: var(--danger); }
+
+    .fc-flight-header {
+      background: var(--navy); color: #fff; padding: 34px 20px 28px; text-align: center;
+      background-image: radial-gradient(circle at 80% 10%, rgba(200,164,93,0.16), transparent 45%);
+    }
+    .route-tracker {
+      display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px;
+      background: rgba(255,255,255,0.07); border: 1px solid rgba(200,164,93,0.35);
+      border-radius: 12px; padding: 14px 16px; margin: 16px 0;
+    }
+    .route-code { font-family: var(--font-mono); font-size: 18px; font-weight: 700; color: var(--gold); }
+    .route-sub { font-size: 9px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ice); }
+    .route-line { position: relative; height: 2px; background: repeating-linear-gradient(90deg, var(--gold) 0 6px, transparent 6px 10px); display: flex; align-items: center; justify-content: center; }
+    .route-plane { background: var(--navy); padding: 0 6px; color: #fff; font-size: 14px; animation: planeFly 3s ease-in-out infinite; }
+    @keyframes planeFly { 0%, 100% { transform: translateX(-8px); } 50% { transform: translateX(8px); } }
+
+    /* Ticket Sections with Cutout Notches */
+    .sec-ticket-wrap { padding: 22px 16px; background: var(--ice); }
+    .ticket-card {
+      background: #fff; border-radius: 16px; padding: 20px 18px;
+      border: 1px solid var(--border); position: relative;
+      box-shadow: 0 10px 24px rgba(31, 44, 74, 0.08);
+    }
+    .ticket-perforation {
+      position: relative; border-top: 2px dashed var(--border); margin: 18px -18px; padding: 0 18px;
+    }
+    .ticket-perforation::before, .ticket-perforation::after {
+      content: ''; position: absolute; top: -11px; width: 20px; height: 20px;
+      background: var(--ice); border-radius: 50%;
+    }
+    .ticket-perforation::before { left: -11px; }
+    .ticket-perforation::after { right: -11px; }
+
+    /* Side-by-Side Co-Pilots Crew Grid */
+    .copilots-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+    .crew-badge {
+      background: var(--bg-paper); border: 1px solid var(--border); border-radius: 12px;
+      padding: 12px 10px; text-align: center;
+    }
+    .crew-badge img { width: 100%; height: 145px; object-fit: cover; border-radius: 8px; border: 1px solid var(--gold); margin-bottom: 8px; display: block; }
+    .crew-tag { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--gold); background: var(--navy); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 4px; }
+    .crew-name { font-family: var(--font-serif); font-size: 15.5px; font-weight: 700; color: var(--navy); line-height: 1.2; margin-bottom: 4px; }
+    .crew-parents { font-size: 10.5px; color: var(--slate); line-height: 1.4; }
+
+    /* Departure Flip Counter */
+    .countdown-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-top: 12px; }
+    .cd-box { background: var(--navy-deep); border: 1px solid var(--gold); border-radius: 8px; padding: 10px 4px; text-align: center; }
+    .cd-num { font-family: var(--font-mono); font-size: 20px; font-weight: 700; color: var(--gold); }
+    .cd-lbl { font-size: 8.5px; color: var(--ice); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
+
+    /* Flight Schedule Gate Table */
+    .gate-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: left; margin: 12px 0; }
+    .gate-cell { background: var(--bg-paper); border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
+    .gate-lbl { font-family: var(--font-mono); font-size: 9px; color: var(--slate); text-transform: uppercase; }
+    .gate-val { font-family: var(--font-serif); font-size: 15px; font-weight: 700; color: var(--navy); margin-top: 3px; }
+
+    /* Passport Stamps Story Timeline */
+    .story-timeline { display: flex; flex-direction: column; gap: 12px; margin-top: 14px; text-align: left; }
+    .story-card {
+      background: var(--bg-paper); border: 1.5px solid var(--border); border-radius: 10px;
+      padding: 14px 16px; position: relative; overflow: hidden;
+    }
+    .story-year {
+      display: inline-block; font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+      color: var(--navy); border: 1.5px solid var(--gold); padding: 2px 8px; border-radius: 4px;
+      transform: rotate(-2deg); margin-bottom: 6px;
+    }
+    .story-card h4 { font-family: var(--font-serif); font-size: 16.5px; color: var(--navy); margin-bottom: 4px; }
+    .story-card p { font-size: 12px; color: var(--slate); line-height: 1.55; }
+
+    /* Boarding Album Horizontal Strip + Grid */
+    .gallery-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
+    .gallery-thumb { width: 100%; height: 155px; object-fit: cover; border-radius: 8px; border: 2px solid #fff; box-shadow: 0 4px 10px rgba(31,44,74,0.12); cursor: pointer; }
+
+    /* Barcode SVG Visual */
+    .barcode-strip { height: 28px; width: 100%; margin: 12px 0 4px; background: repeating-linear-gradient(90deg, var(--navy) 0 2px, transparent 2px 4px, var(--navy) 4px 7px, transparent 7px 10px, var(--navy) 10px 11px, transparent 11px 15px); opacity: 0.78; }
+
+    .guest-input { width: 100%; padding: 11px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-paper); font-family: var(--font-sans); font-size: 13px; margin-bottom: 10px; }
+    .wishes-feed { max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-top: 12px; text-align: left; }
+    .wish-item { background: var(--bg-paper); border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
+    .wish-header { display: flex; justify-content: space-between; margin-bottom: 4px; }
+    .wish-sender { font-weight: 700; font-size: 12.5px; color: var(--navy); }
+    .wish-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; }
+    .wish-badge.hadir { background: rgba(59, 155, 114, 0.16); color: var(--success); }
+    .wish-badge.absen { background: rgba(217, 92, 92, 0.16); color: var(--danger); }
+
     .lightbox-overlay { position: fixed; inset: 0; background: rgba(19, 28, 51, 0.94); z-index: 300; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
     .lightbox-overlay.open { display: flex; }
     .lightbox-Overlay-img { max-width: 100%; max-height: 75vh; border-radius: 10px; }
-    .floating-music-btn { position: fixed; bottom: 78px; right: max(16px, calc(50% - 198px)); width: 44px; height: 44px; border-radius: 50%; background: var(--navy); border: 1.5px solid var(--gold); color: var(--gold); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 95; }
+    .floating-music-btn { position: fixed; bottom: 20px; right: max(16px, calc(50% - 198px)); width: 44px; height: 44px; border-radius: 50%; background: var(--navy); border: 1.5px solid var(--gold); color: var(--gold); display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 95; }
     .floating-music-btn.playing { animation: spin 6s linear infinite; }
-    .bottom-touch-nav { position: fixed; bottom: 0; left: 0; right: 0; margin: 0 auto; width: 100%; max-width: 430px; height: 62px; background: rgba(31, 44, 74, 0.96); border-top: 1px solid rgba(200, 164, 93, 0.35); display: none; grid-template-columns: repeat(5, 1fr); z-index: 90; }
-    .bottom-touch-nav.visible { display: grid; }
-    .touch-nav-link { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: var(--ice); font-size: 10.5px; }
-    @media (max-width: 480px) {
-      .mobile-frame, .opening-cover, .bottom-touch-nav { width: 100% !important; max-width: 100% !important; box-shadow: none !important; }
-    }
+    .bottom-touch-nav { display: none !important; }
+    @media (max-width: 480px) { .mobile-frame, .opening-cover { width: 100% !important; max-width: 100% !important; box-shadow: none !important; } }
   </style>
 </head>
 <body>
   <div class="mobile-frame">
-    <div id="guestLoadingScreen" class="state-screen"><div class="spinner-ring"></div><div class="boarding-eyebrow">PREPARING BOARDING PASS</div></div>
-    <div id="guestErrorScreen" class="state-screen" style="display:none;"><h1 class="sec-title" style="color:var(--gold);">Undangan Tidak Ditemukan</h1><p id="guestErrorMessage" class="sec-desc" style="color:var(--ice);"></p></div>
+    <div id="guestLoadingScreen" class="state-screen"><div class="spinner-ring"></div><div class="passport-emblem">FIRST CLASS VOWS</div></div>
+    <div id="guestErrorScreen" class="state-screen" style="display:none;"><h1 style="font-family:var(--font-serif); color:var(--gold); font-size:22px;">Boarding Pass Invalid</h1><p id="guestErrorMessage" style="font-size:13px; color:var(--ice); margin-top:8px;"></p></div>
 
+    <!-- A. FOLDABLE PASSPORT COVER -->
     <section id="openingCoverPage" class="opening-cover" style="display:none;">
       <div style="width:100%;">
-        <div class="boarding-eyebrow">✈ FIRST CLASS VOWS</div>
+        <div class="passport-emblem">✈ OFFICIAL WEDDING PASSPORT</div>
         <h1 id="openCoupleNames" class="vows-couple">Romeo &amp; Juliet</h1>
-        <div class="passport-frame"><img id="openCoverPhoto" src="" alt="Couple"></div>
+        <div id="openWeddingDate" style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.18em; color:var(--gold);">12 DECEMBER 2026</div>
+        <div class="passport-window"><img id="openCoverPhoto" src="" alt="Couple"></div>
       </div>
       <div style="width:100%;">
-        <div style="background:rgba(255,255,255,0.07); border:1px solid rgba(200,164,93,0.4); border-radius:12px; padding:16px; margin-bottom:14px;">
-          <div style="font-family:var(--font-mono); font-size:10px; color:var(--gold); letter-spacing:0.16em;">PASSENGER / GUEST NAME</div>
-          <div id="openGuestName" style="font-family:var(--font-serif); font-size:22px; font-weight:700; color:#fff; margin:6px 0;">-</div>
-          <p style="font-size:11.5px; color:var(--ice);">You are invited aboard our wedding celebration.</p>
+        <div class="tear-stub">
+          <div style="display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:9px; color:var(--slate); border-bottom:1px dashed var(--border); padding-bottom:6px; margin-bottom:6px;">
+            <span>FLIGHT: FC-2026</span><span>CLASS: FIRST VIP</span>
+          </div>
+          <div style="font-family:var(--font-mono); font-size:9px; color:var(--gold); font-weight:700;">PASSENGER NAME</div>
+          <div id="openGuestName" style="font-family:var(--font-serif); font-size:21px; font-weight:700; color:var(--navy); margin:2px 0;">-</div>
+          <div class="barcode-strip" style="height:18px; margin-top:6px;"></div>
         </div>
         <button type="button" class="btn-firstclass" onclick="handleOpenInvitationClick()">
-          <i data-lucide="plane-takeoff" style="width:16px;height:16px;"></i><span>CHECK IN &amp; OPEN</span>
+          <i data-lucide="plane-takeoff" style="width:16px;height:16px;"></i><span>TEAR STUB &amp; BOARD FLIGHT</span>
         </button>
-        <div id="openWeddingDate" style="font-family:var(--font-mono); font-size:12px; color:var(--gold); margin-top:10px;"></div>
       </div>
     </section>
 
+    <!-- B. BOARDING PASS MAIN INVITATION -->
     <main id="mainInvitationPage" class="main-invitation">
-      <section id="sec-hero" class="sec-fc navy">
-        <div class="boarding-eyebrow">DESTINATION: FOREVER</div>
-        <h2 id="mainHeroCoupleTitle" class="vows-couple"></h2>
-        <div class="passport-frame" style="width:100%; height:290px;"><img id="mainHeroPhoto" src="" alt="Hero"></div>
-        <p id="mainHeroDescription" class="sec-desc"></p>
-      </section>
+      <!-- Flight Hero & Route Tracker -->
+      <section id="sec-hero" class="fc-flight-header">
+        <div class="passport-emblem">BOARDING PASS • WEDDING FLIGHT</div>
+        <h2 id="mainHeroCoupleTitle" class="vows-couple" style="font-size:32px; margin-top:4px;"></h2>
 
-      <section id="sec-couple" class="sec-fc">
-        <div class="boarding-eyebrow" style="color:var(--navy);">CO-PILOTS FOR LIFE</div>
-        <h3 class="sec-title">Groom &amp; Bride</h3>
-        <div class="boarding-pass-card">
-          <img id="mainGroomPhoto" class="avatar-fc" src="" alt="Groom" loading="lazy">
-          <div id="mainGroomFullName" style="font-family:var(--font-serif); font-size:21px; font-weight:600; margin-bottom:6px;"></div>
-          <p id="mainGroomParents" class="sec-desc"></p>
+        <div class="route-tracker">
+          <div>
+            <div class="route-code">TWO</div>
+            <div class="route-sub">Lives</div>
+          </div>
+          <div class="route-line"><span class="route-plane">✈</span></div>
+          <div>
+            <div class="route-code">ONE</div>
+            <div class="route-sub">Forever</div>
+          </div>
         </div>
-        <div class="boarding-pass-card">
-          <img id="mainBridePhoto" class="avatar-fc" src="" alt="Bride" loading="lazy">
-          <div id="mainBrideFullName" style="font-family:var(--font-serif); font-size:21px; font-weight:600; margin-bottom:6px;"></div>
-          <p id="mainBrideParents" class="sec-desc"></p>
-        </div>
-      </section>
 
-      <section id="sec-countdown" class="sec-fc navy">
-        <div class="boarding-eyebrow">DEPARTURE COUNTDOWN</div>
-        <h3 class="sec-title">Hitung Mundur</h3>
-        <p id="mainCountdownDateText" class="sec-desc"></p>
-        <div class="countdown-grid">
-          <div class="cd-box"><div id="cdDays" class="cd-num">00</div><div class="cd-lbl">Days</div></div>
-          <div class="cd-box"><div id="cdHours" class="cd-num">00</div><div class="cd-lbl">Hours</div></div>
-          <div class="cd-box"><div id="cdMinutes" class="cd-num">00</div><div class="cd-lbl">Mins</div></div>
-          <div class="cd-box"><div id="cdSeconds" class="cd-num">00</div><div class="cd-lbl">Secs</div></div>
+        <div style="border-radius:14px; overflow:hidden; border:2px solid var(--gold); margin-bottom:14px;">
+          <img id="mainHeroPhoto" src="" alt="Hero" style="width:100%; height:240px; object-fit:cover; display:block;">
         </div>
-      </section>
+        <p id="mainHeroDescription" style="font-size:12.5px; color:var(--ice); line-height:1.6;"></p>
 
-      <section id="sec-event-info" class="sec-fc">
-        <div id="mainQuoteWrapper" class="boarding-pass-card" style="margin-top:0; margin-bottom:16px;">
-          <p id="mainQuoteText" style="font-family:var(--font-serif); font-style:italic; font-size:15.5px; line-height:1.6;"></p>
-          <div id="mainQuoteSource" style="font-family:var(--font-mono); font-size:11px; color:var(--gold); margin-top:8px;"></div>
-        </div>
-        <div class="boarding-eyebrow" style="color:var(--navy);">FLIGHT ITINERARY</div>
-        <h3 class="sec-title">Jadwal Acara</h3>
-        <div class="boarding-pass-card"><h4 id="mainAkadTitle" style="font-family:var(--font-serif); font-size:20px; color:var(--navy);">Akad Nikah</h4><div id="mainAkadDate" style="font-weight:600; margin:6px 0;"></div><div id="mainAkadTime" class="sec-desc"></div></div>
-        <div class="boarding-pass-card"><h4 id="mainReceptionTitle" style="font-family:var(--font-serif); font-size:20px; color:var(--navy);">Resepsi</h4><div id="mainReceptionDate" style="font-weight:600; margin:6px 0;"></div><div id="mainReceptionTime" class="sec-desc"></div></div>
-        <div class="boarding-pass-card" style="border-color:var(--navy);">
-          <h4 id="mainVenueName" style="font-family:var(--font-serif); font-size:19px;"></h4>
-          <p id="mainVenueAddress" class="sec-desc" style="margin:8px 0 16px;"></p>
-          <a id="mainGoogleMapsBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn-firstclass" style="background:var(--navy); color:#fff;"><i data-lucide="map-pin" style="width:16px;height:16px;"></i><span>Terminal / Maps</span></a>
+        <div id="sec-countdown" style="margin-top:16px;">
+          <div id="mainCountdownDateText" style="font-family:var(--font-mono); font-size:11px; color:var(--gold);"></div>
+          <div class="countdown-grid">
+            <div class="cd-box"><div id="cdDays" class="cd-num">00</div><div class="cd-lbl">Days</div></div>
+            <div class="cd-box"><div id="cdHours" class="cd-num">00</div><div class="cd-lbl">Hours</div></div>
+            <div class="cd-box"><div id="cdMinutes" class="cd-num">00</div><div class="cd-lbl">Mins</div></div>
+            <div class="cd-box"><div id="cdSeconds" class="cd-num">00</div><div class="cd-lbl">Secs</div></div>
+          </div>
         </div>
       </section>
 
-      <section id="sec-story" class="sec-fc" style="background:var(--ice);"><div class="boarding-eyebrow" style="color:var(--navy);">TRAVEL LOG</div><h3 class="sec-title">Our Journey</h3><div id="mainStoryList" class="story-timeline"></div></section>
-      <section id="sec-gallery" class="sec-fc"><div class="boarding-eyebrow" style="color:var(--navy);">ALBUM</div><h3 class="sec-title">Precious Moments</h3><div id="mainGalleryGrid" class="gallery-grid"></div></section>
+      <div class="sec-ticket-wrap">
+        <!-- TICKET 1: FLIGHT CREW (SIDE-BY-SIDE CO-PILOTS) -->
+        <section id="sec-couple" class="ticket-card" style="margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-family:var(--font-mono); font-size:10px; font-weight:700; color:var(--gold);">FLIGHT CREW</span>
+            <span style="font-family:var(--font-mono); font-size:10px; color:var(--slate);">CPT &amp; CO-CPT</span>
+          </div>
+          <h3 style="font-family:var(--font-serif); font-size:22px; margin-top:4px; text-align:left;">The Bride &amp; Groom</h3>
 
-      <section id="sec-rsvp" class="sec-fc navy">
-        <div class="boarding-eyebrow">PASSENGER CHECK-IN</div><h3 class="sec-title">Konfirmasi RSVP</h3>
-        <form id="guestRsvpForm" class="boarding-pass-card" style="text-align:left;" action="javascript:void(0);" onsubmit="handleGuestRsvpSubmit(event); return false;">
-          <label style="font-size:12px; font-weight:600;">Nama Tamu</label><input type="text" id="rsvpFormGuestName" class="guest-input" readonly>
-          <label style="font-size:12px; font-weight:600;">Kehadiran</label>
-          <select id="rsvpFormAttendance" class="guest-input" onchange="handleRsvpAttendanceChange()"><option value="Hadir">Ya, Saya Akan Hadir</option><option value="Tidak Hadir">Maaf, Berhalangan Hadir</option></select>
-          <div id="rsvpGuestCountWrapper"><label style="font-size:12px; font-weight:600;">Jumlah Orang</label><select id="rsvpFormGuestCount" class="guest-input"><option value="1">1 Orang</option><option value="2">2 Orang</option><option value="3">3 Orang</option><option value="4">4 Orang</option><option value="5">5 Orang</option></select></div>
-          <label style="font-size:12px; font-weight:600;">Ucapan &amp; Doa</label><textarea id="rsvpFormWishes" class="guest-input" style="min-height:90px;" required placeholder="Tuliskan ucapan & doa..."></textarea>
-          <button type="button" id="rsvpSubmitBtn" onclick="handleGuestRsvpSubmit(event)" class="btn-firstclass">Kirim Boarding RSVP</button>
-        </form>
+          <div class="copilots-grid">
+            <div class="crew-badge">
+              <img id="mainGroomPhoto" src="" alt="Groom" loading="lazy">
+              <span class="crew-tag">CAPTAIN / GROOM</span>
+              <div id="mainGroomFullName" class="crew-name"></div>
+              <p id="mainGroomParents" class="crew-parents"></p>
+            </div>
+            <div class="crew-badge">
+              <img id="mainBridePhoto" src="" alt="Bride" loading="lazy">
+              <span class="crew-tag">FIRST OFFICER</span>
+              <div id="mainBrideFullName" class="crew-name"></div>
+              <p id="mainBrideParents" class="crew-parents"></p>
+            </div>
+          </div>
+
+          <div id="mainQuoteWrapper" class="ticket-perforation" style="padding-top:14px; text-align:center;">
+            <p id="mainQuoteText" style="font-family:var(--font-serif); font-style:italic; font-size:13.5px; color:var(--slate); line-height:1.55;"></p>
+            <div id="mainQuoteSource" style="font-family:var(--font-mono); font-size:10px; color:var(--gold); font-weight:700; margin-top:6px;"></div>
+          </div>
+        </section>
+
+        <!-- TICKET 2: GATE & BOARDING SCHEDULE -->
+        <section id="sec-event-info" class="ticket-card" style="margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-family:var(--font-mono); font-size:10px; font-weight:700; color:var(--gold);">FLIGHT ITINERARY</span>
+            <span style="font-family:var(--font-mono); font-size:10px; color:var(--success); font-weight:700;">● ON TIME</span>
+          </div>
+          <h3 style="font-family:var(--font-serif); font-size:22px; margin:4px 0 10px; text-align:left;">Jadwal Keberangkatan</h3>
+
+          <div class="gate-grid">
+            <div class="gate-cell">
+              <div class="gate-lbl">GATE 01 • AKAD</div>
+              <div id="mainAkadTitle" class="gate-val">Akad Nikah</div>
+              <div id="mainAkadDate" style="font-size:11px; font-weight:600; margin-top:4px;"></div>
+              <div id="mainAkadTime" style="font-family:var(--font-mono); font-size:10.5px; color:var(--slate); margin-top:2px;"></div>
+            </div>
+            <div class="gate-cell">
+              <div class="gate-lbl">GATE 02 • RESEPSI</div>
+              <div id="mainReceptionTitle" class="gate-val">Resepsi</div>
+              <div id="mainReceptionDate" style="font-size:11px; font-weight:600; margin-top:4px;"></div>
+              <div id="mainReceptionTime" style="font-family:var(--font-mono); font-size:10.5px; color:var(--slate); margin-top:2px;"></div>
+            </div>
+          </div>
+
+          <div class="ticket-perforation" style="padding-top:14px; text-align:left;">
+            <div style="font-family:var(--font-mono); font-size:9.5px; color:var(--slate);">DESTINATION TERMINAL / VENUE</div>
+            <h4 id="mainVenueName" style="font-family:var(--font-serif); font-size:18px; color:var(--navy); margin:4px 0;"></h4>
+            <p id="mainVenueAddress" style="font-size:12px; color:var(--slate); line-height:1.55; margin-bottom:12px;"></p>
+            <a id="mainGoogleMapsBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn-firstclass" style="background:var(--navy); color:#fff;">
+              <i data-lucide="navigation" style="width:15px;height:15px;"></i><span>NAVIGATE TO TERMINAL</span>
+            </a>
+          </div>
+        </section>
+
+        <!-- TICKET 3: STAMPED TRAVEL LOG & ALBUM -->
+        <section id="sec-story" class="ticket-card" style="margin-bottom:16px;">
+          <div style="font-family:var(--font-mono); font-size:10px; font-weight:700; color:var(--gold);">PASSPORT VISAS</div>
+          <h3 style="font-family:var(--font-serif); font-size:21px; margin-top:2px; text-align:left;">Our Travel Log</h3>
+          <div id="mainStoryList" class="story-timeline"></div>
+        </section>
+
+        <section id="sec-gallery" class="ticket-card" style="margin-bottom:16px;">
+          <div style="font-family:var(--font-mono); font-size:10px; font-weight:700; color:var(--gold);">FLIGHT GALLERY</div>
+          <h3 style="font-family:var(--font-serif); font-size:21px; margin-top:2px; text-align:left;">Precious Moments</h3>
+          <div id="mainGalleryGrid" class="gallery-grid"></div>
+        </section>
+
+        <!-- TICKET 4: PASSENGER CHECK-IN (RSVP + WISHES + QR BOARDING STUB) -->
+        <section id="sec-rsvp" class="ticket-card" style="margin-bottom:16px;">
+          <div style="font-family:var(--font-mono); font-size:10px; font-weight:700; color:var(--gold);">ONLINE CHECK-IN</div>
+          <h3 style="font-family:var(--font-serif); font-size:21px; margin:2px 0 12px; text-align:left;">Confirm Seat (RSVP)</h3>
+          <form id="guestRsvpForm" style="text-align:left;" action="javascript:void(0);" onsubmit="handleGuestRsvpSubmit(event); return false;">
+            <label style="font-family:var(--font-mono); font-size:10px; font-weight:700;">PASSENGER</label>
+            <input type="text" id="rsvpFormGuestName" class="guest-input" readonly>
+            <label style="font-family:var(--font-mono); font-size:10px; font-weight:700;">BOARDING STATUS</label>
+            <select id="rsvpFormAttendance" class="guest-input" onchange="handleRsvpAttendanceChange()"><option value="Hadir">Yes, Check-in (Hadir)</option><option value="Tidak Hadir">Unable to Board (Tidak Hadir)</option></select>
+            <div id="rsvpGuestCountWrapper"><label style="font-family:var(--font-mono); font-size:10px; font-weight:700;">SEATS</label><select id="rsvpFormGuestCount" class="guest-input"><option value="1">1 Seat</option><option value="2">2 Seats</option><option value="3">3 Seats</option><option value="4">4 Seats</option><option value="5">5 Seats</option></select></div>
+            <label style="font-family:var(--font-mono); font-size:10px; font-weight:700;">FLIGHT WISHES</label>
+            <textarea id="rsvpFormWishes" class="guest-input" style="min-height:80px;" required placeholder="Leave your warm wishes for the couple..."></textarea>
+            <button type="button" id="rsvpSubmitBtn" onclick="handleGuestRsvpSubmit(event)" class="btn-firstclass">CONFIRM BOARDING PASS</button>
+          </form>
+
+          <div id="sec-wishes" class="ticket-perforation" style="padding-top:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-family:var(--font-mono); font-size:10px; font-weight:700; color:var(--navy);">PASSENGER LOG</span>
+              <span id="wishesTotalLabel" style="font-size:11px; color:var(--slate);"></span>
+            </div>
+            <div id="mainWishesFeed" class="wishes-feed"></div>
+          </div>
+        </section>
+
+        <section id="sec-qrcode" class="ticket-card" style="margin-bottom:16px; border:2px solid var(--navy);">
+          <div style="background:var(--navy); color:var(--gold); margin:-20px -18px 14px; padding:10px 18px; border-radius:14px 14px 0 0; display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:10px; font-weight:700;">
+            <span>BOARDING QR PASS</span><span>PRIORITY GATE</span>
+          </div>
+          <div id="qrPassGuestName" style="font-family:var(--font-serif); font-size:20px; font-weight:700; margin-bottom:10px;"></div>
+          <div id="guestQrCodeContainer" style="display:inline-block; padding:12px; background:#fff; border:1px solid var(--border); border-radius:8px;"></div>
+          <div id="qrPassCategoryBadge" style="margin-top:8px;"></div>
+          <div id="qrPassCheckinStatus" style="margin-top:4px; font-size:11.5px; color:var(--slate);"></div>
+          <div class="barcode-strip"></div>
+        </section>
+      </div>
+
+      <section id="sec-closing" class="fc-flight-header" style="padding:32px 22px;">
+        <p id="mainClosingText" style="font-size:12.5px; color:var(--ice); line-height:1.65; margin-bottom:12px;"></p>
+        <div class="passport-emblem">THANK YOU FOR FLYING WITH US</div>
+        <h3 id="mainClosingCouple" class="vows-couple" style="font-size:28px; margin-top:6px;"></h3>
       </section>
-
-      <section id="sec-wishes" class="sec-fc"><div class="boarding-eyebrow" style="color:var(--navy);">GUESTBOOK</div><h3 class="sec-title">Buku Ucapan</h3><p id="wishesTotalLabel" class="sec-desc"></p><div id="mainWishesFeed" class="wishes-feed"></div></section>
-
-      <section id="sec-qrcode" class="sec-fc" style="background:var(--ice);">
-        <div class="boarding-eyebrow" style="color:var(--navy);">BOARDING GATE QR</div><h3 class="sec-title">First Class Pass</h3>
-        <div class="boarding-pass-card" style="border-color:var(--navy);">
-          <div id="qrPassGuestName" style="font-family:var(--font-serif); font-size:20px; font-weight:700; margin-bottom:12px;"></div>
-          <div id="guestQrCodeContainer" style="display:inline-block; padding:12px; background:#FFF; border:1px solid var(--border); border-radius:8px;"></div>
-          <div id="qrPassCategoryBadge" style="margin-top:10px;"></div>
-          <div id="qrPassCheckinStatus" style="margin-top:6px; font-size:12px; color:var(--slate);"></div>
-        </div>
-      </section>
-
-      <section id="sec-closing" class="sec-fc navy"><p id="mainClosingText" class="sec-desc" style="margin-bottom:14px;"></p><h3 id="mainClosingCouple" class="vows-couple" style="font-size:30px;"></h3></section>
     </main>
 
     <div id="galleryLightbox" class="lightbox-overlay" onclick="closeGalleryLightbox()"><img id="lightboxImgEl" class="lightbox-Overlay-img" src="" alt="Preview"><div id="lightboxCaptionEl" style="color:#FFF; margin-top:10px;"></div></div>
     <audio id="bgMusicAudio" loop preload="none"></audio>
     <button type="button" id="floatingMusicBtn" class="floating-music-btn" onclick="toggleBackgroundMusic()"><i data-lucide="music" style="width:18px;height:18px;"></i></button>
-    <nav id="bottomTouchNav" class="bottom-touch-nav">
-      <a href="#sec-couple" class="touch-nav-link"><i data-lucide="heart" style="width:16px;height:16px;"></i><span>Couple</span></a>
-      <a href="#sec-event-info" class="touch-nav-link"><i data-lucide="plane" style="width:16px;height:16px;"></i><span>Flight</span></a>
-      <a href="#sec-gallery" class="touch-nav-link"><i data-lucide="image" style="width:16px;height:16px;"></i><span>Gallery</span></a>
-      <a href="#sec-rsvp" class="touch-nav-link"><i data-lucide="mail-check" style="width:16px;height:16px;"></i><span>RSVP</span></a>
-      <a href="#sec-qrcode" class="touch-nav-link"><i data-lucide="qr-code" style="width:16px;height:16px;"></i><span>Pass</span></a>
-    </nav>
+    <nav id="bottomTouchNav" class="bottom-touch-nav"><a href="#sec-qrcode"></a></nav>
   </div>
   <script>window.__INITIAL_INVITATION_TOKEN__ = "<?= initialToken ?>";</script>
   <?!= include('ScriptsGuest'); ?>

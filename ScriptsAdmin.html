@@ -1855,6 +1855,176 @@
       return;
     }
 
+    if (themeId === 'first_class_vows') {
+      screen.innerHTML = `
+        <div style="background:#e4e9f4; color:#1f2c4a; font-family:'Plus Jakarta Sans',sans-serif; width:100%; box-sizing:border-box;">
+          <div id="prev-sec-cover" style="background:linear-gradient(180deg,#1b2744,#10182b); color:#c8a45d; padding:26px 16px; text-align:center;">
+            <div style="font-family:monospace; font-size:9.5px; letter-spacing:0.2em; border:1px solid rgba(200,164,93,0.45); display:inline-block; padding:3px 10px; margin-bottom:6px;">✈ WEDDING PASSPORT</div>
+            <div style="font-family:'Playfair Display',serif; font-size:26px; font-weight:700; color:#fff;">${coupleShort}</div>
+            <img src="${escapeHtml(coverImg)}" style="width:130px; height:130px; border-radius:50%; object-fit:cover; border:2px dashed #c8a45d; margin:10px auto; display:block;">
+            <div style="background:#fff; color:#1f2c4a; border-radius:10px; padding:10px; text-align:left; border-top:4px solid #c8a45d; margin-bottom:10px;">
+              <div style="font-family:monospace; font-size:9px; color:#c8a45d;">PASSENGER • VIP</div>
+              <div style="font-family:'Playfair Display',serif; font-size:17px; font-weight:700;">Budi Santoso</div>
+            </div>
+            <div style="background:#c8a45d; color:#131c33; padding:9px; border-radius:8px; font-family:monospace; font-size:10px; font-weight:700;">TEAR STUB &amp; BOARD FLIGHT</div>
+          </div>
+
+          <div id="prev-sec-hero" style="background:#1f2c4a; color:#fff; padding:20px 16px; text-align:center;">
+            <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.08); border:1px solid rgba(200,164,93,0.35); border-radius:10px; padding:10px 14px; margin-bottom:12px;">
+              <div><div style="font-family:monospace; font-size:15px; color:#c8a45d; font-weight:700;">TWO</div><div style="font-size:8px;">LIVES</div></div>
+              <div style="font-size:14px;">─── ✈ ───</div>
+              <div><div style="font-family:monospace; font-size:15px; color:#c8a45d; font-weight:700;">ONE</div><div style="font-size:8px;">FOREVER</div></div>
+            </div>
+            <img src="${escapeHtml(heroImg)}" style="width:100%; height:160px; object-fit:cover; border-radius:10px; border:1.5px solid #c8a45d;">
+          </div>
+
+          <div style="padding:14px;">
+            <div id="prev-sec-couple" style="background:#fff; border-radius:12px; padding:14px; margin-bottom:12px; border:1px solid #cfd8ea;">
+              <div style="font-family:monospace; font-size:9px; color:#c8a45d; font-weight:700; text-align:left;">FLIGHT CREW</div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
+                <div style="background:#f7f8fc; padding:8px; border-radius:8px; text-align:center;">
+                  <img src="${escapeHtml(groomPhoto)}" style="width:100%; height:95px; object-fit:cover; border-radius:6px;">
+                  <div style="font-family:'Playfair Display',serif; font-size:13px; font-weight:700; margin-top:4px;">${escapeHtml(groomNick)}</div>
+                </div>
+                <div style="background:#f7f8fc; padding:8px; border-radius:8px; text-align:center;">
+                  <img src="${escapeHtml(bridePhoto)}" style="width:100%; height:95px; object-fit:cover; border-radius:6px;">
+                  <div style="font-family:'Playfair Display',serif; font-size:13px; font-weight:700; margin-top:4px;">${escapeHtml(brideNick)}</div>
+                </div>
+              </div>
+            </div>
+
+            <div id="prev-sec-event" style="background:#fff; border-radius:12px; padding:14px; margin-bottom:12px; border:1px solid #cfd8ea; text-align:left;">
+              <div style="font-family:monospace; font-size:9px; color:#c8a45d; font-weight:700;">FLIGHT ITINERARY</div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:8px 0;">
+                <div style="background:#f7f8fc; padding:8px; border-radius:8px;"><div style="font-family:monospace; font-size:8.5px;">GATE 01</div><div style="font-weight:700; font-size:12px;">${escapeHtml(akadTitle)}</div><div style="font-size:10px;">${escapeHtml(akadTime)}</div></div>
+                <div style="background:#f7f8fc; padding:8px; border-radius:8px;"><div style="font-family:monospace; font-size:8.5px;">GATE 02</div><div style="font-weight:700; font-size:12px;">${escapeHtml(recTitle)}</div><div style="font-size:10px;">${escapeHtml(recTime)}</div></div>
+              </div>
+              <div style="font-size:11px; color:#4a4f63;">${escapeHtml(venue)} — ${escapeHtml(address)}</div>
+            </div>
+
+            <div id="prev-sec-gallery" style="background:#fff; border-radius:12px; padding:14px; margin-bottom:12px; border:1px solid #cfd8ea;">
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+                ${gallery.slice(0, 4).map((g) => `<img src="${escapeHtml(g.image_url)}" style="width:100%; height:88px; object-fit:cover; border-radius:6px;">`).join('')}
+              </div>
+            </div>
+
+            <div id="prev-sec-rsvp" style="background:#fff; border:2px solid #1f2c4a; border-radius:12px; padding:12px; text-align:center;">
+              <div style="font-family:monospace; font-size:10px; font-weight:700; color:#1f2c4a;">BOARDING QR PASS</div>
+              <div style="margin:6px auto; font-size:11px;">${qrEnabled ? '[ QR CODE AKTIF ]' : 'QR NONAKTIF'}</div>
+            </div>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    if (themeId === 'cypress_linen') {
+      screen.innerHTML = `
+        <div style="background:#faf6f4; color:#222823; font-family:'Plus Jakarta Sans',sans-serif; width:100%; box-sizing:border-box;">
+          <div id="prev-sec-cover" style="background:#fffdfb; padding:22px 16px; text-align:center; border-bottom:1px solid #e0d6cf;">
+            <div style="border:1px solid #e0d6cf; padding:18px 14px;">
+              <div style="font-size:9.5px; letter-spacing:0.2em; color:#005d17; font-weight:700;">CYPRESS &amp; LINEN</div>
+              <div style="font-family:'Cormorant Garamond',serif; font-size:27px; color:#0b3b17; margin:4px 0;">${coupleShort}</div>
+              <img src="${escapeHtml(coverImg)}" style="width:92px; height:112px; object-fit:cover; border-radius:50px 50px 8px 8px; border:1.5px solid #005d17; margin:8px auto;">
+              <div style="width:68px; height:68px; border-radius:50%; background:#005d17; color:#fff; margin:8px auto 0; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700;">BUKA SEGEL</div>
+            </div>
+          </div>
+
+          <div id="prev-sec-hero" style="background:#fff; padding:20px 14px; display:grid; grid-template-columns:1fr 1.1fr; gap:10px; align-items:center; text-align:left; border-bottom:1px solid #e0d6cf;">
+            <div>
+              <div style="font-size:9px; color:#005d17; font-weight:700;">THE WEDDING</div>
+              <div style="font-family:'Cormorant Garamond',serif; font-size:24px; color:#0b3b17; line-height:1.1; margin:4px 0;">${coupleShort}</div>
+              <div style="font-size:10px; color:#6c726d;">${readableDate}</div>
+            </div>
+            <img src="${escapeHtml(heroImg)}" style="width:100%; height:170px; object-fit:cover; border-radius:90px 90px 0 0; border:1.5px solid #005d17;">
+          </div>
+
+          <div id="prev-sec-couple" style="padding:18px 14px;">
+            <div style="display:flex; align-items:center; gap:10px; background:#fff; border:1px solid #e0d6cf; border-radius:99px 12px 12px 99px; padding:8px; margin-bottom:8px; text-align:left;">
+              <img src="${escapeHtml(groomPhoto)}" style="width:56px; height:56px; border-radius:50%; object-fit:cover; border:1.5px solid #005d17;">
+              <div><div style="font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:700;">${escapeHtml(groomName)}</div><div style="font-size:10px; color:#6c726d;">${escapeHtml(groomParents)}</div></div>
+            </div>
+            <div style="display:flex; flex-direction:row-reverse; align-items:center; gap:10px; background:#fff; border:1px solid #e0d6cf; border-radius:12px 99px 99px 12px; padding:8px; text-align:right;">
+              <img src="${escapeHtml(bridePhoto)}" style="width:56px; height:56px; border-radius:50%; object-fit:cover; border:1.5px solid #005d17;">
+              <div><div style="font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:700;">${escapeHtml(brideName)}</div><div style="font-size:10px; color:#6c726d;">${escapeHtml(brideParents)}</div></div>
+            </div>
+          </div>
+
+          <div id="prev-sec-event" style="background:#0b3b17; color:#fff; padding:18px 14px; text-align:center;">
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:4px; background:rgba(255,255,255,0.12); padding:4px; border-radius:99px; margin-bottom:10px; font-size:10px; font-weight:700;">
+              <div style="background:#fff; color:#0b3b17; border-radius:99px; padding:5px;">1. Akad</div>
+              <div style="padding:5px;">2. Resepsi</div>
+              <div style="padding:5px;">3. Lokasi</div>
+            </div>
+            <div style="background:#fff; color:#222823; border-radius:12px; padding:14px;">
+              <div style="font-family:'Cormorant Garamond',serif; font-size:19px; color:#005d17;">${escapeHtml(akadTitle)}</div>
+              <div style="font-size:11.5px; font-weight:700; margin:4px 0;">${readableDate}</div>
+              <div style="font-size:11px; color:#6c726d;">${escapeHtml(akadTime)} • ${escapeHtml(venue)}</div>
+            </div>
+          </div>
+
+          <div id="prev-sec-gallery" style="background:#fff; padding:18px 14px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+              ${gallery.slice(0, 4).map((g, i) => `<img src="${escapeHtml(g.image_url)}" style="width:100%; height:110px; object-fit:cover; border-radius:${i % 2 === 0 ? '60px 60px 8px 8px' : '8px 8px 60px 60px'};">`).join('')}
+            </div>
+          </div>
+          <div id="prev-sec-rsvp" style="padding:16px; text-align:center; font-size:11px;">RSVP &amp; QR (${qrEnabled ? 'Aktif' : 'Off'})</div>
+        </div>
+      `;
+      return;
+    }
+
+    if (themeId === 'traditional_java') {
+      screen.innerHTML = `
+        <div style="background:#d8cfc9; color:#3b1f0d; font-family:'Plus Jakarta Sans',sans-serif; width:100%; box-sizing:border-box; text-align:center;">
+          <div id="prev-sec-cover" style="min-height:360px; background:linear-gradient(180deg,rgba(216,207,201,0.2),#d8cfc9 88%),url('${escapeHtml(coverImg)}') center/cover; display:flex; flex-direction:column; justify-content:space-between; padding:24px 16px;">
+            <div style="font-family:'Cinzel',serif; font-size:10px; letter-spacing:0.22em;">PAWIWAHAN AGUNG</div>
+            <div>
+              <div style="font-family:'Cinzel',serif; font-size:25px; font-weight:700;">${coupleShort}</div>
+              <div style="background:rgba(236,230,225,0.92); border-radius:10px; padding:10px; margin:8px 0;">
+                <div style="font-size:10px; color:#5a574e;">KATUR DHUMATENG</div>
+                <div style="font-family:'Cinzel',serif; font-size:16px; font-weight:700;">Budi Santoso</div>
+              </div>
+              <div style="background:#3b1f0d; color:#ece6e1; border:1px solid #b88e44; border-radius:99px; padding:9px; font-size:10.5px; font-weight:700;">BUKA UNDANGAN</div>
+            </div>
+          </div>
+
+          <div id="prev-sec-hero" style="padding:18px 14px;">
+            <img src="${escapeHtml(heroImg)}" style="width:100%; height:175px; object-fit:cover; border-radius:80px 80px 8px 8px; border:2px solid #3b1f0d;">
+          </div>
+
+          <div id="prev-sec-couple" style="background:#3b1f0d; color:#ece6e1; padding:18px 14px;">
+            <div style="display:grid; grid-template-columns:72px 1fr; gap:10px; align-items:center; text-align:left; border:1px solid rgba(184,142,68,0.4); border-radius:10px; padding:10px; margin-bottom:8px;">
+              <img src="${escapeHtml(groomPhoto)}" style="width:70px; height:70px; border-radius:50%; object-fit:cover; border:2px solid #b88e44;">
+              <div><div style="font-family:'Cinzel',serif; font-size:14px; font-weight:700;">${escapeHtml(groomName)}</div><div style="font-size:10px; color:#d8cfc9;">${escapeHtml(groomParents)}</div></div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 72px; gap:10px; align-items:center; text-align:right; border:1px solid rgba(184,142,68,0.4); border-radius:10px; padding:10px;">
+              <div><div style="font-family:'Cinzel',serif; font-size:14px; font-weight:700;">${escapeHtml(brideName)}</div><div style="font-size:10px; color:#d8cfc9;">${escapeHtml(brideParents)}</div></div>
+              <img src="${escapeHtml(bridePhoto)}" style="width:70px; height:70px; border-radius:50%; object-fit:cover; border:2px solid #b88e44;">
+            </div>
+          </div>
+
+          <div id="prev-sec-gallery" style="padding:18px 14px;">
+            <div style="font-family:'Cinzel',serif; font-size:16px; font-weight:700; margin-bottom:8px;">Sync Slider Gallery</div>
+            <img src="${escapeHtml(gallery[0] ? gallery[0].image_url : coverImg)}" style="width:100%; height:160px; object-fit:cover; border-radius:10px; border:2px solid #3b1f0d; margin-bottom:6px;">
+            <div style="display:flex; gap:6px; justify-content:center;">
+              ${gallery.slice(0, 4).map((g) => `<img src="${escapeHtml(g.image_url)}" style="width:54px; height:54px; object-fit:cover; border-radius:6px; border:1px solid #3b1f0d;">`).join('')}
+            </div>
+          </div>
+
+          <div id="prev-sec-event" style="padding:16px 14px;">
+            <div style="background:#3b1f0d; color:#ece6e1; border-radius:90px 90px 10px 10px; border:1.5px solid #b88e44; padding:22px 12px 16px;">
+              <div style="font-family:'Cinzel',serif; font-size:15px;">Save The Date</div>
+              <div style="font-size:11px; color:#d8cfc9; margin-top:4px;">${readableDate} • ${escapeHtml(venue)}</div>
+            </div>
+          </div>
+
+          <div id="prev-sec-rsvp" style="background:#3b1f0d; color:#ece6e1; padding:16px; font-size:11px;">RSVP &amp; QR (${qrEnabled ? 'Aktif' : 'Off'}) • ${coupleShort}</div>
+        </div>
+      `;
+      return;
+    }
+
     if (themeId === 'thelove_cinematic') {
       screen.innerHTML = `
         <div style="background:#1B1B18; color:#FFFFFF; font-family:'Inter',sans-serif; text-align:center; width:100%; max-width:100%; overflow-x:hidden; box-sizing:border-box; margin:0 auto;">

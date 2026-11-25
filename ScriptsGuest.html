@@ -351,6 +351,15 @@
           onclick="openGalleryLightbox('${escapeGuestHtml(img.image_url)}', '${escapeGuestHtml(img.caption)}')"
         >
       `).join('');
+
+      if (activeTheme === 'traditional_java') {
+        initJavaSyncGallery(galleryList, galleryGrid);
+      }
+    }
+
+    const bohoLiveImg = document.getElementById('bohoLivePhoto');
+    if (bohoLiveImg && galleryList.length) {
+      bohoLiveImg.src = galleryList[0].image_url;
     }
 
     if (activeTheme === 'thelove_cinematic') {
@@ -506,6 +515,31 @@
     } else {
       showGuestToast('info', val);
     }
+  }
+
+  function initJavaSyncGallery(galleryList, fallbackGridEl) {
+    const syncWrap = document.getElementById('javaSyncGallery');
+    const mainImg = document.getElementById('javaSyncMainImg');
+    const strip = document.getElementById('javaSyncThumbStrip');
+    if (!syncWrap || !mainImg || !strip || !galleryList.length) return;
+    syncWrap.style.display = 'block';
+    if (fallbackGridEl) fallbackGridEl.style.display = 'none';
+    mainImg.src = galleryList[0].image_url;
+    strip.innerHTML = galleryList.map((g, i) => `
+      <img
+        src="${escapeGuestHtml(g.image_url)}"
+        alt="${escapeGuestHtml(g.caption)}"
+        class="java-sync-thumb ${i === 0 ? 'active' : ''}"
+        onclick="selectJavaSyncPhoto(this, '${escapeGuestHtml(g.image_url)}')"
+      >
+    `).join('');
+  }
+
+  function selectJavaSyncPhoto(thumbEl, url) {
+    const mainImg = document.getElementById('javaSyncMainImg');
+    if (mainImg) mainImg.src = url;
+    document.querySelectorAll('.java-sync-thumb').forEach((el) => el.classList.remove('active'));
+    if (thumbEl) thumbEl.classList.add('active');
   }
 
   function startTheloveHeroSlideshow(slideUrls) {
