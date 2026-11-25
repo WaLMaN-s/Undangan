@@ -81,22 +81,11 @@
     }
 
     /* ========================================================================
-       B. TOP EDITORIAL NAV HEADER (#header from dark-boho)
+       B. MAIN INVITATION SECTIONS
        ======================================================================== */
-    .main-invitation { display: none; padding-bottom: 90px; width: 100%; overflow-x: hidden; }
+    .main-invitation { display: none; padding-bottom: 0; width: 100%; overflow-x: hidden; }
     .main-invitation.visible { display: block; animation: fadeIn 0.7s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-    .boho-top-header {
-      position: sticky; top: 0; z-index: 80;
-      display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 6px;
-      background: rgba(29, 29, 27, 0.94); backdrop-filter: blur(8px);
-      border-bottom: 1px solid rgba(206, 187, 162, 0.2);
-      padding: 10px 14px;
-    }
-    .boho-nav-side { display: flex; align-items: center; justify-content: space-around; gap: 6px; }
-    .boho-nav-link { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--boho-sand); text-decoration: none; font-weight: 500; }
-    .boho-nav-mono { font-family: var(--font-title); font-size: 19px; color: var(--boho-sand); font-weight: 600; letter-spacing: 0.08em; padding: 0 10px; border-left: 1px solid rgba(206,187,162,0.28); border-right: 1px solid rgba(206,187,162,0.28); }
 
     /* Sections */
     .sec-boho-dark { width: 100%; background-color: var(--boho-dark); color: var(--boho-white); padding: 40px 20px; text-align: center; position: relative; border-bottom: 1px solid rgba(206, 187, 162, 0.12); }
@@ -229,19 +218,6 @@
 
     <!-- B. MAIN INVITATION (OUR-WEDDING.LINK/DESIGN/DARK-BOHO ANATOMY) -->
     <main id="mainInvitationPage" class="main-invitation">
-      <!-- Top Editorial Nav (#header) -->
-      <header class="boho-top-header">
-        <div class="boho-nav-side">
-          <a href="#sec-couple" class="boho-nav-link">Couple</a>
-          <a href="#sec-gallery" class="boho-nav-link">Galleries</a>
-        </div>
-        <div id="bohoNavMonogram" class="boho-nav-mono">R / J</div>
-        <div class="boho-nav-side">
-          <a href="#sec-event-info" class="boho-nav-link">Location</a>
-          <a href="#sec-rsvp" class="boho-nav-link">Wishes</a>
-        </div>
-      </header>
-
       <!-- 1. Save The Date + Boho Arch + Countdown (#1d1d1b) -->
       <section id="sec-hero" class="sec-boho-dark">
         <div class="boho-eyebrow">SAVE THE DATE</div>
