@@ -48,6 +48,10 @@
       title: 'Dashboard Overview',
       subtitle: 'Ringkasan statistik tamu, pengiriman undangan, dan konfirmasi kehadiran.'
     },
+    clients: {
+      title: 'Kelola Klien & Acara',
+      subtitle: 'Tambah klien undangan baru, beralih antar klien aktif, atau hapus klien.'
+    },
     guests: {
       title: 'Manajemen Data Tamu',
       subtitle: 'Kelola database tamu, validasi nomor WhatsApp, import CSV/Excel, dan link personal.'
@@ -331,6 +335,7 @@
   function refreshCurrentView() {
     const v = ADMIN_STATE.currentView;
     if (v === 'overview') loadOverviewDashboard();
+    else if (v === 'clients') loadInvitationEditorAndSettings();
     else if (v === 'guests') loadGuestsTable(ADMIN_STATE.guestsPage);
     else if (v === 'editor') loadInvitationEditorAndSettings();
     else if (v === 'whatsapp') {
@@ -2068,14 +2073,89 @@
   }
 
   function renderClientSwitcherBar(clients, activeId) {
-    const sel = document.getElementById('activeClientSelector');
-    if (!sel) return;
-    if (!Array.isArray(clients) || !clients.length) return;
-    sel.innerHTML = clients.map((c) => {
-      const label = `${c.groom_name || 'Pria'} & ${c.bride_name || 'Wanita'} (${c.wedding_date || '-'})`;
-      const selected = String(c.wedding_id) === String(activeId) ? 'selected' : '';
-      return `<option value="${escapeHtml(c.wedding_id)}" ${selected}>${escapeHtml(label)}</option>`;
+    ADMIN_STATE.clientsList = Array.isArray(clients) ? clients : [];
+    const activeClient = ADMIN_STATE.clientsList.find((c) => String(c.wedding_id) === String(activeId)) || ADMIN_STATE.clientsList[0];
+    if (activeClient) {
+      const coupleLabel = `${activeClient.groom_name || 'Pria'} & ${activeClient.bride_name || 'Wanita'}`;
+      const topNameEl = document.getElementById('topbarActiveClientName');
+      const sbNameEl = document.getElementById('sidebarCoupleNames');
+      const sbDateEl = document.getElementById('sidebarWeddingDate');
+      if (topNameEl) topNameEl.textContent = coupleLabel;
+      if (sbNameEl) sbNameEl.textContent = coupleLabel;
+      if (sbDateEl) sbDateEl.textContent = formatLongWeddingDate(activeClient.wedding_date || '');
+    }
+
+    const grid = document.getElementById('clientsCardsGrid');
+    if (!grid) return;
+    if (!ADMIN_STATE.clientsList.length) {
+      grid.innerHTML = '<div class="empty-state">Belum ada klien terdaftar. Klik "+ Tambah Klien Baru".</div>';
+      return;
+    }
+
+    grid.innerHTML = ADMIN_STATE.clientsList.map((c) => {
+      const isActive = String(c.wedding_id) === String(activeId);
+      const coupleLabel = `${c.groom_name || 'Pria'} & ${c.bride_name || 'Wanita'}`;
+      const themeLabel = THEME_LABELS[c.invitation_theme] || c.invitation_theme || 'elegant_floral';
+      return `
+        <div style="border:2px solid ${isActive ? 'var(--primary)' : 'var(--border)'}; background:${isActive ? 'var(--secondary)' : 'var(--bg-surface)'}; border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:10px; box-shadow:var(--shadow-sm);">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+            <span style="font-family:monospace; font-size:11px; color:var(--text-secondary);">${escapeHtml(c.wedding_id)}</span>
+            ${isActive ? '<span class="badge badge-gold">Klien Aktif</span>' : '<span class="badge badge-neutral">Tersimpan</span>'}
+          </div>
+          <div>
+            <div style="font-family:var(--font-heading); font-size:19px; font-weight:700; color:var(--text-primary);">${escapeHtml(coupleLabel)}</div>
+            <div style="font-size:12.5px; color:var(--text-secondary); margin-top:3px;">Tanggal: ${escapeHtml(formatLongWeddingDate(c.wedding_date || ''))}</div>
+            <div style="font-size:12px; color:var(--primary-hover); font-weight:600; margin-top:4px;">Tema: ${escapeHtml(themeLabel)}</div>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:auto; padding-top:8px; border-top:1px solid var(--border);">
+            ${isActive
+              ? `<button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="switchAdminView('editor')">Edit Tema &amp; Konten</button>`
+              : `<button type="button" class="btn btn-primary btn-sm" style="flex:1;" onclick="handleSwitchClient('${escapeHtml(c.wedding_id)}')">Pilih Klien Ini</button>`
+            }
+            <button type="button" class="btn btn-outline btn-sm" onclick="handleSwitchAndGo('${escapeHtml(c.wedding_id)}', 'guests')">Tamu</button>
+            ${ADMIN_STATE.clientsList.length > 1
+              ? `<button type="button" class="btn btn-danger btn-sm" onclick="handleDeleteClient('${escapeHtml(c.wedding_id)}', '${escapeHtml(coupleLabel)}')" title="Hapus Klien">Hapus</button>`
+              : ''
+            }
+          </div>
+        </div>
+      `;
     }).join('');
+    refreshIcons();
+  }
+
+  async function handleSwitchAndGo(weddingId, targetView) {
+    await handleSwitchClient(weddingId);
+    switchAdminView(targetView);
+  }
+
+  async function handleDeleteClient(weddingId, coupleLabel) {
+    const confirm = await Swal.fire({
+      title: `Hapus Klien "${coupleLabel}"?`,
+      text: 'Data acara, daftar tamu, dan galeri klien ini akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#D95C5C',
+      confirmButtonText: 'Ya, Hapus Permanen',
+      cancelButtonText: 'Batal'
+    });
+    if (!confirm.isConfirmed) return;
+
+    showToast('info', 'Menghapus data klien...');
+    try {
+      const res = await callBackend('deleteWeddingClient', { wedding_id: weddingId });
+      if (!res || !res.success) {
+        Swal.fire('Gagal', (res && res.message) || 'Gagal menghapus klien.', 'error');
+        return;
+      }
+      await Promise.all([
+        loadOverviewDashboard(),
+        loadInvitationEditorAndSettings()
+      ]);
+      showToast('success', res.message || 'Klien berhasil dihapus.');
+    } catch (err) {
+      Swal.fire('Error', err.message, 'error');
+    }
   }
 
   async function handleSwitchClient(weddingId) {

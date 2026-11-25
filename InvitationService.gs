@@ -304,6 +304,15 @@ function deleteWeddingClient(sessionToken, weddingId) {
       return errorResponse('Minimal harus ada 1 klien undangan yang tersisa.', 'CLIENT_MIN_ONE');
     }
     deleteRecordsByIds(APP_CONFIG.SHEETS.WEDDINGS.name, 'wedding_id', [targetId]);
+    var guestIdsToRemove = getSheetRecords(APP_CONFIG.SHEETS.GUESTS.name)
+      .filter(function (g) {
+        var gWid = (g.wedding_id && String(g.wedding_id).trim()) || 'WED-001';
+        return gWid === targetId;
+      })
+      .map(function (g) { return g.guest_id; });
+    if (guestIdsToRemove.length > 0) {
+      deleteRecordsByIds(APP_CONFIG.SHEETS.GUESTS.name, 'guest_id', guestIdsToRemove);
+    }
     var remaining = getSheetRecords(APP_CONFIG.SHEETS.WEDDINGS.name);
     var nextId = remaining[0].wedding_id;
     saveSettingsMap({ active_wedding_id: nextId });

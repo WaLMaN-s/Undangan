@@ -83,6 +83,10 @@
           <i data-lucide="layout-dashboard" class="nav-icon"></i>
           <span>Dashboard Overview</span>
         </button>
+        <button type="button" class="nav-item" data-view="clients" onclick="switchAdminView('clients')">
+          <i data-lucide="briefcase" class="nav-icon"></i>
+          <span>Kelola Klien / Acara</span>
+        </button>
         <button type="button" class="nav-item" data-view="guests" onclick="switchAdminView('guests')">
           <i data-lucide="users" class="nav-icon"></i>
           <span>Manajemen Tamu</span>
@@ -120,8 +124,11 @@
       </nav>
 
       <div class="sidebar-footer">
-        <div class="couple-mini-card">
-          <div class="label">Acara Pernikahan</div>
+        <div class="couple-mini-card" style="cursor:pointer;" onclick="switchAdminView('clients')" title="Klik untuk ganti atau tambah klien">
+          <div class="label" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Klien Aktif</span>
+            <span style="color:var(--primary); font-weight:700; font-size:10.5px;">Ganti ▾</span>
+          </div>
           <div id="sidebarCoupleNames" class="names">Romeo & Juliet</div>
           <div id="sidebarWeddingDate" style="font-size:12px; color:var(--text-secondary); margin-top:2px;">12 Desember 2026</div>
         </div>
@@ -147,15 +154,10 @@
         </div>
 
         <div class="topbar-right">
-          <div style="display:flex; align-items:center; gap:6px; background:var(--secondary); border:1px solid var(--border); padding:4px 8px; border-radius:10px;">
-            <span style="font-size:11px; font-weight:700; color:var(--primary-hover);">KLIEN:</span>
-            <select id="activeClientSelector" class="form-control" style="width:auto; min-width:165px; padding:4px 8px; font-size:12px; font-weight:600; border:none; background:transparent;" onchange="handleSwitchClient(this.value)">
-              <option value="WED-001">Romeo &amp; Juliet</option>
-            </select>
-            <button type="button" class="btn btn-primary btn-sm" style="padding:4px 10px; font-size:11.5px;" onclick="openNewClientModal()" title="Tambah Klien / Acara Baru">
-              <span>+ Klien Baru</span>
-            </button>
-          </div>
+          <button type="button" class="btn btn-outline btn-sm" onclick="switchAdminView('clients')" title="Kelola atau Ganti Klien">
+            <i data-lucide="briefcase" style="width:14px;height:14px; color:var(--primary);"></i>
+            <span id="topbarActiveClientName">Romeo &amp; Juliet</span>
+          </button>
           <button type="button" class="btn btn-secondary btn-sm" onclick="refreshCurrentView()" title="Segarkan Data">
             <i data-lucide="refresh-cw" style="width:15px;height:15px;"></i>
             <span>Refresh</span>
@@ -352,6 +354,29 @@
         </section>
 
         <!-- ==================================================================
+             B2. KELOLA KLIEN / PROYEK UNDANGAN (MULTI-KLIEN)
+             ================================================================== -->
+        <section id="view-clients" class="view-section">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Daftar Klien &amp; Proyek Undangan</div>
+                <div class="card-subtitle">Kelola banyak klien acara secara terpisah, tambah klien baru, beralih klien aktif, atau hapus klien</div>
+              </div>
+              <button type="button" class="btn btn-primary" onclick="openNewClientModal()">
+                <i data-lucide="plus-circle" style="width:16px;height:16px;"></i>
+                <span>+ Tambah Klien Baru</span>
+              </button>
+            </div>
+            <div class="card-body">
+              <div id="clientsCardsGrid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(290px, 1fr)); gap:16px;">
+                <div class="empty-state">Memuat daftar klien...</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
              C. MANAJEMEN DATA TAMU VIEW
              ================================================================== -->
         <section id="view-guests" class="view-section">
@@ -458,6 +483,7 @@
             </div>
           </div>
         </section>
+
 
         <!-- ==================================================================
              D. INVITATION EDITOR VIEW (DENGAN LIVE MOBILE PREVIEW)
@@ -1064,6 +1090,7 @@
           </div>
         </section>
 
+
         <!-- ==================================================================
              E. WHATSAPP MESSAGE MANAGEMENT VIEW
              ================================================================== -->
@@ -1227,6 +1254,7 @@
           </div>
         </section>
 
+
         <!-- ==================================================================
              F. RSVP MANAGEMENT VIEW
              ================================================================== -->
@@ -1289,6 +1317,7 @@
             </div>
           </div>
         </section>
+
 
         <!-- ==================================================================
              G. QR CHECK-IN VIEW
@@ -1399,6 +1428,7 @@
           </div>
         </section>
 
+
         <!-- ==================================================================
              H. REPORTS VIEW (LAPORAN LENGKAP, EXPORT CSV & CETAK)
              ================================================================== -->
@@ -1482,6 +1512,7 @@
             </div>
           </div>
         </section>
+
 
         <!-- ==================================================================
              I. SETTINGS VIEW
@@ -1641,6 +1672,7 @@
             </div>
           </div>
         </section>
+
 
       </main>
     </div>
